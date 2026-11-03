@@ -23,24 +23,23 @@
       position: fixed; top: 0; left: 0; inset: 0;
       width: 100%; height: 100%; object-fit: cover; z-index: 1; background: #000;
     }
-    /* Three.js 3D AR 레이어 — [수정] 드래그 조준을 받도록 포인터 이벤트 허용 */
+    /* Three.js 3D AR 레이어 — 드래그 조준·포켓볼 스와이프를 받음 */
     #ar-canvas {
       position: fixed; top: 0; left: 0; inset: 0;
       width: 100%; height: 100%; z-index: 2;
-      touch-action: none; cursor: grab; display: block;
+      touch-action: none; display: block;
     }
-    #ar-canvas:active { cursor: grabbing; }
     /* 피격 시 화면 점멸 효과 */
     #damage-flash {
       position: fixed; top: 0; left: 0; inset: 0; width: 100%; height: 100%; z-index: 3;
       background: rgba(255, 0, 0, 0.45);
       opacity: 0; pointer-events: none; transition: opacity 0.15s ease;
     }
-    /* UI 레이어 — [수정] 노치·홈 인디케이터(safe area) 영역 피하기 */
+    /* UI 레이어 — 노치·홈 인디케이터(safe area) 영역 피하기 */
     #ui-layer {
       position: fixed; top: 0; left: 0; inset: 0; width: 100%; height: 100%; z-index: 4;
       display: flex; flex-direction: column; justify-content: space-between;
-      padding-block: calc(12px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-bottom, 0px));
+      padding-block: calc(12px + env(safe-area-inset-top, 0px)) calc(10px + env(safe-area-inset-bottom, 0px));
       padding-left: max(16px, env(safe-area-inset-left, 0px));
       padding-right: max(16px, env(safe-area-inset-right, 0px));
       pointer-events: none;
@@ -72,7 +71,7 @@
     #status-log {
       font-size: 13px; line-height: 1.45; color: #cbd5e1; min-height: 38px;
     }
-    /* [추가] 카메라 상태 · 조준 도구 줄 */
+    /* 카메라 상태 · 조준 도구 줄 */
     .hud-tools {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -94,12 +93,14 @@
     }
     .pill:active { transform: scale(0.96); }
     .pill.pill-on { background: #0284c7; border-color: #38bdf8; color: #fff; }
-    /* 중앙 조준점 */
+    .pill.attention { border-color: #38bdf8; animation: pill-pulse 1.3s ease-in-out infinite; }
+    @keyframes pill-pulse { 50% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.35); } }
+    /* 중앙 조준점 (⚡ 공격용) */
     #reticle {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 56px; height: 56px;
-      border: 2px dashed rgba(255, 255, 255, 0.75);
+      width: 48px; height: 48px;
+      border: 2px dashed rgba(255, 255, 255, 0.6);
       border-radius: 50%; pointer-events: none;
       display: flex; align-items: center; justify-content: center;
     }
@@ -107,7 +108,7 @@
       content: ''; width: 6px; height: 6px;
       background: #ef4444; border-radius: 50%;
     }
-    /* [추가] 화면 밖 포켓몬 방향 표시 화살표 */
+    /* 화면 밖 포켓몬 방향 표시 화살표 */
     #target-indicator {
       position: absolute; left: 0; top: 0;
       width: 44px; height: 44px; margin: -22px 0 0 -22px;
@@ -121,29 +122,56 @@
       clip-path: polygon(10% 0, 100% 50%, 10% 100%);
       transform: translateX(2px);
     }
-    /* 하단 조작 버튼 */
-    .bottom-controls {
-      display: grid; grid-template-columns: repeat(2, 1fr);
-      gap: 10px; max-width: 400px; width: 100%; margin: 0 auto;
-      pointer-events: auto;
+    /* [추가] Nice! / Great! / 잡았다! 같은 짧은 알림 */
+    #toast {
+      position: absolute; left: 50%; top: 40%;
+      transform: translate(-50%, -40%); opacity: 0;
+      font-size: 30px; font-weight: 800; color: #fff; letter-spacing: 0.02em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+      pointer-events: none; transition: opacity 0.2s, transform 0.2s;
     }
+    #toast.show { opacity: 1; transform: translate(-50%, -70%); }
+    /* [수정] 하단 조작부: 가운데는 포켓볼 자리(스와이프로 던짐), 양옆에 동그란 버튼 */
+    .bottom-controls { /* 가운데 칸은 항상 화면 정가운데 (포켓볼 자리) */
+      display: grid; grid-template-columns: 1fr 112px 1fr; align-items: end;
+      max-width: 440px; width: 100%; margin: 0 auto; pointer-events: none;
+    }
+    .ctrl-side { display: flex; gap: 8px; align-items: flex-end; justify-content: flex-start; pointer-events: none; }
+    .ctrl-side.right { justify-content: flex-end; }
+    .ctrl-side > * { pointer-events: auto; } /* 버튼 사이 빈 곳은 아래 게임 화면(조준)으로 통과 */
+    .round-btn {
+      width: 56px; height: 56px; border-radius: 50%; border: none; color: #fff; cursor: pointer; flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      font: inherit; font-size: 22px; line-height: 1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      touch-action: manipulation; transition: transform 0.1s, opacity 0.2s;
+    }
+    .round-btn span { font-size: 11px; font-weight: 700; }
+    .round-btn:active { transform: scale(0.94); }
+    .round-btn:disabled { opacity: 0.45; cursor: default; }
+    .round-btn:disabled:active { transform: none; }
+    .ball-slot { position: relative; height: 116px; pointer-events: none; } /* 3D 포켓볼이 이 칸 가운데에 그려짐 */
+    #throw-hint {
+      position: absolute; left: 50%; bottom: calc(100% + 2px); transform: translateX(-50%);
+      white-space: nowrap; font-size: 12px; font-weight: 700; color: #fff;
+      background: rgba(15, 23, 42, 0.6); padding: 3px 10px; border-radius: 999px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+    @media (max-width: 359px) { /* 아주 좁은 화면: 왼쪽 버튼 두 개를 세로로 */
+      .ctrl-side:not(.right) { flex-direction: column-reverse; align-items: flex-start; }
+    }
+    /* 오류 안내의 새로고침 버튼 */
     .btn {
       border: none; border-radius: 14px; padding: 14px 12px;
-      font: inherit; font-size: 15px; font-weight: 700; color: #fff;
-      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-      transition: transform 0.1s, opacity 0.2s;
-      touch-action: manipulation; /* [수정] iOS 더블탭 확대 방지 */
+      font: inherit; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); touch-action: manipulation;
     }
     .btn:active { transform: scale(0.95); }
-    .btn:disabled { opacity: 0.45; cursor: default; }
-    .btn:disabled:active { transform: none; }
-    .btn:focus-visible, .pill:focus-visible, .chip:focus-visible, .sbtn:focus-visible { outline: 2px solid #fde047; outline-offset: 2px; }
-    .btn-ball { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .btn:focus-visible, .pill:focus-visible, .chip:focus-visible, .sbtn:focus-visible, .round-btn:focus-visible { outline: 2px solid #fde047; outline-offset: 2px; }
     .btn-atk { background: linear-gradient(135deg, #eab308, #ca8a04); }
-    .btn-cover { background: linear-gradient(135deg, #06b6d4, #0891b2); }
     .btn-change { background: linear-gradient(135deg, #6366f1, #4f46e5); }
-    .btn-card { grid-column: 1 / -1; padding: 12px; background: linear-gradient(135deg, #ec4899, #db2777); }
+    .btn-card { background: linear-gradient(135deg, #ec4899, #db2777); }
 
     /* [추가] 카드 스캔 화면 */
     #photo-view {
@@ -216,7 +244,7 @@
     .field input[type="range"] { width: 100%; accent-color: #ec4899; }
     .field-row { display: flex; gap: 10px; }
 
-    /* [추가] 실행 불가 오류 안내 */
+    /* 실행 불가 오류 안내 */
     #fatal {
       position: fixed; top: 0; left: 0; inset: 0; width: 100%; height: 100%; z-index: 10;
       display: flex; align-items: center; justify-content: center;
@@ -233,11 +261,10 @@
     }
     .fatal-card strong { font-size: 17px; line-height: 1.35; }
     .fatal-card p { margin: 0; color: #cbd5e1; font-size: 14px; line-height: 1.55; }
-    /* [추가] 가로로 눕힌 휴대폰: HUD는 왼쪽 위, 버튼은 오른쪽 아래로 비켜서 조준점을 가리지 않게 */
+    /* 가로로 눕힌 휴대폰: HUD는 왼쪽 위로 비켜서 조준점을 가리지 않게 */
     @media (orientation: landscape) and (max-height: 500px) {
       .top-hud { margin: 0; max-width: 320px; padding: 10px 14px; }
-      .bottom-controls { margin: 0 0 0 auto; max-width: 340px; gap: 8px; }
-      .btn { padding: 10px; font-size: 14px; }
+      .ball-slot { height: 100px; }
       #scanner { align-items: flex-end; }
       .scan-panel { margin: 0; max-width: 380px; }
       .scan-top { padding: 10px 12px; }
@@ -245,7 +272,8 @@
       .scan-bottom { max-height: calc(100vh - 140px); overflow-y: auto; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .btn, .pill, .hp-bar-fill, #damage-flash { transition: none; }
+      .pill, .round-btn, .hp-bar-fill, #damage-flash, #toast { transition: none; }
+      .pill.attention { animation: none; }
       .scan-line { animation: none; top: 50%; }
     }
   </style>
@@ -257,7 +285,7 @@
   <!-- 카메라 영상 -->
   <video id="camera-feed" autoplay playsinline muted hidden></video>
   <!-- 3D AR 렌더링 캔버스 -->
-  <canvas id="ar-canvas" aria-label="게임 화면. 드래그해서 조준합니다."></canvas>
+  <canvas id="ar-canvas" aria-label="게임 화면. 아래 포켓볼을 위로 밀어 던지고(키보드는 스페이스), 화면을 끌어 조준합니다."></canvas>
   <!-- 피격 효과 -->
   <div id="damage-flash"></div>
 
@@ -271,7 +299,7 @@
       <div class="hp-bar-bg" role="progressbar" aria-label="포켓몬 체력" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
         <div class="hp-bar-fill" id="hp-fill"></div>
       </div>
-      <div id="status-log" aria-live="polite">화면을 드래그하거나 자이로를 켜서 중앙 조준점을 포켓몬에 맞추고 공격하세요!</div>
+      <div id="status-log" aria-live="polite">카메라가 켜지면 [🧭 자이로 켜기]로 AR을 시작하고, 아래 포켓볼을 위로 밀어 던지세요!</div>
       <div class="hud-tools">
         <button class="chip" id="cam-chip" type="button">📷 카메라 확인 중…</button>
         <span class="hud-tools-right">
@@ -283,13 +311,17 @@
 
     <div id="reticle"></div>
     <div id="target-indicator" hidden aria-hidden="true"></div>
+    <div id="toast" aria-live="polite"></div>
 
     <div class="bottom-controls">
-      <button class="btn btn-ball" id="btn-ball" type="button" disabled>🔴 포켓볼 던지기</button>
-      <button class="btn btn-atk" id="btn-atk" type="button" disabled>⚡ 내 공격 발사</button>
-      <button class="btn btn-cover" id="btn-cover" type="button">🧱 지형 은폐물 설치</button>
-      <button class="btn btn-change" id="btn-change" type="button">🔄 다른 포켓몬 소환</button>
-      <button class="btn btn-card" id="btn-card" type="button">🃏 카드를 비춰 포켓몬 소환</button>
+      <div class="ctrl-side">
+        <button class="round-btn btn-card" id="btn-card" type="button" aria-label="카드를 비춰 포켓몬 소환">🃏<span>카드</span></button>
+        <button class="round-btn btn-change" id="btn-change" type="button" aria-label="다른 포켓몬 소환">🔄<span>교체</span></button>
+      </div>
+      <div class="ball-slot" id="ball-slot"><span id="throw-hint">포켓볼을 위로 휙 밀어서 던지기</span></div>
+      <div class="ctrl-side right">
+        <button class="round-btn btn-atk" id="btn-atk" type="button" aria-label="조준점 방향으로 공격 발사" disabled>⚡<span>공격</span></button>
+      </div>
     </div>
   </div>
 
@@ -345,7 +377,7 @@
     <input id="photo-input" type="file" accept="image/*" hidden>
   </section>
 
-  <!-- [추가] 실행 자체가 불가능할 때 보여주는 안내 -->
+  <!-- 실행 자체가 불가능할 때 보여주는 안내 -->
   <div id="fatal" role="alert" hidden>
     <div class="fatal-card">
       <strong id="fatal-title">실행할 수 없어요</strong>
@@ -400,7 +432,7 @@
   if (!window.AR_BOOT_OK) throw new Error('AR_BOOT_ABORT'); // 여기서 중단 (안내는 위에서 표시)
   document.documentElement.lang = 'ko';
 
-  // 1. 포켓몬 데이터 (PokeAPI 공식 고해상도 스탠딩 이미지 활용)
+  // 1. 포켓몬 데이터 (PokeAPI 그림 활용)
   const POKEMON_LIST = [
     { id: 25, name: '피카츄', speed: 0.045, dodgeRate: 0.45 },
     { id: 6, name: '리자몽', speed: 0.04, dodgeRate: 0.35 },
@@ -413,27 +445,44 @@
   let currentPokeIdx = 0;
   let currentPokemon = POKEMON_LIST[0];
 
+  // 게임 공간 (단위 m): 휴대폰은 바닥에서 1.5m 높이, 포켓몬은 앞쪽 바닥 위를 돌아다님
+  const CAMERA_HEIGHT = 1.5;
+  const POKE_HEIGHT = 1.0;          // 화면에 보이는 포켓몬 키 (가구 뒤에 숨을 수 있는 정도)
+  const CARD_ART_HEIGHT = 0.9;      // 카드 그림으로 보일 때 높이
+  const ARENA = { xMin: -1.6, xMax: 1.6, zNear: -2.4, zFar: -4.8 }; // 세로 화면 시야에서 너무 벗어나지 않는 범위
+  const START_POS = new THREE.Vector3(0, 0, -3.6);
+  const DEFAULT_PITCH = -0.2;       // 가상 공간에서 처음 내려다보는 각도 (라디안)
+
   const $ = (id) => document.getElementById(id);
   const video = $('camera-feed');
   const canvas = $('ar-canvas');
   const uiLayer = $('ui-layer');
-  const btnBall = $('btn-ball'), btnAtk = $('btn-atk'), btnCover = $('btn-cover'), btnChange = $('btn-change'), btnCard = $('btn-card');
+  const btnAtk = $('btn-atk'), btnChange = $('btn-change'), btnCard = $('btn-card');
   const btnGyro = $('btn-gyro'), btnRecenter = $('btn-recenter');
   const camChip = $('cam-chip');
   const indicator = $('target-indicator');
-  // 카드 스캔 화면 상태 (다른 함수들이 먼저 참조하므로 위쪽에 선언)
+  const ballSlot = $('ball-slot'), throwHint = $('throw-hint'), toastEl = $('toast');
+  // 여러 부분이 함께 쓰는 상태 (먼저 선언해 두어야 초기화 순서 문제가 없음)
   const scanner = { open: false, mode: 'live', timer: 0, streak: 0, lastUid: null, busy: false, resumeAt: 0 };
+  const gyro = { active: false, hasData: false, alpha: 0, beta: 0, gamma: 0, headingRef: 0, needsCalib: true, checkTimer: 0, autoTried: false, userOff: false };
+  const realObjects = [];           // 카메라로 찾은 실제 사물 (포켓몬이 뒤에 숨는 곳)
+  const DETECTOR = { state: 'off', instance: null, lastRun: 0, interval: 450, failures: 0, delegate: 'GPU', make: null };
+  const effects = [];
+  const projectiles = [];
 
-  // [추가] 받침 유무에 맞는 조사 (피카츄가 / 리자몽이)
+  // 받침 유무에 맞는 조사 (피카츄가 / 리자몽이)
   function josa(word, withBatchim, withoutBatchim) {
     const code = word.charCodeAt(word.length - 1) - 0xAC00;
     if (code < 0 || code > 11171) return `${withBatchim}(${withoutBatchim})`;
     return code % 28 ? withBatchim : withoutBatchim;
   }
-  // [추가] 브라우저 저장소 (개인 정보 보호 모드 등에서 막혀도 게임은 그대로 동작)
+  // 브라우저 저장소 (개인 정보 보호 모드 등에서 막혀도 게임은 그대로 동작)
   function storageGet(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
   function storageSet(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { return false; } }
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const wrapAngle = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+  const _tmp = new THREE.Vector3(), _tmp2 = new THREE.Vector3(), _tmp3 = new THREE.Vector3();
+  const _yAxis = new THREE.Vector3(0, 1, 0), _zee = new THREE.Vector3(0, 0, 1);
 
   // 2. Three.js 장면 설정
   let renderer;
@@ -446,26 +495,41 @@
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x000000, 0);
+  renderer.autoClear = false; // 장면 → 손에 든 포켓볼 순서로 직접 지우고 그림
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 1.5, 0);
+  const overlayScene = new THREE.Scene(); // 손에 든 포켓볼 전용 (항상 맨 앞에 보이게 따로 그림)
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.05, 100);
+  camera.position.set(0, CAMERA_HEIGHT, 0);
 
-  // 조명 추가
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
-  scene.add(ambientLight);
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  dirLight.position.set(3, 8, 5);
-  scene.add(dirLight);
+  for (const s of [scene, overlayScene]) {
+    s.add(new THREE.AmbientLight(0xffffff, 0.9));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(3, 8, 5);
+    s.add(dirLight);
+  }
+  // 카메라 영상과 3D 화면의 화각을 맞춤 → 찾은 사물의 위치·가림막이 실제 사물과 겹쳐 보이게
+  // (일반 휴대폰 기본 카메라는 긴 변 화각이 약 67°. 영상은 화면을 꽉 채우도록 잘려 보임)
+  const CAM_LONG_FOV = 67;
+  function fitCameraFov() {
+    let fov = 60;
+    if (isCameraLive()) {
+      const vw = video.videoWidth, vh = video.videoHeight, W = window.innerWidth, H = window.innerHeight;
+      const tLong = Math.tan(THREE.MathUtils.degToRad(CAM_LONG_FOV / 2));
+      const tV = vh >= vw ? tLong : tLong * vh / vw;           // 영상 세로 방향의 tan(반화각)
+      const visible = H / (vh * Math.max(W / vw, H / vh));      // 잘리고 남은 세로 비율
+      fov = THREE.MathUtils.clamp(2 * THREE.MathUtils.radToDeg(Math.atan(tV * visible)), 25, 90);
+    }
+    if (Math.abs(camera.fov - fov) > 0.05) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  }
 
-  // 바닥 그리드 (AR 공간감 보조용 반투명 가이드)
+  // 바닥 그리드 (공간감 보조용 반투명 가이드)
   const gridHelper = new THREE.GridHelper(16, 16, 0x38bdf8, 0x1e293b);
-  gridHelper.position.y = 0;
   gridHelper.material.opacity = 0.25;
   gridHelper.material.transparent = true;
   scene.add(gridHelper);
 
-  // [추가] 카메라를 못 쓸 때 보여줄 가상 공간 (하늘 + 바닥). 시점을 돌려도 지평선이 맞게 3D로 그림
+  // 카메라를 못 쓸 때 보여줄 가상 공간 (하늘 + 바닥)
   const virtualEnv = (function buildVirtualEnvironment() {
     const group = new THREE.Group();
     const skyGeo = new THREE.SphereGeometry(60, 32, 16);
@@ -489,11 +553,11 @@
   })();
   scene.add(virtualEnv);
 
-  // 3. [수정] 후면 카메라 구동 — 원인을 HUD에 계속 표시하고, 표시를 누르면 다시 연결
-  //    (보안 앱을 끈 뒤 새로고침 없이 다시 켤 수 있음)
+  // 3. 후면 카메라 — 꺼진 이유를 HUD에 계속 표시하고, 표시를 누르면 다시 연결
   let cameraStream = null;
   let cameraStarting = false;
   let cameraReason = '';
+  let cameraMode = 'pending';
   const CAMERA_ERRORS = {
     NotAllowedError: ['권한 거부', '카메라 권한이 거부됐어요. 주소창의 사이트 설정에서 카메라를 허용한 뒤 HUD의 카메라 표시를 눌러 주세요.'],
     SecurityError: ['권한 거부', '카메라 권한이 거부됐어요. 주소창의 사이트 설정에서 카메라를 허용한 뒤 HUD의 카메라 표시를 눌러 주세요.'],
@@ -503,17 +567,36 @@
     AbortError: ['시작 실패', '카메라를 시작하지 못했어요. 카메라 표시를 눌러 다시 시도하세요.']
   };
   function setCameraMode(mode, shortReason) {
+    cameraMode = mode;
     const live = mode === 'camera';
     video.hidden = !live;
     virtualEnv.visible = !live;
+    gridHelper.visible = !live; // 실제 카메라 화면 위에는 가상의 바닥·벽을 그리지 않음
     cameraReason = live ? '' : (shortReason || '');
-    camChip.textContent = live ? '📷 카메라 켜짐'
-      : mode === 'pending' ? '📷 카메라 연결 중…'
-      : `🌐 가상 공간 · ${cameraReason || '카메라 꺼짐'} ↻`;
-    camChip.classList.toggle('chip-live', live);
-    camChip.classList.toggle('chip-off', mode === 'virtual');
-    camChip.setAttribute('aria-label', live ? '카메라 켜짐' : `카메라 꺼짐 (${cameraReason || '연결 안 됨'}). 누르면 다시 연결`);
+    if (!live) clearRealObjects();
+    updateCamChip();
     if (scanner.open) refreshScannerNotice();
+  }
+  function updateCamChip() {
+    const live = cameraMode === 'camera';
+    let text;
+    if (live) {
+      if (isArMode()) {
+        const n = realObjects.filter((o) => o.active).length;
+        text = DETECTOR.state === 'failed' ? '📷 AR · 사물 인식 꺼짐'
+          : DETECTOR.state === 'ready' ? `📷 AR · 찾은 사물 ${n}개` : '📷 AR · 사물 인식 준비 중';
+      } else {
+        text = '📷 카메라 켜짐 · 자이로를 켜 주세요';
+      }
+    } else if (cameraMode === 'pending') {
+      text = '📷 카메라 연결 중…';
+    } else {
+      text = `🌐 가상 공간 · ${cameraReason || '카메라 꺼짐'} ↻`;
+    }
+    if (camChip.textContent !== text) camChip.textContent = text;
+    camChip.classList.toggle('chip-live', live);
+    camChip.classList.toggle('chip-off', cameraMode === 'virtual');
+    camChip.setAttribute('aria-label', cameraMode === 'virtual' ? `카메라 꺼짐 (${cameraReason || '연결 안 됨'}). 누르면 다시 연결` : text);
   }
   setCameraMode('pending');
 
@@ -541,7 +624,7 @@
     try {
       stopCameraStream();
       cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, // 카드 인식용으로 조금 더 선명하게
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false
       });
       video.srcObject = cameraStream;
@@ -552,7 +635,12 @@
         setCameraMode('virtual', '연결 끊김');
         logStatus('카메라 연결이 끊겼어요. HUD의 카메라 표시를 누르면 다시 연결합니다.');
       });
-      if (isRetry) logStatus('📷 카메라가 연결됐어요!');
+      if (!gyro.active) {
+        btnGyro.classList.add('attention');
+        logStatus('📷 카메라가 켜졌어요! 화면을 한 번 터치하거나 [🧭 자이로 켜기]를 누르면 AR이 시작되고, 포켓몬이 주변 가구를 찾아 그 뒤에 숨어요.');
+      } else if (isRetry) {
+        logStatus('📷 카메라가 연결됐어요!');
+      }
     } catch (err) {
       const [shortReason, detail] = CAMERA_ERRORS[err && err.name] || ['열 수 없음', '카메라를 열 수 없어요. HUD의 카메라 표시를 눌러 다시 시도하세요.'];
       setCameraMode('virtual', shortReason);
@@ -563,7 +651,11 @@
     }
   }
   camChip.addEventListener('click', () => {
-    if (isCameraLive()) { logStatus('📷 카메라가 켜져 있어요.'); return; }
+    if (isCameraLive()) {
+      if (isArMode()) logStatus('📷 AR 모드로 실행 중이에요. 휴대폰을 천천히 돌려 주변 가구를 비춰 보세요.');
+      else if (!gyro.active) enableGyro();
+      return;
+    }
     logStatus('📷 카메라를 다시 연결하는 중…');
     initCamera(true);
   });
@@ -577,59 +669,190 @@
     else if (video.paused) video.play().catch(() => {});
   });
 
-  // 4. 포켓몬 객체 및 상태 머신 (AI)
-  //    [수정] 메쉬를 하나만 만들어 재사용 → 교체할 때마다 생기던 메모리 누수 제거
-  const pokeData = {
-    hp: 100,
-    state: 'SPAWNING', // SPAWNING(등장 준비), APPEARING(카드에서 튀어나오는 중), WANDER, HIDE, DODGE, ATTACK, CAPTURED
-    pos: new THREE.Vector3(0, 1.1, -4.5),        // 부유 모션을 뺀 실제 위치
-    targetPos: new THREE.Vector3(0, 1.1, -4.5),
-    stateTimer: 0,                               // [수정] 프레임 수 → 초 단위
-    speed: 0.045,                                // 60fps 기준 프레임당 보간 비율
-    dodgeRate: 0.45,
-    baseScale: new THREE.Vector2(1, 1),          // 그림 비율 (카드 그림은 가로로 김)
-    appearFrom: new THREE.Vector3(),
-    appearT: 0
-  };
-  const pokemonMat = new THREE.MeshBasicMaterial({ transparent: true, side: THREE.DoubleSide, alphaTest: 0.1 });
-  const pokemonMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 1.7), pokemonMat);
-  pokemonMesh.visible = false;
-  scene.add(pokemonMesh);
-
-  const pokeShadow = new THREE.Mesh(
-    new THREE.CircleGeometry(0.6, 24),
-    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.4 })
-  );
-  pokeShadow.rotation.x = -Math.PI / 2;
-  pokeShadow.position.set(0, 0.02, -4.5);
-  pokeShadow.visible = false;
-  scene.add(pokeShadow);
-
-  function isTargetActive() {
-    return pokemonMesh.visible && !['CAPTURED', 'SPAWNING', 'APPEARING'].includes(pokeData.state);
+  // 4. [추가] 포켓몬 그림
+  //    ① 움직이는 그림(GIF) ② 공식 그림 ③ 카드 사진 그림 ④ '?' 순서로 찾음.
+  //    각 그림은 HTML과 같은 폴더의 sprites/ 에서 먼저 찾고, 없으면 PokeAPI(GitHub)에서 받음.
+  //    WebGL은 GIF를 직접 못 그리므로 아래에서 프레임을 풀어 캔버스 텍스처로 재생함.
+  function lzwDecode(minCodeSize, data, npix) {
+    const out = new Uint8Array(npix);
+    const prefix = new Int16Array(4096), suffix = new Uint8Array(4096), stack = new Uint8Array(4097);
+    const clear = 1 << minCodeSize, eoi = clear + 1;
+    let codeSize = minCodeSize + 1, codeMask = (1 << codeSize) - 1, avail = clear + 2, old = -1, first = 0;
+    for (let c = 0; c < clear; c++) { prefix[c] = 0; suffix[c] = c; }
+    let datum = 0, bits = 0, top = 0, pi = 0, bi = 0;
+    while (pi < npix) {
+      if (top === 0) {
+        if (bits < codeSize) {
+          if (bi >= data.length) break;
+          datum += data[bi++] << bits;
+          bits += 8;
+          continue;
+        }
+        let code = datum & codeMask;
+        datum >>= codeSize;
+        bits -= codeSize;
+        if (code > avail || code === eoi) break;
+        if (code === clear) {
+          codeSize = minCodeSize + 1; codeMask = (1 << codeSize) - 1; avail = clear + 2; old = -1;
+          continue;
+        }
+        if (old === -1) { stack[top++] = suffix[code]; old = code; first = code; continue; }
+        const inCode = code;
+        if (code === avail) { stack[top++] = first; code = old; }
+        while (code > clear) { stack[top++] = suffix[code]; code = prefix[code]; }
+        first = suffix[code];
+        stack[top++] = first;
+        if (avail < 4096) {
+          prefix[avail] = old; suffix[avail] = first; avail++;
+          if ((avail & codeMask) === 0 && avail < 4096) { codeSize++; codeMask += avail; }
+        }
+        old = inCode;
+      }
+      top--;
+      out[pi++] = stack[top];
+    }
+    return out;
   }
-  function updateControls() {
-    const active = isTargetActive();
-    btnBall.disabled = !active;
-    btnAtk.disabled = !active;
+  function interlaceRows(h) {
+    const rows = [];
+    for (const [start, step] of [[0, 8], [4, 8], [2, 4], [1, 2]]) for (let y = start; y < h; y += step) rows.push(y);
+    return rows;
+  }
+  function decodeGif(buffer) {
+    const b = new Uint8Array(buffer);
+    const sig = String.fromCharCode(b[0], b[1], b[2], b[3], b[4], b[5]);
+    if (sig !== 'GIF87a' && sig !== 'GIF89a') throw new Error('GIF 파일이 아님');
+    const W = b[6] | (b[7] << 8), H = b[8] | (b[9] << 8), flags = b[10];
+    if (!W || !H || W * H > 1600 * 1600) throw new Error('GIF 크기 이상');
+    let p = 13, gct = null;
+    if (flags & 0x80) { const n = 2 << (flags & 7); gct = b.subarray(p, p + n * 3); p += n * 3; }
+    let comp = new Uint8ClampedArray(W * H * 4);
+    const frames = [];
+    let gce = { delay: 10, trans: -1, disposal: 0 };
+    while (p < b.length) {
+      const block = b[p++];
+      if (block === 0x21) {                                // 확장 블록
+        const label = b[p++];
+        if (label === 0xF9 && b[p] >= 4) {
+          const pf = b[p + 1];
+          gce = { disposal: (pf >> 2) & 7, trans: (pf & 1) ? b[p + 4] : -1, delay: b[p + 2] | (b[p + 3] << 8) };
+        }
+        while (p < b.length && b[p] !== 0) p += b[p] + 1;
+        p++;
+      } else if (block === 0x2C) {                         // 이미지 블록
+        const ix = b[p] | (b[p + 1] << 8), iy = b[p + 2] | (b[p + 3] << 8);
+        const iw = b[p + 4] | (b[p + 5] << 8), ih = b[p + 6] | (b[p + 7] << 8), f = b[p + 8];
+        p += 9;
+        let ct = gct;
+        if (f & 0x80) { const n = 2 << (f & 7); ct = b.subarray(p, p + n * 3); p += n * 3; }
+        const minCode = b[p++];
+        let len = 0;
+        for (let q = p; q < b.length && b[q] !== 0; q += b[q] + 1) len += b[q];
+        const data = new Uint8Array(len);
+        let o = 0;
+        while (p < b.length && b[p] !== 0) { const n = b[p++]; data.set(b.subarray(p, p + n), o); o += n; p += n; }
+        p++;
+        const idx = lzwDecode(minCode, data, iw * ih);
+        const saved = gce.disposal === 3 ? comp.slice() : null;
+        const rows = (f & 0x40) ? interlaceRows(ih) : null;
+        if (ct) {
+          for (let r = 0; r < ih; r++) {
+            const y = iy + (rows ? rows[r] : r);
+            if (y >= H) continue;
+            for (let x = 0; x < iw; x++) {
+              const ci = idx[r * iw + x];
+              const X = ix + x;
+              if (ci === gce.trans || X >= W || ci * 3 + 2 >= ct.length) continue;
+              const k = (y * W + X) * 4;
+              comp[k] = ct[ci * 3]; comp[k + 1] = ct[ci * 3 + 1]; comp[k + 2] = ct[ci * 3 + 2]; comp[k + 3] = 255;
+            }
+          }
+        }
+        frames.push({ rgba: comp.slice(), delay: gce.delay });
+        if (gce.disposal === 2) {
+          for (let y = iy; y < Math.min(H, iy + ih); y++) comp.fill(0, (y * W + ix) * 4, (y * W + Math.min(W, ix + iw)) * 4);
+        } else if (gce.disposal === 3 && saved) {
+          comp = saved;
+        }
+        gce = { delay: 10, trans: -1, disposal: 0 };
+        if (frames.length >= 240) break;                   // 아주 긴 애니메이션은 앞부분만
+      } else {
+        break;                                             // 0x3B(끝) 또는 알 수 없는 블록
+      }
+    }
+    return { width: W, height: H, frames };
+  }
+  // 투명하지 않은 부분만 잘라 쓰기 위한 범위 계산 (그림 여백 때문에 발이 떠 보이지 않게)
+  function alphaBounds(rgbaList, W, H) {
+    let x0 = W, y0 = H, x1 = -1, y1 = -1;
+    for (const a of rgbaList) {
+      for (let y = 0; y < H; y++) {
+        const row = y * W * 4;
+        for (let x = 0; x < W; x++) {
+          if (a[row + x * 4 + 3] > 24) {
+            if (x < x0) x0 = x;
+            if (x > x1) x1 = x;
+            if (y < y0) y0 = y;
+            if (y > y1) y1 = y;
+          }
+        }
+      }
+    }
+    if (x1 < 0) return { rect: new THREE.Vector4(0, 0, 1, 1), aspect: W / H };
+    x0 = Math.max(0, x0 - 1); y0 = Math.max(0, y0 - 1); x1 = Math.min(W - 1, x1 + 1); y1 = Math.min(H - 1, y1 + 1);
+    const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
+    return { rect: new THREE.Vector4(x0 / W, 1 - (y1 + 1) / H, cw / W, ch / H), aspect: cw / ch };
+  }
+  function makeAnimatedVisual(gif) {
+    // 원본 GIF는 아주 작아서(피카츄 60×60) 그대로 키우면 흐릿함 → 픽셀을 정수 배로 또렷하게 키운 뒤 텍스처로 씀
+    const src = document.createElement('canvas');
+    src.width = gif.width; src.height = gif.height;
+    const sctx = src.getContext('2d');
+    const k = Math.max(1, Math.min(4, Math.ceil(256 / Math.max(gif.width, gif.height))));
+    const cv = document.createElement('canvas');
+    cv.width = gif.width * k; cv.height = gif.height * k;
+    const ctx = cv.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    const frames = gif.frames.map((f) => new ImageData(f.rgba, gif.width, gif.height));
+    const draw = (i) => {
+      sctx.putImageData(frames[i], 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.drawImage(src, 0, 0, cv.width, cv.height);
+    };
+    draw(0);
+    const texture = new THREE.CanvasTexture(cv);
+    texture.minFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    const { rect, aspect } = alphaBounds(gif.frames.map((f) => f.rgba), gif.width, gif.height);
+    const delays = gif.frames.map((f) => (f.delay <= 1 ? 10 : f.delay) * 10); // 브라우저와 같게: 0~1은 0.1초
+    return { kind: 'animated', texture, rect, aspect, draw, frames, delays, idx: 0, t: 0 };
+  }
+  function makeStaticVisual(texture, kind) {
+    let rect = new THREE.Vector4(0, 0, 1, 1), aspect = 1;
+    try {
+      const img = texture.image;
+      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      aspect = w / h;
+      const k = Math.min(1, 256 / Math.max(w, h));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+      const g = c.getContext('2d');
+      g.drawImage(img, 0, 0, c.width, c.height);
+      const bounds = alphaBounds([g.getImageData(0, 0, c.width, c.height).data], c.width, c.height);
+      rect = bounds.rect; aspect = bounds.aspect;
+    } catch (_) { /* 픽셀을 읽을 수 없는 그림은 전체 영역 사용 */ }
+    return { kind, texture, rect, aspect };
   }
 
-  // [수정] 포켓몬 그림 불러오기 순서
-  //   ① 이 HTML과 같은 폴더의 sprites/{도감번호}.png (네트워크가 GitHub를 막아도 동작)
-  //   ② PokeAPI 공식 그림 (raw.githubusercontent.com)
-  //   ③ 등록한 카드 사진에서 잘라낸 그림   ④ '?' 대체 이미지
-  //   느리면 2.5초 뒤 ③·④로 먼저 보여주고, 공식 그림이 도착하면 바꿔 끼움
-  const githubSpriteUrl = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  const githubArtUrl = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  const githubGifUrl = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${id}.gif`;
   const textureLoader = new THREE.TextureLoader();
   textureLoader.setCrossOrigin('anonymous');
-  const spriteCache = new Map();   // id → Texture (성공한 것만)
-  const spritePending = new Map(); // id → Promise (같은 그림 중복 요청 방지)
-  let localSprites = 'unknown';    // 'unknown' | 'present' | 'absent'
+  const visualJobs = new Map();     // 'gif:25' / 'png:25' → Promise<visual|null> (성공한 것만 남김)
+  let localSprites = 'unknown', localGifs = 'unknown';  // sprites 폴더가 있는지
   let githubBlockedByPolicy = false;
   let imageNoteShown = false;
   let placeholderTexture = null;
-  let spawnSeq = 0;
-  let firstSpawn = true;
   document.addEventListener('securitypolicyviolation', (e) => {
     if (/raw\.githubusercontent\.com/.test(e.blockedURI || '')) githubBlockedByPolicy = true;
   });
@@ -637,24 +860,57 @@
   function loadTexture(url) {
     return new Promise((resolve) => textureLoader.load(url, resolve, undefined, () => resolve(null)));
   }
-  function loadOfficialSprite(id) {
-    if (spriteCache.has(id)) return Promise.resolve(spriteCache.get(id));
-    if (spritePending.has(id)) return spritePending.get(id);
-    const job = (async () => {
+  async function fetchBytes(url, ms) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), ms);
+    try {
+      const res = await fetch(url, { signal: ctl.signal });
+      return res.ok ? await res.arrayBuffer() : null;
+    } catch (_) {
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  function cachedJob(key, make) {
+    if (visualJobs.has(key)) return visualJobs.get(key);
+    const job = make().catch(() => null).then((v) => { if (!v) visualJobs.delete(key); return v; });
+    visualJobs.set(key, job);
+    return job;
+  }
+  function gifToVisual(buf) {
+    try {
+      const gif = decodeGif(buf);
+      return gif.frames.length ? makeAnimatedVisual(gif) : null;
+    } catch (err) {
+      console.warn('[AR Battle] 움직이는 그림 해석 실패', err);
+      return null;
+    }
+  }
+  function loadAnimatedVisual(id) {
+    return cachedJob('gif:' + id, async () => {
+      if (localGifs !== 'absent') {
+        const buf = await fetchBytes(`sprites/${id}.gif`, 4000);
+        const vis = buf && gifToVisual(buf);
+        if (vis) { localGifs = 'present'; return vis; }
+        if (localGifs === 'unknown') localGifs = 'absent';
+      }
+      if (githubBlockedByPolicy) return null;
+      const buf = await fetchBytes(githubGifUrl(id), 9000);
+      return buf ? gifToVisual(buf) : null;
+    });
+  }
+  function loadStaticVisual(id) {
+    return cachedJob('png:' + id, async () => {
       if (localSprites !== 'absent') {
         const tex = await loadTexture(`sprites/${id}.png`);
-        if (tex) { localSprites = 'present'; return tex; }
-        if (localSprites === 'unknown') localSprites = 'absent'; // 폴더가 없으면 이후엔 건너뜀
+        if (tex) { localSprites = 'present'; return makeStaticVisual(tex, 'official'); }
+        if (localSprites === 'unknown') localSprites = 'absent';
       }
-      if (!githubBlockedByPolicy) return loadTexture(githubSpriteUrl(id));
-      return null;
-    })().then((tex) => {
-      spritePending.delete(id);
-      if (tex) spriteCache.set(id, tex);
-      return tex;
+      if (githubBlockedByPolicy) return null;
+      const tex = await loadTexture(githubArtUrl(id));
+      return tex ? makeStaticVisual(tex, 'official') : null;
     });
-    spritePending.set(id, job);
-    return job;
   }
   function getPlaceholderTexture() {
     if (placeholderTexture) return placeholderTexture;
@@ -678,8 +934,8 @@
     g.lineTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y);
     g.closePath();
   }
-  // 카드 사진에서 잘라 둔 그림 → 둥근 테두리가 있는 텍스처 (카드별로 한 번만 생성)
-  const artTextureCache = new Map(); // card uid → Promise<Texture|null>
+  // 카드 사진에서 잘라 둔 그림 → 둥근 테두리 텍스처 (카드별로 한 번만 생성)
+  const artTextureCache = new Map();
   function getCardArtTexture(card) {
     if (!card || !card.art) return Promise.resolve(null);
     if (!artTextureCache.has(card.uid)) {
@@ -700,7 +956,7 @@
             resolve(tex);
           } catch (err) {
             console.error('[AR Battle] 카드 그림 처리 실패', err);
-            resolve(null); // 실패하면 '?' 대체 이미지로 넘어감
+            resolve(null);
           }
         };
         img.onerror = () => resolve(null);
@@ -709,160 +965,758 @@
     }
     return artTextureCache.get(card.uid);
   }
-  async function fallbackTexture(info) {
+  async function fallbackVisual(info) {
     const card = info.card || cardStore.cards.find((c) => c.id === info.id && c.art);
     const art = await getCardArtTexture(card);
-    return art ? { texture: art, kind: 'card' } : { texture: getPlaceholderTexture(), kind: 'placeholder' };
-  }
-  function applyPokemonTexture(texture) {
-    pokemonMat.map = texture;
-    pokemonMat.needsUpdate = true;
-    const aspect = (texture.userData && texture.userData.aspect) || 1;
-    pokeData.baseScale.set(Math.sqrt(aspect), 1 / Math.sqrt(aspect));
-    pokemonMesh.scale.set(pokeData.baseScale.x, pokeData.baseScale.y, 1);
+    return art ? makeStaticVisual(art, 'card') : makeStaticVisual(getPlaceholderTexture(), 'placeholder');
   }
   function explainImageFailure() {
     if (imageNoteShown) return;
     imageNoteShown = true;
     const why = githubBlockedByPolicy
-      ? '이 미리보기 페이지는 보안 정책상 외부 이미지를 막아서 공식 포켓몬 그림을 못 불러와요. HTML을 직접 HTTPS 주소에 올리면 보여요.'
+      ? '이 미리보기 페이지는 보안 정책상 외부 그림을 막아서 공식 포켓몬 그림을 못 불러와요. HTML을 직접 HTTPS 주소에 올리면 보여요.'
       : '포켓몬 그림 서버(raw.githubusercontent.com)에 연결하지 못했어요. 네트워크를 확인하거나 HTML 옆 sprites 폴더에 그림을 넣어 주세요.';
     logStatus(why + (cardStore.cards.length ? '' : ' 카드를 등록하면 카드 그림으로 보여드려요.'));
+  }
+
+  // 5. 포켓몬 객체 · 상태 머신 · 움직임
+  const pokeData = {
+    hp: 100,
+    state: 'SPAWNING', // SPAWNING, APPEARING, WANDER, HIDE, PEEK, DODGE, ATTACK, CATCHING, CAPTURED
+    pos: START_POS.clone(),           // 발 위치 (y=0이 바닥)
+    targetPos: START_POS.clone(),
+    lastPos: START_POS.clone(),
+    path: [],                         // 사물을 돌아가는 경유지
+    stateTimer: 0,                    // 초 단위
+    speed: 0.045,                     // 60fps 기준 프레임당 보간 비율
+    dodgeRate: 0.45,
+    size: new THREE.Vector2(POKE_HEIGHT, POKE_HEIGHT), // 너비·높이 (m)
+    canFlip: true, facing: 1, hop: 0, lean: 0, crouch: 1,
+    react: null,                      // { kind: 'hit' | 'attack', t, fired }
+    hideObj: null, travelT: 0,
+    appearFrom: new THREE.Vector3(), appearT: 0, appearDur: 0.45
+  };
+  // 그림 한 장을 살아 있는 것처럼 보이게 하는 셰이더: 위쪽 휘어짐(기울기), 좌우 반전, 흰색 번쩍임
+  const SPRITE_VS = `
+    uniform float uSway;
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      vec3 p = position;
+      p.x += uSway * p.y * p.y;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+    }`;
+  const SPRITE_FS = `
+    uniform sampler2D uMap;
+    uniform vec4 uRect;
+    uniform float uFlip;
+    uniform float uFlash;
+    varying vec2 vUv;
+    void main() {
+      vec2 uv = vec2(mix(vUv.x, 1.0 - vUv.x, uFlip), vUv.y);
+      vec4 c = texture2D(uMap, uRect.xy + uv * uRect.zw);
+      if (c.a < 0.12) discard;
+      gl_FragColor = vec4(mix(c.rgb, vec3(1.0), uFlash), c.a);
+    }`;
+  const spriteUniforms = {
+    uMap: { value: null }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) },
+    uFlip: { value: 0 }, uFlash: { value: 0 }, uSway: { value: 0 }
+  };
+  const spriteGeo = new THREE.PlaneGeometry(1, 1, 6, 6);
+  spriteGeo.translate(0, 0.5, 0);                     // 원점을 발밑으로 → 크기가 변해도 발이 바닥에 붙어 있음
+  const pokemonMat = new THREE.ShaderMaterial({
+    uniforms: spriteUniforms, vertexShader: SPRITE_VS, fragmentShader: SPRITE_FS,
+    transparent: true, side: THREE.DoubleSide
+  });
+  const pokemonMesh = new THREE.Mesh(spriteGeo, pokemonMat);
+  pokemonMesh.visible = false;
+  pokemonMesh.renderOrder = 2;
+  scene.add(pokemonMesh);
+  const pokeShadow = new THREE.Mesh(
+    new THREE.CircleGeometry(1, 28),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.38, depthWrite: false })
+  );
+  pokeShadow.rotation.x = -Math.PI / 2;
+  pokeShadow.visible = false;
+  scene.add(pokeShadow);
+
+  let pokeVisual = null;
+  let spawnSeq = 0;
+  let firstSpawn = true;
+  const _bc = new THREE.Vector3();
+  function bodyCenter(out) {
+    return (out || _bc).set(pokemonMesh.position.x, pokemonMesh.position.y + pokemonMesh.scale.y * 0.5, pokemonMesh.position.z);
+  }
+  function hitRadius() { return Math.max(pokeData.size.x, pokeData.size.y) * 0.45 + 0.05; }
+  function isTargetActive() {
+    return pokemonMesh.visible && !['CAPTURED', 'SPAWNING', 'APPEARING', 'CATCHING'].includes(pokeData.state);
+  }
+  function updateControls() {
+    btnAtk.disabled = !isTargetActive();
+  }
+  function applyVisual(vis) {
+    pokeVisual = vis;
+    spriteUniforms.uMap.value = vis.texture;
+    spriteUniforms.uRect.value.copy(vis.rect);
+    const h = vis.kind === 'card' ? CARD_ART_HEIGHT : POKE_HEIGHT;
+    const w = h * vis.aspect;
+    const s = w > 1.8 ? 1.8 / w : 1;                  // 아주 넓은 그림은 줄임
+    pokeData.size.set(w * s, h * s);
+    pokeData.canFlip = vis.kind === 'animated' || vis.kind === 'official';
+    if (!pokeData.canFlip) spriteUniforms.uFlip.value = 0;
   }
 
   function spawnPokemon(info, opts = {}) {
     const seq = ++spawnSeq;
     currentPokemon = info;
-    // 이전 포켓몬은 즉시 숨기고 판정에서 제외 (로딩 중 보이지 않는 포켓몬이 맞거나 공격하던 버그 수정)
+    // 이전 포켓몬은 즉시 숨기고 판정에서 제외 (로딩 중 보이지 않는 포켓몬이 맞거나 공격하던 버그 방지)
     pokemonMesh.visible = false;
     pokeShadow.visible = false;
+    cancelCatch();
     clearProjectiles();
+    onBallFinished(0);
     Object.assign(pokeData, {
-      hp: 100, state: 'SPAWNING', stateTimer: 0,
+      hp: 100, state: 'SPAWNING', stateTimer: 0, react: null, hideObj: null, crouch: 1,
       speed: info.speed || DEFAULT_STATS.speed, dodgeRate: info.dodgeRate || DEFAULT_STATS.dodgeRate
     });
-    pokeData.pos.set(0, 1.1, -4.5);
-    pokeData.targetPos.copy(pokeData.pos);
+    pokeData.pos.copy(START_POS);
+    pokeData.targetPos.copy(START_POS);
+    pokeData.lastPos.copy(START_POS);
+    pokeData.path.length = 0;
+    pokeData.travelT = 0;
+    spriteUniforms.uFlash.value = 0;
     updateHpUI();
     updateControls();
     $('poke-name').textContent = `야생의 ${info.name}`;
     setBadge('⏳ 등장 중', '#64748b');
     logStatus(opts.fromCard ? `🃏 ${info.name} 카드에서 포켓몬을 불러내는 중…` : `${info.name}의 모습을 불러오는 중…`);
 
-    let appeared = false;
-    const appear = (texture, kind) => {
-      if (seq !== spawnSeq) return; // 더 최근에 소환했다면 무시 (레이스 컨디션 방지)
-      applyPokemonTexture(texture);
-      if (appeared) return;         // 대체 그림 → 공식 그림으로 교체만
-      appeared = true;
+    const RANK = { placeholder: 1, card: 1, official: 2, animated: 3 };
+    let shownRank = 0, pending = 2;
+    const show = (vis) => {
+      if (seq !== spawnSeq || !vis || RANK[vis.kind] <= shownRank) return; // 더 최근 소환이거나 더 못한 그림이면 무시
+      const first = shownRank === 0;
+      shownRank = RANK[vis.kind];
+      applyVisual(vis);
+      if (!first) return;                               // 나중에 온 더 좋은 그림은 교체만
       startAppearance(!!opts.fromCard);
       const name = info.name;
       let msg = opts.fromCard
         ? `🃏 카드에서 ${name}${josa(name, '이', '가')} 나타났다!`
         : `야생의 ${name}${josa(name, '이', '가')} 나타났다!`;
-      if (kind === 'card') msg += ' (카드 그림으로 표시)';
-      else if (kind === 'placeholder') msg += ' (그림을 불러오지 못해 대체 이미지로 표시)';
-      else if (firstSpawn) msg += ' 화면을 드래그해서 조준점을 맞추세요.';
+      if (vis.kind === 'card') msg += ' (카드 그림으로 표시)';
+      else if (vis.kind === 'placeholder') msg += ' (그림을 불러오지 못해 대체 이미지로 표시)';
+      else if (firstSpawn) msg += ' 아래 포켓볼을 위로 밀어서 던져 보세요.';
       firstSpawn = false;
       logStatus(msg);
-      if (kind !== 'official') setTimeout(explainImageFailure, 1600);
+      if (vis.kind === 'card' || vis.kind === 'placeholder') setTimeout(explainImageFailure, 1600);
     };
-    const fallbackTimer = setTimeout(() => {
-      fallbackTexture(info).then((t) => appear(t.texture, t.kind));
-    }, 2500);
-    loadOfficialSprite(info.id).then((tex) => {
-      clearTimeout(fallbackTimer);
-      if (tex) appear(tex, 'official');
-      else fallbackTexture(info).then((t) => appear(t.texture, t.kind));
-    });
+    const fallbackTimer = setTimeout(() => fallbackVisual(info).then(show), 2500);
+    const settle = (vis) => {
+      if (vis) { clearTimeout(fallbackTimer); show(vis); }
+      if (--pending === 0 && shownRank === 0) { clearTimeout(fallbackTimer); fallbackVisual(info).then(show); }
+    };
+    loadAnimatedVisual(info.id).then(settle);
+    loadStaticVisual(info.id).then(settle);
   }
 
+  const _fwd = new THREE.Vector3();
   function startAppearance(fromCard) {
     pokemonMesh.visible = true;
     pokeShadow.visible = true;
+    pokeData.appearT = 0;
     if (fromCard) {
-      // 카드를 비추던 화면 가운데 앞(1.3m)에서 튀어나와 전장으로 이동
+      // 카드를 비추던 화면 가운데 앞(1.3m)에서 튀어나와 바닥으로 내려옴
       _fwd.set(0, 0, -1).applyQuaternion(camera.quaternion);
       pokeData.appearFrom.copy(camera.position).addScaledVector(_fwd, 1.3);
-      pokeData.appearT = 0;
-      pokeData.state = 'APPEARING';
-      pokemonMesh.position.copy(pokeData.appearFrom);
-      pokemonMesh.scale.set(pokeData.baseScale.x * 0.15, pokeData.baseScale.y * 0.15, 1);
-      spawnSummonRing(pokeData.appearFrom);
+      pokeData.appearFrom.y = Math.max(0, pokeData.appearFrom.y - 0.4);
+      pokeData.appearDur = 0.9;
+      spawnRing(_tmp.copy(pokeData.appearFrom).setY(pokeData.appearFrom.y + 0.4), 0xf472b6, 1);
       setBadge('🃏 소환 중', '#db2777');
     } else {
-      pokemonMesh.position.copy(pokeData.pos);
-      pokeData.state = 'WANDER';
-      pokeData.stateTimer = 0.4;
-      setBadge('🐾 이동 중', '#3b82f6');
+      pokeData.appearFrom.copy(pokeData.pos);
+      pokeData.appearDur = 0.45;
+      setBadge('✨ 등장', '#64748b');
     }
+    pokeData.state = 'APPEARING';
+    pokemonMesh.position.copy(pokeData.appearFrom);
+    pokemonMesh.scale.set(pokeData.size.x * 0.15, pokeData.size.y * 0.15, 1);
     updateControls();
   }
+  function updateAppearing(dt) {
+    pokeData.appearT = Math.min(1, pokeData.appearT + dt / pokeData.appearDur);
+    const k = 1 - Math.pow(1 - pokeData.appearT, 3);
+    pokemonMesh.position.lerpVectors(pokeData.appearFrom, pokeData.pos, k);
+    const s = 0.15 + 0.85 * k;
+    pokemonMesh.scale.set(pokeData.size.x * s, pokeData.size.y * s, 1);
+    pokemonMesh.lookAt(camera.position.x, pokemonMesh.position.y, camera.position.z);
+    spriteUniforms.uFlash.value = 1 - k;
+    pokeShadow.position.set(pokemonMesh.position.x, 0.01, pokemonMesh.position.z);
+    const r = Math.max(0.01, pokeData.size.x * 0.38 * k);
+    pokeShadow.scale.set(r, r, 1);
+    if (pokeData.appearT >= 1) {
+      pokeData.lastPos.copy(pokeData.pos);
+      pokeData.state = 'WANDER';
+      pokeData.stateTimer = 0.5;
+      setBadge('🐾 이동 중', '#3b82f6');
+      updateControls();
+    }
+  }
 
-  // 소환 링 효과 (재질은 효과마다 만들고 끝나면 해제)
+  // 걷기: 목표까지 부드럽게 다가가되 최대 속도를 넘지 않음 (프레임레이트와 무관)
+  const MAX_WALK = 2.0, MAX_DASH = 5.5;
+  const frameLerp = (perFrame, dt) => 1 - Math.pow(1 - perFrame, dt * 60);
+  function moveToward(target, dt, maxSpeed, k) {
+    _tmp.subVectors(target, pokeData.pos);
+    const dist = _tmp.length();
+    if (dist < 1e-4) return 0;
+    const step = Math.min(dist * frameLerp(k, dt), maxSpeed * dt);
+    pokeData.pos.addScaledVector(_tmp, step / dist);
+    return dist - step;
+  }
+  function updatePokemon(dt) {
+    if (pokeData.state === 'APPEARING') { updateAppearing(dt); return; }
+    if (pokeData.state === 'CATCHING') { updateCatch(dt); return; }
+    if (!isTargetActive()) return;
+    // 숨기·빼꼼은 그 자리에 도착한 뒤부터 시간을 잼 (멀리 있는 사물로 가는 도중에 다음 행동으로 넘어가지 않게)
+    const travelling = (pokeData.state === 'HIDE' || pokeData.state === 'PEEK') &&
+      pokeData.pos.distanceTo(pokeData.targetPos) > 0.3 && pokeData.travelT < 4;
+    if (travelling) pokeData.travelT += dt;
+    else pokeData.stateTimer -= dt;
+    if (pokeData.stateTimer <= 0) chooseNextState();
+    const dodging = pokeData.state === 'DODGE';
+    const goal = pokeData.path.length ? pokeData.path[0] : pokeData.targetPos;
+    const remain = moveToward(goal, dt, dodging ? MAX_DASH : MAX_WALK, (dodging ? 2.6 : 1.4) * pokeData.speed);
+    if (pokeData.path.length > 1 && remain < 0.2) pokeData.path.shift();
+    if (dodging && pokeData.pos.distanceTo(pokeData.targetPos) < 0.25) pokeData.targetPos.y = 0; // 점프 후 착지
+    animatePokemon(dt);
+  }
+
+  // 상태 고르기: 실제 사물이 있으면 그 뒤에 숨었다가 옆으로 빼꼼 내밀고 반격, 없으면 돌아다니기·공격
+  function chooseNextState() {
+    const r = Math.random();
+    const obj = pokeData.hideObj && pokeData.hideObj.active ? pokeData.hideObj : null;
+    if (obj && pokeData.state === 'HIDE') {
+      if (r < 0.55) { startPeek(); return; }
+      if (r < 0.75) { startHide(obj); return; }        // 조금 더 숨어 있기
+    } else if (obj && pokeData.state === 'PEEK') {
+      if (r < 0.35) { startAttack(); return; }         // 나온 김에 반격
+      if (r < 0.7) { startHide(obj); return; }         // 다시 쏙
+    }
+    const covers = coverObjects();
+    const r2 = Math.random();
+    if (covers.length && r2 < 0.5) { startHide(covers[Math.floor(Math.random() * covers.length)]); return; }
+    if (r2 < 0.82) { startWander(); return; }
+    startAttack();
+  }
+  function coverObjects() {
+    _fwd.set(0, 0, -1).applyQuaternion(camera.quaternion).setY(0).normalize();
+    return realObjects.filter((o) => {
+      if (!o.active || o.size.y < 0.45) return false;                // 너무 낮은 사물 뒤엔 못 숨음
+      _tmp2.set(o.center.x - camera.position.x, 0, o.center.z - camera.position.z);
+      const d = _tmp2.length();
+      return d > 1.2 && d < 7 && _tmp2.normalize().dot(_fwd) > 0.25; // 대략 보이는 쪽에 있는 사물만
+    });
+  }
+  // 카메라에서 볼 때 사물 바로 뒤(side=0) 또는 옆(side=±1) 자리
+  function hideSpot(obj, side) {
+    const dir = _tmp2.set(obj.center.x - camera.position.x, 0, obj.center.z - camera.position.z).normalize();
+    const right = _tmp3.set(-dir.z, 0, dir.x);
+    const back = obj.size.z / 2 + 0.3 + pokeData.size.x * 0.3;
+    const out = new THREE.Vector3(obj.center.x, 0, obj.center.z).addScaledVector(dir, side ? back * 0.4 : back);
+    if (side) out.addScaledVector(right, side * (obj.size.x / 2 + pokeData.size.x * 0.4 + 0.1));
+    return out;
+  }
+  function startHide(obj) {
+    const again = pokeData.hideObj === obj;
+    const spot = hideSpot(obj, 0);
+    pokeData.state = 'HIDE';
+    pokeData.hideObj = obj;
+    pokeData.targetPos.copy(spot);
+    pokeData.path = planPath(pokeData.pos, spot);
+    pokeData.travelT = 0;
+    pokeData.stateTimer = 1.8 + Math.random() * 1.2;
+    setBadge(`${obj.def.icon} 숨는 중`, '#06b6d4');
+    if (!again) logStatus(`포켓몬이 ${obj.def.ko} 뒤로 숨으러 가요! 옆으로 나올 때를 노리세요.`);
+  }
+  // 카메라가 보는 방향에서 얼마나 벗어났는지(라디안) — 화면에 보이는 쪽을 고를 때 사용
+  function offCenter(p) {
+    _fwd.set(0, 0, -1).applyQuaternion(camera.quaternion).setY(0).normalize();
+    _tmp2.set(p.x - camera.position.x, 0, p.z - camera.position.z).normalize();
+    return Math.acos(THREE.MathUtils.clamp(_fwd.dot(_tmp2), -1, 1));
+  }
+  function startPeek() {
+    const obj = pokeData.hideObj;
+    // 대개는 화면 가운데에 더 가까운 쪽으로 빼꼼 (가끔은 반대쪽)
+    const a = hideSpot(obj, -1), b = hideSpot(obj, 1);
+    let spot = offCenter(a) <= offCenter(b) ? a : b;
+    if (Math.random() < 0.25) spot = spot === a ? b : a;
+    pokeData.state = 'PEEK';
+    pokeData.targetPos.copy(spot);
+    pokeData.path = planPath(pokeData.pos, spot);
+    pokeData.travelT = 0;
+    pokeData.stateTimer = 1.2 + Math.random() * 0.6;
+    setBadge('👀 빼꼼', '#0ea5e9');
+    logStatus(`포켓몬이 ${obj.def.ko} 옆으로 고개를 내밀었어요! 지금 던지세요!`);
+  }
+  function startWander() {
+    pokeData.state = 'WANDER';
+    pokeData.hideObj = null;
+    const p = randomFreePoint();
+    pokeData.targetPos.copy(p);
+    pokeData.path = planPath(pokeData.pos, p);
+    pokeData.stateTimer = 1.6 + Math.random() * 0.8;
+    setBadge('🐾 이동 중', '#3b82f6');
+  }
+  function startAttack() {
+    pokeData.state = 'ATTACK';
+    pokeData.path.length = 0;
+    pokeData.targetPos.copy(pokeData.pos);
+    pokeData.react = { kind: 'attack', t: 0, fired: false };
+    pokeData.stateTimer = 1.1;
+    setBadge('🔥 반격 준비!', '#ef4444');
+  }
+  function randomFreePoint() {
+    for (let i = 0; i < 12; i++) {
+      const p = new THREE.Vector3(
+        THREE.MathUtils.lerp(ARENA.xMin, ARENA.xMax, Math.random()), 0,
+        THREE.MathUtils.lerp(ARENA.zNear, ARENA.zFar, Math.random()));
+      if (!pointInsideObject(p, 0.35)) return p;
+    }
+    return START_POS.clone();
+  }
+  // 사물 안을 뚫고 지나가지 않도록, 길이 사물에 걸리면 왼쪽·오른쪽 중 가까운 쪽으로 돌아감
+  const _la = new THREE.Vector3(), _lb = new THREE.Vector3();
+  function insideBox(p, o, margin) {
+    _la.copy(p).applyMatrix4(o.rigidInv);
+    return Math.abs(_la.x) <= o.size.x / 2 + margin && Math.abs(_la.z) <= o.size.z / 2 + margin;
+  }
+  function pointInsideObject(p, margin) {
+    return realObjects.some((o) => o.active && insideBox(p, o, margin));
+  }
+  function segmentHitsObject(a, b, o, margin) {
+    _la.copy(a).applyMatrix4(o.rigidInv);
+    _lb.copy(b).applyMatrix4(o.rigidInv);
+    const hx = o.size.x / 2 + margin, hz = o.size.z / 2 + margin;
+    const dx = _lb.x - _la.x, dz = _lb.z - _la.z;
+    let t0 = 0, t1 = 1;
+    const clip = (p, q) => {
+      if (Math.abs(p) < 1e-9) return q >= 0;
+      const r = q / p;
+      if (p < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; }
+      return true;
+    };
+    return clip(-dx, _la.x + hx) && clip(dx, hx - _la.x) && clip(-dz, _la.z + hz) && clip(dz, hz - _la.z) && t0 <= t1;
+  }
+  // 사물 기준 좌표에서 왼쪽 또는 오른쪽 옆면을 따라 앞→뒤로 돌아가는 경유지 2개를 만들고, 더 짧은 쪽을 고름
+  const PATH_MARGIN = 0.32;
+  function planPath(from, to) {
+    for (const o of realObjects) {
+      if (!o.active || insideBox(from, o, 0.05) || !segmentHitsObject(from, to, o, PATH_MARGIN)) continue;
+      const hx = o.size.x / 2 + PATH_MARGIN + 0.05, hz = o.size.z / 2 + PATH_MARGIN + 0.05;
+      const az = from.clone().applyMatrix4(o.rigidInv).z, bz = to.clone().applyMatrix4(o.rigidInv).z;
+      const cos = Math.cos(o.yaw), sin = Math.sin(o.yaw);
+      const local = (lx, lz) => new THREE.Vector3(o.center.x + cos * lx + sin * lz, 0, o.center.z - sin * lx + cos * lz);
+      let best = null, bestLen = Infinity;
+      for (const s of [1, -1]) {
+        const w1 = local(s * hx, THREE.MathUtils.clamp(az, -hz, hz));
+        const w2 = local(s * hx, THREE.MathUtils.clamp(bz, -hz, hz));
+        if (segmentHitsObject(from, w1, o, PATH_MARGIN - 0.02) || segmentHitsObject(w2, to, o, PATH_MARGIN - 0.02)) continue;
+        // 길이가 비슷하면 화면 가운데 쪽으로 돌아감 (화면 밖으로 나갔다 오지 않게)
+        const len = from.distanceTo(w1) + w1.distanceTo(w2) + w2.distanceTo(to) + 1.2 * (offCenter(w1) + offCenter(w2));
+        if (len < bestLen) { bestLen = len; best = [w1, w2, to.clone()]; }
+      }
+      if (best) return best;
+    }
+    return [to.clone()];
+  }
+
+  // [추가] 포켓몬 움직임: 걸을 때 깡충깡충·찌그러짐, 가는 방향으로 기울기·돌아보기,
+  //        가만히 있을 땐 숨쉬기, 맞으면 하얗게 번쩍·흔들림, 공격할 땐 움츠렸다 튀어나오기
+  const _right = new THREE.Vector3(), _toCam = new THREE.Vector3();
+  function animatePokemon(dt) {
+    const moved = _tmp.subVectors(pokeData.pos, pokeData.lastPos);
+    pokeData.lastPos.copy(pokeData.pos);
+    const inv = 1 / Math.max(dt, 1e-3);
+    _right.set(1, 0, 0).applyQuaternion(camera.quaternion);
+    const vxScreen = moved.dot(_right) * inv;           // 화면 기준 좌우 속도
+    const speed = Math.hypot(moved.x, moved.z) * inv;
+    if (pokeData.canFlip && Math.abs(vxScreen) > 0.3) pokeData.facing = vxScreen > 0 ? -1 : 1; // 그림은 왼쪽을 봄 → 오른쪽으로 갈 땐 뒤집기
+    spriteUniforms.uFlip.value = pokeData.canFlip && pokeData.facing < 0 ? 1 : 0;
+    const moving = Math.min(1, speed / 1.5);
+    pokeData.hop += dt * (4 + 7 * moving);
+    const s = Math.abs(Math.sin(pokeData.hop));
+    const hopY = s * 0.16 * moving;
+    let sx = 1 + (1 - s) * 0.08 * moving, sy = 1 - (1 - s) * 0.1 * moving;
+    const breathe = Math.sin(elapsed * 3.1) * 0.03 * (1 - moving);
+    sx -= breathe * 0.5; sy += breathe;
+    // 숨을 땐 사물 높이에 맞춰 웅크림 (낮은 사물이면 더 납작하게) — 귀 끝 정도만 살짝 보임
+    const hideObj = pokeData.state === 'HIDE' ? pokeData.hideObj : null;
+    const crouchGoal = hideObj && pokeData.pos.distanceTo(pokeData.targetPos) < 0.6
+      ? THREE.MathUtils.clamp(hideObj.size.y * 0.92 / pokeData.size.y, 0.55, 0.92) : 1;
+    pokeData.crouch += (crouchGoal - pokeData.crouch) * Math.min(1, dt * 8);
+    sy *= pokeData.crouch; sx *= 1 + (1 - pokeData.crouch) * 0.25;
+    if (pokeData.pos.y > 0.05) { sy *= 1.08; sx *= 0.95; }                                         // 점프 중엔 길쭉하게
+    let flash = 0, shake = 0, lunge = 0;
+    const r = pokeData.react;
+    if (r) {
+      r.t += dt;
+      if (r.kind === 'hit') {
+        const k = Math.max(0, 1 - r.t / 0.35);
+        flash = k; shake = Math.sin(r.t * 70) * 0.06 * k;
+        if (r.t > 0.35) pokeData.react = null;
+      } else if (r.kind === 'attack') {
+        if (r.t < 0.2) { sy *= 0.86; sx *= 1.1; }                            // 움츠리기
+        else if (r.t < 0.36) {                                               // 튀어나오며 발사
+          sx *= 1.12; sy *= 1.12; lunge = 0.35;
+          if (!r.fired) { r.fired = true; firePokemonCounterAttack(); }
+        } else if (r.t > 0.6) pokeData.react = null;
+      }
+    }
+    _toCam.set(camera.position.x - pokeData.pos.x, 0, camera.position.z - pokeData.pos.z).normalize();
+    pokemonMesh.position.set(
+      pokeData.pos.x + _right.x * shake + _toCam.x * lunge,
+      pokeData.pos.y + hopY,
+      pokeData.pos.z + _right.z * shake + _toCam.z * lunge);
+    pokemonMesh.scale.set(pokeData.size.x * sx, pokeData.size.y * sy, 1);
+    pokemonMesh.lookAt(camera.position.x, pokemonMesh.position.y, camera.position.z); // 항상 플레이어를 바라봄
+    const targetLean = THREE.MathUtils.clamp(vxScreen * 0.06, -0.18, 0.18);
+    pokeData.lean += (targetLean - pokeData.lean) * Math.min(1, dt * 6);
+    spriteUniforms.uSway.value = pokeData.lean + Math.sin(elapsed * 2.2) * 0.025;
+    spriteUniforms.uFlash.value = flash;
+    pokeShadow.position.set(pokeData.pos.x, 0.01, pokeData.pos.z);
+    const shadowR = pokeData.size.x * 0.38 * (1 - Math.min(0.5, (hopY + pokeData.pos.y) * 0.8));
+    pokeShadow.scale.set(shadowR, shadowR, 1);
+  }
+  // 움직이는 그림(GIF) 프레임 넘기기
+  function playAnimatedFrames(dt) {
+    const v = pokeVisual;
+    if (!v || v.kind !== 'animated' || v.frames.length < 2) return;
+    v.t += dt * 1000;
+    let changed = false, guard = 0;
+    while (v.t >= v.delays[v.idx] && guard++ < 12) {
+      v.t -= v.delays[v.idx];
+      v.idx = (v.idx + 1) % v.frames.length;
+      changed = true;
+    }
+    if (changed) {
+      v.draw(v.idx);
+      v.texture.needsUpdate = true;
+    }
+  }
+
+  // 포켓몬 회피 AI 판정 (체력이 높을수록 더 잘 피함) — 화면에서 잘 보이게 옆으로 점프
+  function tryTriggerPokemonDodge(factor = 1) {
+    if (!isTargetActive() || pokeData.state === 'ATTACK') return;
+    const effectiveDodge = factor * pokeData.dodgeRate * (0.4 + 0.6 * (pokeData.hp / 100));
+    if (Math.random() < effectiveDodge) {
+      pokeData.state = 'DODGE';
+      pokeData.stateTimer = 40 / 60;
+      pokeData.path.length = 0;
+      _right.set(1, 0, 0).applyQuaternion(camera.quaternion).setY(0).normalize();
+      const side = Math.random() > 0.5 ? 1 : -1;
+      const t = pokeData.pos.clone().addScaledVector(_right, side * 1.5);
+      if (pointInsideObject(t, 0.3)) t.copy(pokeData.pos).addScaledVector(_right, -side * 1.5);
+      t.y = 0.55; // 점프
+      pokeData.targetPos.copy(t);
+      setBadge('⚡ 고속 회피!', '#eab308');
+      logStatus('포켓몬이 날아오는 궤적을 보고 재빠르게 피했습니다!');
+    }
+  }
+
+  // 6. [추가] 실제 사물 인식 (AR)
+  //    카메라 영상에서 의자·소파·탁자 등을 찾아(MediaPipe 물체 인식), 휴대폰 기울기로 바닥 위 위치와 크기를 추정한 뒤
+  //    그 자리에 보이지 않는 '가림막'(색은 안 그리고 깊이만 쓰는 상자)을 둠 → 포켓몬이 사물 뒤로 가면 실제로 가려짐
+  const MP_VERSION = '0.10.20';
+  const MP_BASE = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VERSION}`;
+  const MP_MODEL = 'https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite';
+  const REAL_OBJECT_TYPES = {
+    chair: { ko: '의자', icon: '🪑', depth: 0.55 },
+    couch: { ko: '소파', icon: '🛋️', depth: 0.9 },
+    bed: { ko: '침대', icon: '🛏️', depth: 1.6 },
+    'dining table': { ko: '탁자', icon: '🍽️', depth: 0.8 },
+    'potted plant': { ko: '화분', icon: '🪴', depth: 0.45 },
+    tv: { ko: 'TV', icon: '📺', depth: 0.3 },
+    refrigerator: { ko: '냉장고', icon: '🧊', depth: 0.7 },
+    toilet: { ko: '변기', icon: '🚽', depth: 0.65 },
+    bench: { ko: '벤치', icon: '🪑', depth: 0.5 },
+    suitcase: { ko: '여행가방', icon: '🧳', depth: 0.3 },
+    car: { ko: '자동차', icon: '🚗', depth: 2.0 },
+    truck: { ko: '트럭', icon: '🚚', depth: 2.4 },
+    bicycle: { ko: '자전거', icon: '🚲', depth: 0.5 },
+    motorcycle: { ko: '오토바이', icon: '🏍️', depth: 0.8 },
+    'fire hydrant': { ko: '소화전', icon: '🧯', depth: 0.3 }
+  };
+  const OBJECT_ALIASES = { sofa: 'couch', diningtable: 'dining table', table: 'dining table', pottedplant: 'potted plant',
+    tvmonitor: 'tv', television: 'tv', motorbike: 'motorcycle', fridge: 'refrigerator', firehydrant: 'fire hydrant' };
+  function objectType(name) {
+    const n = String(name || '').toLowerCase().trim();
+    const key = REAL_OBJECT_TYPES[n] ? n : (OBJECT_ALIASES[n] || OBJECT_ALIASES[n.replace(/\s+/g, '')]);
+    return key ? Object.assign({ key }, REAL_OBJECT_TYPES[key]) : null;
+  }
+  const OCCLUDER_MAT = new THREE.MeshBasicMaterial({ colorWrite: false }); // 깊이만 기록 → 뒤의 3D 물체가 가려짐
+  const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
+  const UNIT_EDGES = new THREE.EdgesGeometry(UNIT_BOX);
+  const MAX_REAL_OBJECTS = 6;
+  let objectSeq = 0;
+  function isArMode() { return isCameraLive() && gyro.active && gyro.hasData; }
+
+  async function ensureDetector() {
+    if (DETECTOR.state !== 'off') return;
+    DETECTOR.state = 'loading';
+    updateCamChip();
+    logStatus('🔍 주변 사물을 찾는 기능을 불러오는 중이에요… (처음 한 번 몇 초 걸려요)');
+    let timer = 0;
+    const timeout = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('시간 초과')), 30000); });
+    try {
+      DETECTOR.instance = await Promise.race([(async () => {
+        const mp = await import(`${MP_BASE}/vision_bundle.mjs`);
+        const files = await mp.FilesetResolver.forVisionTasks(`${MP_BASE}/wasm`);
+        DETECTOR.make = (delegate) => mp.ObjectDetector.createFromOptions(files, {
+          baseOptions: { modelAssetPath: MP_MODEL, delegate },
+          runningMode: 'VIDEO', scoreThreshold: 0.35, maxResults: 8
+        });
+        try { return await DETECTOR.make('GPU'); } catch (_) { DETECTOR.delegate = 'CPU'; return await DETECTOR.make('CPU'); }
+      })(), timeout]);
+      DETECTOR.state = 'ready';
+      logStatus('🔍 사물 인식이 켜졌어요. 휴대폰을 천천히 돌려 의자·소파·화분 같은 가구를 비춰 보세요.');
+    } catch (err) {
+      console.error('[AR Battle] 사물 인식 불러오기 실패', err);
+      DETECTOR.state = 'failed';
+      logStatus('사물 인식 기능을 불러오지 못했어요(네트워크 확인). 포켓몬은 숨지 않고 돌아다녀요.');
+    } finally {
+      clearTimeout(timer);
+    }
+    updateCamChip();
+  }
+  // GPU로 만든 인식기가 실행 중에 오류를 내는 기기가 있어서, 그럴 땐 CPU로 한 번 다시 만듦
+  async function switchDetectorToCpu() {
+    DETECTOR.state = 'loading';
+    DETECTOR.delegate = 'CPU';
+    DETECTOR.failures = 0;
+    try { if (DETECTOR.instance && DETECTOR.instance.close) DETECTOR.instance.close(); } catch (_) {}
+    try {
+      DETECTOR.instance = await DETECTOR.make('CPU');
+      DETECTOR.state = 'ready';
+    } catch (err) {
+      console.error('[AR Battle] 사물 인식(CPU) 만들기 실패', err);
+      DETECTOR.state = 'failed';
+      logStatus('사물 인식 중 오류가 계속 나서 껐어요. 포켓몬은 숨지 않고 돌아다녀요.');
+    }
+    updateCamChip();
+  }
+  function runDetection(now) {
+    if (DETECTOR.state !== 'ready' || !isArMode() || document.hidden) return;
+    if (now - DETECTOR.lastRun < DETECTOR.interval) return;
+    DETECTOR.lastRun = now;
+    let result;
+    const t0 = performance.now();
+    try {
+      result = DETECTOR.instance.detectForVideo(video, now);
+    } catch (err) {
+      console.error('[AR Battle] 사물 인식 오류', err);
+      DETECTOR.failures++;
+      if (DETECTOR.delegate === 'GPU' && DETECTOR.make && DETECTOR.failures >= 2) {
+        switchDetectorToCpu();
+      } else if (DETECTOR.failures >= 4) {
+        DETECTOR.state = 'failed';
+        updateCamChip();
+        logStatus('사물 인식 중 오류가 계속 나서 껐어요. 포켓몬은 숨지 않고 돌아다녀요.');
+      }
+      return;
+    }
+    DETECTOR.failures = 0;
+    DETECTOR.interval = THREE.MathUtils.clamp((performance.now() - t0) * 6, 350, 1500); // 느린 폰은 덜 자주
+    ingestDetections((result && result.detections) || [], now);
+  }
+  const raycaster = new THREE.Raycaster();
+  const _ndcV = new THREE.Vector2();
+  function videoPointToNdc(vx, vy, out) {
+    const vw = video.videoWidth, vh = video.videoHeight, W = window.innerWidth, H = window.innerHeight;
+    const scale = Math.max(W / vw, H / vh);                // 영상은 object-fit: cover로 잘려 보임
+    const sx = vx * scale - (vw * scale - W) / 2, sy = vy * scale - (vh * scale - H) / 2;
+    return out.set(sx / W * 2 - 1, -(sy / H * 2 - 1));
+  }
+  function floorPointFromVideo(vx, vy) {
+    raycaster.setFromCamera(videoPointToNdc(vx, vy, _ndcV), camera);
+    const o = raycaster.ray.origin, d = raycaster.ray.direction;
+    if (d.y > -0.03) return null;                         // 지평선 위를 가리키면 바닥과 만나지 않음
+    return o.clone().addScaledVector(d, -o.y / d.y);
+  }
+  // 물체 상자의 아래쪽 = 바닥에 닿은 곳 → 거리, 양 끝 → 너비, 위쪽 → 높이
+  function estimateObject(bb, type) {
+    const vh = video.videoHeight;
+    const bottom = bb.originY + bb.height;
+    if (bottom > vh * 0.97 || bb.height < vh * 0.06) return null; // 아래가 잘렸거나 너무 작으면 거리를 알 수 없음
+    const pC = floorPointFromVideo(bb.originX + bb.width / 2, bottom);
+    if (!pC) return null;
+    const cam = camera.position;
+    const horiz = Math.hypot(pC.x - cam.x, pC.z - cam.z);
+    if (horiz < 0.6 || horiz > 9) return null;
+    const pL = floorPointFromVideo(bb.originX, bottom), pR = floorPointFromVideo(bb.originX + bb.width, bottom);
+    const width = pL && pR ? THREE.MathUtils.clamp(pL.distanceTo(pR), 0.2, 4) : 0.6;
+    const depth = Math.min(type.depth, Math.max(0.25, width * 1.2));
+    raycaster.setFromCamera(videoPointToNdc(bb.originX + bb.width / 2, bb.originY, _ndcV), camera);
+    const d = raycaster.ray.direction, dh = Math.max(Math.hypot(d.x, d.z), 1e-3);
+    // 휴대폰보다 낮은 사물은 상자 맨 위가 '뒤쪽 윗모서리', 더 높은 사물은 '앞쪽 윗모서리'에 해당
+    const reach = d.y < 0 ? horiz + depth : horiz;
+    const height = THREE.MathUtils.clamp(cam.y + d.y * (reach / dh), 0.25, 3);
+    const dir = new THREE.Vector3(pC.x - cam.x, 0, pC.z - cam.z).normalize();
+    return {
+      center: new THREE.Vector3(pC.x + dir.x * depth / 2, height / 2, pC.z + dir.z * depth / 2),
+      size: new THREE.Vector3(width, height, depth),
+      yaw: Math.atan2(dir.x, dir.z)
+    };
+  }
+  function ingestDetections(dets, now) {
+    const fresh = [];
+    for (const det of dets) {
+      const cat = det.categories && det.categories[0];
+      const type = cat && cat.score >= 0.4 ? objectType(cat.categoryName || cat.displayName) : null;
+      if (!type || !det.boundingBox) continue;
+      const est = estimateObject(det.boundingBox, type);
+      if (est) { const o = mergeObject(type, est, now); if (o) fresh.push(o); }
+      else touchObjectsInBox(type, det.boundingBox, now);
+    }
+    pruneObjects(now);
+    if (fresh.length) { // 한 번에 여러 개를 찾으면 한 문장으로
+      const last = fresh[fresh.length - 1].def.ko;
+      logStatus(`${fresh.map((o) => `${o.def.icon} ${o.def.ko}`).join(', ')}${josa(last, '을', '를')} 찾았어요! 포켓몬이 그 뒤에 숨을 수 있어요.`);
+    }
+  }
+  // 사물 아래쪽이 화면 밖이라 거리는 못 재도, 이미 아는 사물이 그 상자 안에 보이면 '아직 있음'으로 표시
+  function touchObjectsInBox(type, bb, now) {
+    const a = videoPointToNdc(bb.originX, bb.originY, new THREE.Vector2());
+    const b = videoPointToNdc(bb.originX + bb.width, bb.originY + bb.height, new THREE.Vector2());
+    for (const o of realObjects) {
+      if (!o.active || o.def.key !== type.key) continue;
+      _proj.copy(o.center).project(camera);
+      if (_proj.z < 1 && _proj.x >= Math.min(a.x, b.x) && _proj.x <= Math.max(a.x, b.x) &&
+          _proj.y >= Math.min(a.y, b.y) && _proj.y <= Math.max(a.y, b.y)) o.lastSeen = now;
+    }
+  }
+  function mergeObject(type, est, now) {
+    let best = null, bestD = Infinity;
+    for (const o of realObjects) {
+      if (o.def.key !== type.key) continue;
+      const d = Math.hypot(o.center.x - est.center.x, o.center.z - est.center.z);
+      if (d < bestD) { bestD = d; best = o; }
+    }
+    if (best && bestD < Math.max(0.8, est.size.x * 0.7)) {   // 이미 아는 사물 → 위치·크기를 조금씩 맞춤
+      best.center.lerp(est.center, 0.35);
+      best.size.lerp(est.size, 0.35);
+      best.yaw += wrapAngle(est.yaw - best.yaw) * 0.35;
+      best.lastSeen = now;
+      best.hits++;
+      updateObjectTransform(best);
+      if (!best.active && best.hits >= 2) { activateObject(best); return best; } // 두 번 이상 보여야 진짜로 인정
+      return null;
+    }
+    if (realObjects.length >= MAX_REAL_OBJECTS) {
+      let oldest = null;
+      for (const o of realObjects) if (!oldest || o.lastSeen < oldest.lastSeen) oldest = o;
+      removeObject(oldest);
+    }
+    const o = {
+      id: ++objectSeq, def: type, center: est.center, size: est.size, yaw: est.yaw,
+      hits: 1, active: false, firstSeen: now, lastSeen: now,
+      mesh: new THREE.Mesh(UNIT_BOX, OCCLUDER_MAT), rigidInv: new THREE.Matrix4()
+    };
+    o.mesh.renderOrder = -1;
+    o.mesh.visible = false;
+    scene.add(o.mesh);
+    updateObjectTransform(o);
+    realObjects.push(o);
+  }
+  const _rq = new THREE.Quaternion(), _rm = new THREE.Matrix4(), _one = new THREE.Vector3(1, 1, 1);
+  function updateObjectTransform(o) {
+    o.mesh.position.copy(o.center);
+    o.mesh.rotation.set(0, o.yaw, 0);
+    o.mesh.scale.copy(o.size);
+    _rq.setFromAxisAngle(_yAxis, o.yaw);
+    o.rigidInv.copy(_rm.compose(o.center, _rq, _one)).invert();
+  }
+  function activateObject(o) {
+    o.active = true;
+    o.mesh.visible = true;
+    flashOutline(o);
+    updateCamChip();
+  }
+  function removeObject(o) {
+    if (!o) return;
+    scene.remove(o.mesh);
+    const i = realObjects.indexOf(o);
+    if (i >= 0) realObjects.splice(i, 1);
+    if (pokeData.hideObj === o) pokeData.hideObj = null;
+    updateCamChip();
+  }
+  function clearRealObjects() {
+    while (realObjects.length) removeObject(realObjects[0]);
+  }
+  const _proj = new THREE.Vector3();
+  function pruneObjects(now) {
+    for (const o of realObjects.slice()) {
+      if (!o.active) { if (now - o.firstSeen > 2500) removeObject(o); continue; }
+      // 바닥에 닿은 앞면 가운데가 화면 안에 잘 보이는데도 4초 넘게 못 찾으면 치워졌거나 잘못 본 것으로 봄
+      _proj.set(o.center.x - Math.sin(o.yaw) * o.size.z / 2, 0, o.center.z - Math.cos(o.yaw) * o.size.z / 2).project(camera);
+      const inView = _proj.z < 1 && Math.abs(_proj.x) < 0.75 && Math.abs(_proj.y) < 0.75;
+      if (inView && now - o.lastSeen > 4000) removeObject(o);
+    }
+  }
+  // 찾은 사물을 잠깐 테두리로 보여 줌 (계속 그려 두지는 않음)
+  function flashOutline(o) {
+    const mat = new THREE.LineBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0.95, depthTest: false });
+    const lines = new THREE.LineSegments(UNIT_EDGES, mat);
+    lines.position.copy(o.center);
+    lines.rotation.y = o.yaw;
+    lines.scale.copy(o.size);
+    lines.renderOrder = 5;
+    scene.add(lines);
+    effects.push({ kind: 'outline', mesh: lines, t: 0, dur: 1.6 });
+  }
   const RING_GEO = new THREE.RingGeometry(0.35, 0.5, 48);
-  const effects = [];
-  function spawnSummonRing(at) {
+  function spawnRing(at, color, size) {
     const mat = new THREE.MeshBasicMaterial({
-      color: 0xf472b6, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
+      color, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending, depthWrite: false
     });
     const ring = new THREE.Mesh(RING_GEO, mat);
     ring.position.copy(at);
     ring.lookAt(camera.position);
+    ring.scale.setScalar(size);
     scene.add(ring);
-    effects.push({ mesh: ring, t: 0 });
+    effects.push({ kind: 'ring', mesh: ring, t: 0, dur: 0.8, base: size });
   }
   function updateEffects(dt) {
     for (let i = effects.length - 1; i >= 0; i--) {
       const e = effects[i];
-      e.t += dt / 0.8;
-      e.mesh.scale.setScalar(1 + e.t * 3);
-      e.mesh.material.opacity = 0.9 * Math.max(0, 1 - e.t);
+      e.t += dt / e.dur;
+      if (e.kind === 'ring') {
+        e.mesh.scale.setScalar(e.base * (1 + e.t * 3));
+        e.mesh.material.opacity = 0.9 * Math.max(0, 1 - e.t);
+      } else {
+        e.mesh.material.opacity = 0.95 * Math.max(0, 1 - e.t);
+      }
       if (e.t >= 1) { scene.remove(e.mesh); e.mesh.material.dispose(); effects.splice(i, 1); }
     }
   }
 
-  // 5. 지형지물 (은폐물/장애물) 관리 — [수정] 지오메트리·재질 공유, 충돌은 실제 상자 크기로 판정
-  const OBSTACLE_SIZE = new THREE.Vector3(1.5, 1.4, 0.5);
-  const OBSTACLE_GEO = new THREE.BoxGeometry(OBSTACLE_SIZE.x, OBSTACLE_SIZE.y, OBSTACLE_SIZE.z);
-  const OBSTACLE_MAT = new THREE.MeshStandardMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.45, roughness: 0.3 });
-  const OBSTACLE_EDGES = new THREE.EdgesGeometry(OBSTACLE_GEO);
-  const OBSTACLE_EDGE_MAT = new THREE.LineBasicMaterial({ color: 0x67e8f9 });
-  const obstacles = [];
-  function createObstacle(x, z) {
-    // 실제 공간의 소파나 책상에 맞춰 세워두는 반투명 AR 차폐 벽
-    const box = new THREE.Mesh(OBSTACLE_GEO, OBSTACLE_MAT);
-    box.position.set(x, 0.7, z);
-    box.add(new THREE.LineSegments(OBSTACLE_EDGES, OBSTACLE_EDGE_MAT)); // 테두리 강조선
-    box.userData.bounds = new THREE.Box3().setFromCenterAndSize(box.position, OBSTACLE_SIZE);
-    scene.add(box);
-    obstacles.push(box);
-    // 최대 3개까지만 유지
-    if (obstacles.length > 3) scene.remove(obstacles.shift());
-  }
-  // 초기 기본 지형지물 2개 배치
-  createObstacle(-1.8, -3.6);
-  createObstacle(1.8, -4.2);
-
-  // 6. 발사체 관리 (포켓볼, 내 공격, 포켓몬의 반격)
-  //    [수정] 속도는 초당 단위(기존 60fps 기준 값과 동일), 지오메트리·재질 공유
+  // 7. 발사체 (⚡ 내 공격, 포켓몬의 반격, 던진 포켓볼) — 속도는 초당 단위, 재질 공유
   const PROJECTILE = {
-    POKEBALL:   { speed: 10.8, gravity: 7.92, radius: 0.22 },
-    PLAYER_ATK: { speed: 16.8, gravity: 0,    radius: 0.18 },
-    ENEMY_ATK:  { speed: 9.6,  gravity: 0,    radius: 0.24 }
+    PLAYER_ATK: { speed: 16.8, gravity: 0, radius: 0.12 },
+    ENEMY_ATK: { speed: 7.5, gravity: 0, radius: 0.16 }
   };
-  const projectiles = [];
-  const BOLT_GEO = new THREE.SphereGeometry(0.18, 16, 16);
+  const BOLT_GEO = new THREE.SphereGeometry(0.12, 16, 16);
   const BOLT_MAT = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
-  const ORB_GEO = new THREE.SphereGeometry(0.24, 16, 16);
+  const ORB_GEO = new THREE.SphereGeometry(0.16, 16, 16);
   const ORB_MAT = new THREE.MeshBasicMaterial({ color: 0xa855f7 });
   const BALL_PARTS = (() => {
     const radius = 0.22;
     return [
       [new THREE.SphereGeometry(radius, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.2 })],
       [new THREE.SphereGeometry(radius, 20, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })],
-      [new THREE.CylinderGeometry(radius * 1.02, radius * 1.02, 0.04, 20), new THREE.MeshBasicMaterial({ color: 0x111111 })]
+      [new THREE.CylinderGeometry(radius * 1.02, radius * 1.02, 0.04, 20), new THREE.MeshBasicMaterial({ color: 0x111111 })],
+      [new THREE.CylinderGeometry(0.06, 0.06, 0.03, 16).rotateX(Math.PI / 2).translate(0, 0, radius), new THREE.MeshBasicMaterial({ color: 0xf8fafc })]
     ];
   })();
   function createPokeballMesh() {
@@ -871,20 +1725,17 @@
     return group;
   }
 
-  // [수정] 카메라 방향 기준으로 발사 → 중앙 조준점이 실제로 겨누는 지점(포켓몬 거리)에 도달
-  const _fwd = new THREE.Vector3();
-  function launchFromPlayer(mesh, type, offsetY) {
-    const spec = PROJECTILE[type];
-    const start = new THREE.Vector3(0, offsetY, -0.45).applyQuaternion(camera.quaternion).add(camera.position);
+  // ⚡ 내 공격: 카메라 방향(조준점)으로 발사 → 조준점이 겨누는 지점(포켓몬 거리)에 도달
+  function launchBolt() {
+    const spec = PROJECTILE.PLAYER_ATK;
+    const start = new THREE.Vector3(0.12, -0.18, -0.45).applyQuaternion(camera.quaternion).add(camera.position);
     _fwd.set(0, 0, -1).applyQuaternion(camera.quaternion);
-    const aimDist = THREE.MathUtils.clamp(camera.position.distanceTo(pokemonMesh.position), 1.5, 12);
+    const aimDist = THREE.MathUtils.clamp(camera.position.distanceTo(bodyCenter()), 1.5, 12);
     const delta = camera.position.clone().addScaledVector(_fwd, aimDist).sub(start);
-    const flightTime = delta.length() / spec.speed;
-    const vel = delta.divideScalar(flightTime);
-    vel.y += 0.5 * spec.gravity * flightTime; // 포켓볼은 중력만큼 높게 던져 조준점에 떨어지게
-    mesh.position.copy(start);
-    scene.add(mesh);
-    projectiles.push({ mesh, vel, type, age: 0, gravity: spec.gravity, radius: spec.radius });
+    const bolt = new THREE.Mesh(BOLT_GEO, BOLT_MAT);
+    bolt.position.copy(start);
+    scene.add(bolt);
+    projectiles.push({ mesh: bolt, vel: delta.normalize().multiplyScalar(spec.speed), type: 'PLAYER_ATK', age: 0, gravity: 0, radius: spec.radius });
   }
   function clearProjectiles(type) {
     for (let i = projectiles.length - 1; i >= 0; i--) {
@@ -894,69 +1745,28 @@
       }
     }
   }
-
-  // 포켓볼 던지기
-  btnBall.addEventListener('click', () => {
-    if (!isTargetActive()) return;
-    launchFromPlayer(createPokeballMesh(), 'POKEBALL', -0.22);
-    tryTriggerPokemonDodge();
-  });
-
-  // 내 공격 발사 (포켓몬 HP 깎기)
   btnAtk.addEventListener('click', () => {
     if (!isTargetActive()) return;
-    launchFromPlayer(new THREE.Mesh(BOLT_GEO, BOLT_MAT), 'PLAYER_ATK', -0.16);
+    launchBolt();
     tryTriggerPokemonDodge();
   });
-
-  // 지형 은폐물 설치 버튼 (바라보는 방향 앞쪽, 전장 범위 안에 설치)
-  btnCover.addEventListener('click', () => {
-    const forward = new THREE.Vector3(0, 0, -3.5).applyQuaternion(camera.quaternion);
-    const spawnX = THREE.MathUtils.clamp(camera.position.x + forward.x + (Math.random() - 0.5), -2.5, 2.5);
-    const spawnZ = THREE.MathUtils.clamp(camera.position.z + forward.z, -5.5, -2.5);
-    createObstacle(spawnX, spawnZ);
-    logStatus('현실 사물 위치에 AR 은폐물을 설치했습니다! 포켓몬이 숨을 수 있습니다.');
-  });
-
-  // 다른 포켓몬 소환 버튼
   btnChange.addEventListener('click', () => {
     currentPokeIdx = (currentPokeIdx + 1) % POKEMON_LIST.length;
     spawnPokemon(POKEMON_LIST[currentPokeIdx]);
   });
 
-  // 포켓몬 회피 AI 판정
-  function tryTriggerPokemonDodge() {
-    if (!isTargetActive()) return;
-    // 체력이 높을수록 더 잘 피함
-    const effectiveDodge = pokeData.dodgeRate * (0.4 + 0.6 * (pokeData.hp / 100));
-    if (Math.random() < effectiveDodge) {
-      pokeData.state = 'DODGE';
-      pokeData.stateTimer = 40 / 60;
-      let sideDir = Math.random() > 0.5 ? 1.8 : -1.8;
-      if (Math.abs(pokeData.pos.x + sideDir) > 2.6) sideDir = -sideDir; // 벽 쪽이면 반대로
-      pokeData.targetPos.set(
-        THREE.MathUtils.clamp(pokeData.pos.x + sideDir, -2.6, 2.6),
-        1.8, // 점프 회피
-        pokeData.pos.z
-      );
-      setBadge('⚡ 고속 회피!', '#eab308');
-      logStatus('포켓몬이 날아오는 궤적을 보고 재빠르게 피했습니다!');
-    }
-  }
-
-  // 포켓몬의 반격 발사
+  // 포켓몬의 반격 (공격 동작에서 튀어나오는 순간 발사)
   function firePokemonCounterAttack() {
     if (!isTargetActive()) return;
     const spec = PROJECTILE.ENEMY_ATK;
     const orb = new THREE.Mesh(ORB_GEO, ORB_MAT);
-    orb.position.copy(pokemonMesh.position);
+    bodyCenter(orb.position);
     const vel = new THREE.Vector3().subVectors(camera.position, orb.position).normalize().multiplyScalar(spec.speed);
     scene.add(orb);
     projectiles.push({ mesh: orb, vel, type: 'ENEMY_ATK', age: 0, gravity: 0, radius: spec.radius });
     setBadge('🔥 반격 중!', '#ef4444');
     logStatus('주의! 포켓몬이 나를 향해 공격을 날렸습니다!');
   }
-
   function capturePokemon() {
     pokeData.state = 'CAPTURED';
     pokemonMesh.visible = false;
@@ -964,8 +1774,374 @@
     clearProjectiles('ENEMY_ATK');
     setBadge('✨ 포획 성공!', '#22c55e');
     const name = currentPokemon.name;
-    logStatus(`🎉 신난다! ${name}${josa(name, '을', '를')} 잡았습니다! [다른 포켓몬 소환]이나 카드로 새 포켓몬을 불러 보세요.`);
+    logStatus(`🎉 신난다! ${name}${josa(name, '을', '를')} 잡았습니다! [🔄 교체]나 카드로 새 포켓몬을 불러 보세요.`);
     updateControls();
+  }
+
+  // 한 프레임 이동 구간 전체로 충돌 검사 → 빠른 발사체가 사물·포켓몬을 뚫고 지나가지 않음
+  const _prev = new THREE.Vector3(), _dir = new THREE.Vector3(), _hit = new THREE.Vector3();
+  const _ray = new THREE.Ray(), _sphere = new THREE.Sphere();
+  const _lr = new THREE.Ray(), _lbox = new THREE.Box3();
+  function sphereHitDistance(from) {
+    if (_sphere.containsPoint(from)) return 0;
+    return _ray.intersectSphere(_sphere, _hit) ? _hit.distanceTo(from) : Infinity;
+  }
+  function findFirstHit(p, from, to) {
+    _dir.subVectors(to, from);
+    const len = _dir.length();
+    if (len === 0) return null;
+    _ray.set(from, _dir.divideScalar(len));
+    let best = null, bestDist = len;
+    for (const o of realObjects) {                       // 실제 사물(가림막)에 막힘 (이미 튕긴 공은 그냥 떨어짐)
+      if (!o.active || p.dead) continue;
+      _lr.copy(_ray).applyMatrix4(o.rigidInv);
+      _lbox.min.set(-o.size.x / 2, -o.size.y / 2, -o.size.z / 2).subScalar(p.radius);
+      _lbox.max.set(o.size.x / 2, o.size.y / 2, o.size.z / 2).addScalar(p.radius);
+      let d = Infinity;
+      if (_lbox.containsPoint(_lr.origin)) d = 0;
+      else if (_lr.intersectBox(_lbox, _hit)) d = _hit.distanceTo(_lr.origin);
+      if (d <= bestDist) { bestDist = d; best = { kind: 'object', obj: o }; }
+    }
+    if (p.type !== 'ENEMY_ATK' && !p.dead && isTargetActive()) {
+      _sphere.set(bodyCenter(), hitRadius());
+      const d = sphereHitDistance(from);
+      if (d <= bestDist) { bestDist = d; best = { kind: 'pokemon' }; }
+    }
+    if (p.type === 'ENEMY_ATK') {
+      _sphere.set(camera.position, 0.55);
+      const d = sphereHitDistance(from);
+      if (d <= bestDist) { bestDist = d; best = { kind: 'player' }; }
+    }
+    return best;
+  }
+  // 반환값: 'remove' 발사체 삭제, 'bounce' 튕김, 'catch' 포획 연출로 넘김
+  function handleHit(p, hit) {
+    if (hit.kind === 'object') {
+      const o = hit.obj, name = o.def.ko;
+      if (p.type === 'ENEMY_ATK') logStatus(`${o.def.icon} ${name}${josa(name, '이', '가')} 포켓몬의 공격을 막아 줬어요!`);
+      else if (p.type === 'POKEBALL') logStatus(`${o.def.icon} 포켓볼이 ${name}에 맞고 튕겼어요! 포켓몬이 나올 때를 노리세요.`);
+      else logStatus(`${o.def.icon} ${name}에 가로막혔어요! 각도를 바꾸세요.`);
+      return p.type === 'POKEBALL' ? 'bounce' : 'remove';
+    }
+    if (hit.kind === 'pokemon') {
+      if (p.type === 'PLAYER_ATK') {
+        pokeData.hp = Math.max(10, pokeData.hp - 25);
+        updateHpUI();
+        pokeData.react = { kind: 'hit', t: 0 };
+        logStatus(`⚡ 명중! 포켓몬의 체력이 줄어들어 회피율이 감소했습니다! (HP: ${pokeData.hp}%)`);
+        return 'remove';
+      }
+      startCatch(p);
+      return 'catch';
+    }
+    triggerDamageFlash();
+    logStatus('💥 포켓몬의 공격에 맞았습니다!');
+    return 'remove';
+  }
+  function updateProjectiles(dt) {
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+      const p = projectiles[i];
+      p.age += dt;
+      _prev.copy(p.mesh.position);
+      p.mesh.position.addScaledVector(p.vel, dt);
+      if (p.gravity) { // 등가속도 운동을 정확히 적분
+        p.mesh.position.y -= 0.5 * p.gravity * dt * dt;
+        p.vel.y -= p.gravity * dt;
+      }
+      p.mesh.rotation.x += (p.spin === undefined ? 9 : p.spin) * dt;
+      let remove = false, keepMesh = false;
+      const hit = p.resting ? null : findFirstHit(p, _prev, p.mesh.position);
+      if (hit) {
+        const result = handleHit(p, hit);
+        if (result === 'bounce') {
+          p.mesh.position.copy(_prev);
+          p.vel.set(-p.vel.x * 0.3, Math.abs(p.vel.y) * 0.4, -p.vel.z * 0.3);
+          p.dead = true;
+        } else {
+          remove = true;
+          keepMesh = result === 'catch';
+        }
+      } else if (p.type === 'POKEBALL' && p.mesh.position.y < p.radius) {
+        // 바닥에 닿으면 한 번 튀고 멈춤 → 빗나감
+        p.mesh.position.y = p.radius;
+        if (!p.bounced) {
+          p.bounced = true;
+          if (!p.dead && isTargetActive()) logStatus('포켓볼이 빗나갔어요. 링이 작아질 때 포켓몬을 향해 밀어 던져 보세요.');
+          p.dead = true;
+          p.vel.set(p.vel.x * 0.45, Math.abs(p.vel.y) * 0.3, p.vel.z * 0.45);
+        } else {
+          p.vel.set(0, 0, 0); p.gravity = 0; p.spin = 0; p.resting = true;
+        }
+      } else if (p.type !== 'POKEBALL' && p.mesh.position.y < 0) {
+        remove = true;
+      }
+      if (p.resting) { p.restT = (p.restT || 0) + dt; if (p.restT > 0.6) remove = true; }
+      if (p.age > 5 || p.mesh.position.distanceTo(camera.position) > 30) remove = true;
+      if (remove) {
+        if (!keepMesh) scene.remove(p.mesh);
+        projectiles.splice(i, 1);
+        if (p.type === 'POKEBALL' && !keepMesh) onBallFinished();
+      }
+    }
+  }
+
+  // 8. [추가] 포켓볼 스와이프 던지기 (포켓몬 GO 방식)
+  //    화면 아래 포켓볼을 손가락으로 잡고 위로 휙 밀면 던짐. 미는 속도 = 세기, 좌우 기울기 = 방향.
+  //    포켓몬 쪽으로 대충 맞게 던지면 살짝 보정해 줌. 링이 작을 때 맞히면 포획 확률이 올라감.
+  const BALL_RADIUS = 0.05, BALL_SCALE = BALL_RADIUS / 0.22, BALL_GRAVITY = 9.0, HAND_BALL_PX = 46;
+  const handBall = createPokeballMesh();
+  handBall.scale.setScalar(BALL_SCALE);
+  handBall.visible = false;
+  overlayScene.add(handBall);
+  // screen: 손에 든 공의 화면 위치(px). 화면 좌표로 들고 있어야 휴대폰을 돌려도 공이 손가락·제자리에 붙어 있음
+  const throwState = { ready: true, readyAt: 0, grabbing: false, pointerId: null, samples: [], showHint: true, screen: null, appear: 0 };
+  const _scr = new THREE.Vector3(), _sdir = new THREE.Vector3(), _aimT = new THREE.Vector3();
+  // 손에 든 공이 화면에서 늘 비슷한 크기(반지름 약 46px)로 보이도록 카메라와의 거리를 정함
+  function handDist() {
+    const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    return THREE.MathUtils.clamp(BALL_RADIUS * (window.innerHeight / 2) / (tanHalf * HAND_BALL_PX), 0.25, 1.2);
+  }
+  function screenToWorld(x, y, dist, out) {
+    _scr.set(x / window.innerWidth * 2 - 1, -(y / window.innerHeight * 2 - 1), 0.5).unproject(camera);
+    _sdir.subVectors(_scr, camera.position).normalize();
+    return out.copy(camera.position).addScaledVector(_sdir, dist);
+  }
+  function ballSlotPoint() { // 화면 아래 가운데 포켓볼 자리
+    const r = ballSlot.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+  function handBallAvailable() {
+    return isTargetActive() && throwState.ready && !scanner.open && !catchSeq && !uiLayer.hidden && performance.now() >= throwState.readyAt;
+  }
+  function onBallFinished(delayMs = 450) {
+    throwState.ready = true;
+    throwState.readyAt = performance.now() + delayMs;
+  }
+  function updateHandBall(dt) {
+    const show = throwState.grabbing || handBallAvailable();
+    handBall.visible = show;
+    throwHint.hidden = !show || !throwState.showHint;
+    if (!show) return;
+    const slot = ballSlotPoint();
+    if (!throwState.screen) { throwState.screen = { x: slot.x, y: slot.y }; throwState.appear = 0; } // 새 공 등장
+    if (!throwState.grabbing) {                                 // 놓으면 제자리로 돌아옴
+      const k = Math.min(1, dt * 14);
+      throwState.screen.x += (slot.x - throwState.screen.x) * k;
+      throwState.screen.y += (slot.y - throwState.screen.y) * k;
+    }
+    throwState.appear = Math.min(1, throwState.appear + dt / 0.25);
+    screenToWorld(throwState.screen.x, throwState.screen.y, handDist(), handBall.position);
+    handBall.scale.setScalar(BALL_SCALE * (0.2 + 0.8 * throwState.appear));
+    handBall.quaternion.copy(camera.quaternion);
+    if (!throwState.grabbing) handBall.rotateY(Math.sin(elapsed * 1.6) * 0.35);
+  }
+  function nearHandBall(x, y) {
+    const s = throwState.screen || ballSlotPoint();
+    return Math.hypot(x - s.x, y - s.y) < HAND_BALL_PX * 1.6;
+  }
+  // 손가락 움직임의 시각은 이벤트가 실제로 일어난 시각(timeStamp)을 씀 → 화면이 잠깐 버벅여도 던지는 세기가 정확함
+  function eventTime(e) {
+    const t = e.timeStamp;
+    return t > 0 && Math.abs(t - performance.now()) < 10000 ? t : performance.now();
+  }
+  function grabBall(e) {
+    throwState.grabbing = true;
+    throwState.pointerId = e.pointerId;
+    throwState.samples = [{ t: eventTime(e), x: e.clientX, y: e.clientY }];
+    throwState.screen = { x: e.clientX, y: e.clientY };
+  }
+  function dragBall(e) {
+    const list = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+    for (const ce of list.length ? list : [e]) throwState.samples.push({ t: eventTime(ce), x: ce.clientX, y: ce.clientY });
+    const last = throwState.samples[throwState.samples.length - 1].t;
+    while (throwState.samples.length > 2 && last - throwState.samples[0].t > 200) throwState.samples.shift();
+    throwState.screen = { x: e.clientX, y: e.clientY };
+  }
+  function releaseBall(e) {
+    throwState.grabbing = false;
+    throwState.pointerId = null;
+    if (scanner.open || uiLayer.hidden) return;                // 카드 스캔 화면이 열렸으면 던지지 않음
+    const now = eventTime(e);
+    throwState.samples.push({ t: now, x: e.clientX, y: e.clientY });
+    const s = throwState.samples.filter((q) => now - q.t <= 140);   // 손을 놓기 직전의 움직임만
+    if (s.length < 2) return;
+    const a = s[0], b = s[s.length - 1];
+    const dt = Math.max(16, b.t - a.t) / 1000;
+    const vx = (b.x - a.x) / dt, vy = (b.y - a.y) / dt;
+    if (-vy < 380) { logStatus('포켓볼을 위쪽으로 휙 밀어서 던져 주세요.'); return; } // 약하게 놓으면 제자리로
+    throwBall(vx, vy);
+  }
+  function throwBall(vx, vy) {
+    if (!isTargetActive()) return;
+    const speedNorm = Math.hypot(vx, vy) / window.innerHeight;          // 1초에 화면 높이의 몇 배를 밀었는지
+    const v = THREE.MathUtils.clamp(2.6 + speedNorm * 1.7, 3.2, 12);    // 던지는 속도 (m/s)
+    const side = THREE.MathUtils.clamp(Math.atan2(vx, -vy), -0.7, 0.7) * 0.75;
+    const elev = 0.3;
+    const dir = new THREE.Vector3(Math.sin(side) * Math.cos(elev), Math.sin(elev), -Math.cos(side) * Math.cos(elev))
+      .applyQuaternion(camera.quaternion);
+    const s = throwState.screen || ballSlotPoint();
+    const start = screenToWorld(s.x, s.y, handDist(), new THREE.Vector3());
+    assistThrow(dir, v, start);
+    const ball = createPokeballMesh();
+    ball.scale.setScalar(BALL_SCALE);
+    ball.position.copy(start);
+    scene.add(ball);
+    projectiles.push({ mesh: ball, vel: dir.multiplyScalar(v), type: 'POKEBALL', age: 0, gravity: BALL_GRAVITY, radius: BALL_RADIUS, spin: 16 });
+    throwState.ready = false;
+    throwState.screen = null;
+    throwState.showHint = false;
+    handBall.visible = false;
+    tryTriggerPokemonDodge(0.6);
+  }
+  // 포켓몬 쪽으로 15° 안쪽으로 던졌다면 방향과 높이를 조금 맞춰 줌 (크게 빗나간 건 그대로)
+  function assistThrow(dir, v, from) {
+    const tgt = bodyCenter(_aimT);
+    const dx = tgt.x - from.x, dy = tgt.y - from.y, dz = tgt.z - from.z;
+    const horiz = Math.hypot(dx, dz);
+    if (horiz < 0.5) return;
+    const yawB = Math.atan2(dir.x, dir.z);
+    const diff = wrapAngle(Math.atan2(dx, dz) - yawB);
+    if (Math.abs(diff) > 0.26) return;
+    const yaw = yawB + diff * 0.7;
+    let elev = Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1));
+    const g = BALL_GRAVITY, disc = v ** 4 - g * (g * horiz * horiz + 2 * dy * v * v);
+    if (disc >= 0) {                                          // 이 속도로 닿을 수 있으면 필요한 각도로 당겨 줌
+      const need = Math.atan((v * v - Math.sqrt(disc)) / (g * horiz));
+      if (Math.abs(need - elev) < 0.5) elev += (need - elev) * 0.75;
+    }
+    dir.set(Math.sin(yaw) * Math.cos(elev), Math.sin(elev), Math.cos(yaw) * Math.cos(elev));
+  }
+
+  // 타깃 링: 흰 테두리 안의 색 링이 줄었다 커졌다 반복. 색 = 잡기 쉬운 정도(초록 > 노랑 > 빨강)
+  const ringGroup = new THREE.Group();
+  const ringOuter = new THREE.Mesh(new THREE.RingGeometry(0.94, 1, 64), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide }));
+  const ringInner = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 64), new THREE.MeshBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide }));
+  ringOuter.renderOrder = ringInner.renderOrder = 3;
+  ringGroup.add(ringOuter, ringInner);
+  ringGroup.visible = false;
+  scene.add(ringGroup);
+  let ringPhase = 0;
+  function catchChanceBase() { return Math.min(0.95, (100 - pokeData.hp) / 100 + 0.25); } // 체력이 낮을수록 잘 잡힘
+  function ringRatio() { return 1 - 0.85 * ringPhase; }
+  function ringRadius() { return Math.max(pokeData.size.x, pokeData.size.y) * 0.5; }
+  function updateRing(dt) {
+    const show = isTargetActive() && !scanner.open &&
+      (handBall.visible || throwState.grabbing || projectiles.some((p) => p.type === 'POKEBALL' && !p.dead));
+    ringGroup.visible = show;
+    if (!show) return;
+    ringPhase = (ringPhase + dt / 1.8) % 1;
+    const R = ringRadius();
+    bodyCenter(ringGroup.position);
+    _view.subVectors(camera.position, ringGroup.position).normalize();
+    ringGroup.position.addScaledVector(_view, 0.06);   // 포켓몬 그림과 겹쳐 깜빡이지 않게 살짝 앞으로
+    ringGroup.quaternion.copy(camera.quaternion);
+    ringOuter.scale.setScalar(R);
+    ringInner.scale.setScalar(R * ringRatio());
+    const c = catchChanceBase();
+    ringInner.material.color.set(c >= 0.6 ? 0x22c55e : c >= 0.35 ? 0xeab308 : 0xef4444);
+  }
+
+  // 포획 연출: 빨려 들어감 → 볼이 바닥에 떨어짐 → 흔들흔들(최대 3번) → 딸깍(성공) 또는 튀어나옴(실패)
+  let catchSeq = null;
+  // 공이 맞은 자리가 색 링 안쪽이면 링이 작을수록 큰 보너스 (화면에서 본 몸 중심과의 거리로 판정)
+  const _off = new THREE.Vector3(), _view = new THREE.Vector3();
+  function ringBonus(ballPos) {
+    const center = bodyCenter(_aimT);
+    _view.subVectors(center, camera.position).normalize();
+    _off.subVectors(ballPos, center);
+    _off.addScaledVector(_view, -_off.dot(_view));
+    const r = ringRatio();
+    if (_off.length() > ringRadius() * r + BALL_RADIUS) return [null, 1];
+    return r <= 0.3 ? ['Excellent!', 1.8] : r <= 0.6 ? ['Great!', 1.4] : ['Nice!', 1.15];
+  }
+  function startCatch(p) {
+    const [label, mult] = ringBonus(p.mesh.position);
+    if (label) showToast(label);
+    const success = Math.random() < Math.min(0.97, catchChanceBase() * mult);
+    const roll = Math.random();
+    catchSeq = {
+      phase: 'absorb', t: 0, ball: p.mesh, success, label,
+      wobbles: success ? 3 : (roll < 0.4 ? 1 : roll < 0.75 ? 2 : 3),
+      pos: p.mesh.position.clone(), y0: 0
+    };
+    pokeData.state = 'CATCHING';
+    pokeData.react = null;
+    clearProjectiles('ENEMY_ATK');
+    setBadge('🔴 포획 중…', '#ef4444');
+    logStatus(label ? `${label} 링 안에 명중했어요!` : '포켓볼이 명중했어요! 링 안을 맞히면 더 잘 잡혀요.');
+    updateControls();
+  }
+  function updateCatch(dt) {
+    const c = catchSeq;
+    if (!c) return;
+    c.t += dt;
+    if (c.phase === 'absorb') {
+      const k = Math.min(1, c.t / 0.45);
+      spriteUniforms.uFlash.value = 1;
+      pokemonMesh.scale.set(pokeData.size.x * (1 - k) + 0.001, pokeData.size.y * (1 - k) + 0.001, 1);
+      pokemonMesh.position.lerp(c.pos, k * 0.3);
+      c.ball.position.copy(c.pos);
+      c.ball.rotation.set(0, 0, 0);
+      if (k >= 1) {
+        pokemonMesh.visible = false;
+        pokeShadow.visible = false;
+        c.phase = 'drop'; c.t = 0; c.y0 = c.ball.position.y;
+      }
+    } else if (c.phase === 'drop') {
+      const k = Math.min(1, c.t / 0.35);
+      c.ball.position.y = THREE.MathUtils.lerp(c.y0, BALL_RADIUS, k * k);
+      if (k >= 1) { c.phase = 'wobble'; c.t = 0; }
+    } else if (c.phase === 'wobble') {
+      const per = 0.75, n = Math.floor(c.t / per), u = (c.t % per) / per;
+      c.ball.rotation.z = u < 0.55 ? Math.sin(u / 0.55 * Math.PI * 2) * 0.5 : 0;
+      if (n >= c.wobbles) { c.ball.rotation.z = 0; c.phase = c.success ? 'click' : 'break'; c.t = 0; }
+    } else if (c.phase === 'click') {
+      if (!c.clicked) { c.clicked = true; spawnRing(c.ball.position, 0xfacc15, 0.6); showToast('잡았다!'); }
+      if (c.t > 0.8) finishCatch(true);
+    } else if (c.phase === 'break') {
+      if (!c.broke) {
+        c.broke = true;
+        spawnRing(c.ball.position, 0xffffff, 0.8);
+        scene.remove(c.ball);
+        pokemonMesh.visible = true;
+        pokeShadow.visible = true;
+        pokeData.lastPos.copy(pokeData.pos);
+      }
+      const k = Math.min(1, c.t / 0.4);
+      pokemonMesh.position.copy(pokeData.pos);
+      pokemonMesh.scale.set(pokeData.size.x * (0.2 + 0.8 * k), pokeData.size.y * (0.2 + 0.8 * k), 1);
+      pokemonMesh.lookAt(camera.position.x, pokemonMesh.position.y, camera.position.z);
+      spriteUniforms.uFlash.value = 1 - k;
+      if (k >= 1) finishCatch(false);
+    }
+  }
+  function finishCatch(success) {
+    const c = catchSeq;
+    catchSeq = null;
+    if (success) {
+      scene.remove(c.ball);
+      capturePokemon();
+    } else {
+      pokeData.state = 'WANDER';
+      pokeData.stateTimer = 0.6;
+      setBadge('🐾 이동 중', '#3b82f6');
+      logStatus('앗! 포켓몬이 볼에서 빠져나왔어요! ⚡ 공격으로 체력을 더 깎고 다시 던져 보세요.');
+      updateControls();
+    }
+    onBallFinished();
+  }
+  function cancelCatch() {
+    if (!catchSeq) return;
+    scene.remove(catchSeq.ball);
+    catchSeq = null;
+    spriteUniforms.uFlash.value = 0;
+  }
+  let toastTimer = 0;
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 900);
   }
 
   // UI 업데이트 보조 함수
@@ -991,35 +2167,54 @@
     flashTimer = setTimeout(() => { flash.style.opacity = '0'; }, 220);
   }
 
-  // 7. [추가] 조준 — 드래그(모든 기기) + 자이로(지원 기기, iOS는 권한 요청)
-  const view = { yaw: 0, pitch: 0 };
+  // 9. 조준 — 가상 공간에선 드래그, AR(카메라+자이로)에선 휴대폰 방향 그대로
+  const view = { yaw: 0, pitch: DEFAULT_PITCH };
   const YAW_LIMIT = 1.2, PITCH_LIMIT = 1.1;
-  const gyro = { active: false, hasData: false, alpha: 0, beta: 0, gamma: 0, headingRef: 0, needsCalib: true, checkTimer: 0 };
-  const _yAxis = new THREE.Vector3(0, 1, 0), _zee = new THREE.Vector3(0, 0, 1);
   const _q0 = new THREE.Quaternion(), _q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
   const _deviceQ = new THREE.Quaternion(), _euler = new THREE.Euler(), _euler2 = new THREE.Euler();
 
   let dragPointer = null, lastX = 0, lastY = 0;
   canvas.addEventListener('pointerdown', (e) => {
+    if (!throwState.grabbing && handBallAvailable() && nearHandBall(e.clientX, e.clientY)) {  // 포켓볼 잡기
+      grabBall(e);
+      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+      return;
+    }
     if (dragPointer !== null) return;
     dragPointer = e.pointerId; lastX = e.clientX; lastY = e.clientY;
     try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
   });
   canvas.addEventListener('pointermove', (e) => {
+    if (throwState.grabbing && e.pointerId === throwState.pointerId) { dragBall(e); return; }
     if (e.pointerId !== dragPointer) return;
-    const radPerPx = THREE.MathUtils.degToRad(camera.fov) / window.innerHeight;
     const dx = e.clientX - lastX, dy = e.clientY - lastY;
     lastX = e.clientX; lastY = e.clientY;
+    if (isArMode()) return;                      // AR에선 끌어서 돌리면 실제 공간과 어긋나므로 막음
+    const radPerPx = THREE.MathUtils.degToRad(camera.fov) / window.innerHeight;
     view.yaw -= dx * radPerPx;                   // 오른쪽으로 끌면 오른쪽을 봄
-    if (!(gyro.active && gyro.hasData)) {        // 자이로 사용 중엔 좌우 보정만
+    if (!(gyro.active && gyro.hasData)) {
       view.yaw = THREE.MathUtils.clamp(view.yaw, -YAW_LIMIT, YAW_LIMIT);
       view.pitch = THREE.MathUtils.clamp(view.pitch - dy * radPerPx, -PITCH_LIMIT, PITCH_LIMIT); // 위로 끌면 위를 봄
     }
   });
-  const endDrag = (e) => { if (e.pointerId === dragPointer) dragPointer = null; };
-  canvas.addEventListener('pointerup', endDrag);
-  canvas.addEventListener('pointercancel', endDrag);
+  canvas.addEventListener('pointerup', (e) => {
+    maybeAutoEnableGyro();
+    if (throwState.grabbing && e.pointerId === throwState.pointerId) { releaseBall(e); return; }
+    if (e.pointerId === dragPointer) dragPointer = null;
+  });
+  canvas.addEventListener('pointercancel', (e) => {
+    if (throwState.grabbing && e.pointerId === throwState.pointerId) { throwState.grabbing = false; throwState.pointerId = null; return; }
+    if (e.pointerId === dragPointer) dragPointer = null;
+  });
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+  // 키보드로도 던질 수 있게: 스페이스 또는 B = 포켓몬 쪽으로 보통 세기의 스와이프
+  document.addEventListener('keydown', (e) => {
+    if ((e.code !== 'Space' && e.key !== 'b' && e.key !== 'B') || e.repeat) return;
+    if (e.target && e.target.closest && e.target.closest('button, input, select, textarea, a')) return;
+    if (!handBallAvailable()) return;
+    e.preventDefault();
+    throwBall(0, -2.6 * window.innerHeight);
+  });
 
   function screenAngle() {
     if (screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle;
@@ -1028,19 +2223,22 @@
   function onDeviceOrientation(e) {
     if (e.alpha === null && e.beta === null && e.gamma === null) return; // 센서 없음
     gyro.alpha = e.alpha || 0; gyro.beta = e.beta || 0; gyro.gamma = e.gamma || 0;
-    gyro.hasData = true;
+    if (!gyro.hasData) { gyro.hasData = true; updateCamChip(); }
   }
   function updateGyroButton() {
     btnGyro.textContent = gyro.active ? '🧭 자이로 끄기' : '🧭 자이로 켜기';
     btnGyro.classList.toggle('pill-on', gyro.active);
+    if (gyro.active) btnGyro.classList.remove('attention');
     btnGyro.setAttribute('aria-pressed', String(gyro.active));
   }
   function disableGyro() {
     gyro.active = false; gyro.hasData = false;
     clearTimeout(gyro.checkTimer);
     window.removeEventListener('deviceorientation', onDeviceOrientation);
-    view.yaw = 0; view.pitch = 0;
+    view.yaw = 0; view.pitch = DEFAULT_PITCH;
+    clearRealObjects();
     updateGyroButton();
+    updateCamChip();
   }
   async function enableGyro() {
     if (typeof window.DeviceOrientationEvent === 'undefined') {
@@ -1058,7 +2256,9 @@
     gyro.active = true; gyro.hasData = false; gyro.needsCalib = true;
     window.addEventListener('deviceorientation', onDeviceOrientation);
     updateGyroButton();
-    logStatus('🧭 휴대폰을 움직여 조준하세요. 포켓몬이 안 보이면 [🎯 정면]을 누르세요.');
+    logStatus(isCameraLive()
+      ? '🧭 AR 시작! 휴대폰을 움직여 포켓몬을 찾고, 주변 가구를 비춰 주세요.'
+      : '🧭 휴대폰을 움직여 조준하세요. 포켓몬이 안 보이면 [🎯 정면]을 누르세요.');
     clearTimeout(gyro.checkTimer);
     gyro.checkTimer = setTimeout(() => {
       if (gyro.active && !gyro.hasData) {
@@ -1068,15 +2268,33 @@
     }, 1500);
   }
   btnGyro.addEventListener('click', () => {
-    if (gyro.active) { disableGyro(); logStatus('자이로 조준을 껐습니다. 화면을 드래그해서 조준하세요.'); }
-    else enableGyro();
+    if (gyro.active) {
+      gyro.userOff = true;
+      disableGyro();
+      logStatus('자이로 조준을 껐습니다. 화면을 드래그해서 조준하세요. (AR 사물 인식도 멈춰요)');
+    } else {
+      gyro.userOff = false;
+      enableGyro();
+    }
   });
+  // 카메라가 켜져 있으면 게임 화면을 처음 터치할 때 자이로(AR)를 자동으로 켬
+  // (iOS의 권한 창은 손가락을 뗄 때만 띄울 수 있어서 pointerup에서 호출)
+  function maybeAutoEnableGyro() {
+    if (gyro.active || gyro.autoTried || gyro.userOff || !isCameraLive()) return;
+    gyro.autoTried = true;
+    enableGyro();
+  }
   btnRecenter.addEventListener('click', () => {
-    view.yaw = 0; view.pitch = 0;
-    if (gyro.active) gyro.needsCalib = true;
-    logStatus('🎯 시점을 정면으로 맞췄습니다.');
+    view.yaw = 0;
+    view.pitch = DEFAULT_PITCH;
+    if (gyro.active) {
+      gyro.needsCalib = true;
+      clearRealObjects();                         // 기준 방향이 바뀌므로 사물은 다시 찾음
+      logStatus('🎯 지금 보는 방향을 정면으로 맞췄어요. 주변 사물은 다시 찾을게요.');
+    } else {
+      logStatus('🎯 시점을 정면으로 맞췄습니다.');
+    }
   });
-
   function updateCameraOrientation() {
     if (gyro.active && gyro.hasData) {
       const d = THREE.MathUtils.degToRad;
@@ -1094,21 +2312,22 @@
     camera.updateMatrixWorld();
   }
 
-  // [추가] 화면 밖 포켓몬 방향 화살표
+  // 화면 밖 포켓몬 방향 화살표
   const _ndc = new THREE.Vector3(), _camSpace = new THREE.Vector3();
   let safeTop = 0, safeBottom = 0;
   function measureUiBounds() {
     if (uiLayer.hidden) return;
     safeTop = document.querySelector('.top-hud').getBoundingClientRect().bottom + 30;
-    safeBottom = document.querySelector('.bottom-controls').getBoundingClientRect().top - 30;
+    safeBottom = document.querySelector('.bottom-controls').getBoundingClientRect().top - 10;
     if (safeBottom - safeTop < 60) { safeTop = window.innerHeight * 0.3; safeBottom = window.innerHeight * 0.7; }
   }
   function updateIndicator() {
     if (!isTargetActive() || uiLayer.hidden) { indicator.hidden = true; return; }
     const W = window.innerWidth, H = window.innerHeight;
-    _camSpace.copy(pokemonMesh.position).applyMatrix4(camera.matrixWorldInverse);
+    const target = bodyCenter();
+    _camSpace.copy(target).applyMatrix4(camera.matrixWorldInverse);
     if (_camSpace.z < 0) {
-      _ndc.copy(pokemonMesh.position).project(camera);
+      _ndc.copy(target).project(camera);
       const sx = (_ndc.x + 1) / 2 * W, sy = (1 - _ndc.y) / 2 * H;
       if (sx > 0 && sx < W && sy > safeTop - 30 && sy < safeBottom + 30) { indicator.hidden = true; return; }
     }
@@ -1120,7 +2339,7 @@
     indicator.hidden = false;
   }
 
-  // 8. [추가] 카드 인식
+  // 10. [추가] 카드 인식
   //    카드 그림 창·색 배치·명암 구조를 숫자 특징으로 바꿔, 미리 등록한 카드와 비교합니다.
   //    외부 서버·라이브러리 없이 기기 안에서만 계산하고, 등록 정보는 이 브라우저에만 저장돼요.
   const CARD_ASPECT = 63 / 88;        // 포켓몬 카드 규격 63×88mm
@@ -1489,7 +2708,7 @@
     saveCards();
     const art = artTextureCache.get(uid);
     artTextureCache.delete(uid);
-    if (art) art.then((t) => { if (t && pokemonMat.map !== t) t.dispose(); });
+    if (art) art.then((t) => { if (t && spriteUniforms.uMap.value !== t) t.dispose(); });
     renderCardList();
     refreshScannerNotice();
     if (card) setScanStatus(`${card.name} 카드를 지웠어요.`);
@@ -1754,175 +2973,33 @@
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && scanner.open) closeScanner(); });
 
-  // 9. 메인 게임 루프 — [수정] 경과 시간(dt) 기반이라 60Hz·120Hz 화면에서 속도가 같음
+  // 11. 메인 게임 루프 — 경과 시간(dt) 기반이라 60Hz·120Hz 화면에서 속도가 같음
   const clock = new THREE.Clock();
   let elapsed = 0;
-  const frameLerp = (perFrame, dt) => 1 - Math.pow(1 - perFrame, dt * 60);
-
-  function chooseNextState() {
-    const rand = Math.random();
-    if (rand < 0.42 && obstacles.length > 0) {
-      // 지형지물(은폐물) 뒤로 숨기
-      pokeData.state = 'HIDE';
-      const obs = obstacles[Math.floor(Math.random() * obstacles.length)];
-      pokeData.targetPos.set(obs.position.x, 0.85, obs.position.z - 0.8);
-      pokeData.stateTimer = 110 / 60;
-      setBadge('🧱 은폐 중', '#06b6d4');
-      logStatus('포켓몬이 지형지물 뒤로 몸을 숨겼습니다!');
-    } else if (rand < 0.78) {
-      // 자유 이동
-      pokeData.state = 'WANDER';
-      pokeData.targetPos.set((Math.random() - 0.5) * 4.5, 1.1, -3.0 - Math.random() * 2.5);
-      pokeData.stateTimer = 90 / 60;
-      setBadge('🐾 이동 중', '#3b82f6');
-    } else {
-      // 플레이어 공격
-      pokeData.state = 'ATTACK';
-      firePokemonCounterAttack();
-      pokeData.stateTimer = 70 / 60;
-    }
-  }
-
-  function updatePokemon(dt) {
-    if (pokeData.state === 'APPEARING' && pokemonMesh.visible) {
-      // 카드에서 튀어나와 커지면서 전장으로 날아감
-      pokeData.appearT = Math.min(1, pokeData.appearT + dt / 0.9);
-      const k = 1 - Math.pow(1 - pokeData.appearT, 3);
-      pokemonMesh.position.lerpVectors(pokeData.appearFrom, pokeData.pos, k);
-      const s = 0.15 + 0.85 * k;
-      pokemonMesh.scale.set(pokeData.baseScale.x * s, pokeData.baseScale.y * s, 1);
-      pokemonMesh.lookAt(camera.position.x, pokemonMesh.position.y, camera.position.z);
-      pokeShadow.position.set(pokemonMesh.position.x, 0.02, pokemonMesh.position.z);
-      pokeShadow.scale.setScalar(Math.max(0.01, k));
-      if (pokeData.appearT >= 1) {
-        pokeData.state = 'WANDER';
-        pokeData.stateTimer = 0.4;
-        setBadge('🐾 이동 중', '#3b82f6');
-        updateControls();
-      }
-      return;
-    }
-    if (!isTargetActive()) return;
-    pokeData.stateTimer -= dt;
-    if (pokeData.stateTimer <= 0) chooseNextState();
-
-    // 목표 지점으로 부드럽게 이동
-    const k = pokeData.state === 'DODGE' ? pokeData.speed * 2.6 : pokeData.speed;
-    pokeData.pos.lerp(pokeData.targetPos, frameLerp(k, dt));
-    if (pokeData.state === 'DODGE' && pokeData.pos.distanceTo(pokeData.targetPos) < 0.3) {
-      pokeData.targetPos.y = 1.1; // 점프 후 착지
-    }
-    pokemonMesh.position.copy(pokeData.pos);
-    if (pokeData.state !== 'DODGE') pokemonMesh.position.y += Math.sin(elapsed * 4) * 0.06; // 숨쉬기/부유 모션
-    pokemonMesh.scale.set(pokeData.baseScale.x, pokeData.baseScale.y, 1);
-
-    // 빌보드 처리: 포켓몬이 항상 카메라(플레이어)를 정면으로 바라봄
-    pokemonMesh.lookAt(camera.position.x, pokemonMesh.position.y, camera.position.z);
-    pokeShadow.position.set(pokeData.pos.x, 0.02, pokeData.pos.z);
-    pokeShadow.scale.setScalar(1);
-  }
-
-  // [수정] 한 프레임 이동 구간 전체로 충돌 검사 → 빠른 발사체가 벽·포켓몬을 뚫고 지나가지 않음
-  const _prev = new THREE.Vector3(), _dir = new THREE.Vector3(), _hit = new THREE.Vector3();
-  const _ray = new THREE.Ray(), _box = new THREE.Box3(), _sphere = new THREE.Sphere();
-  function sphereHitDistance(from) {
-    if (_sphere.containsPoint(from)) return 0;
-    return _ray.intersectSphere(_sphere, _hit) ? _hit.distanceTo(from) : Infinity;
-  }
-  function findFirstHit(p, from, to) {
-    _dir.subVectors(to, from);
-    const len = _dir.length();
-    if (len === 0) return null;
-    _ray.set(from, _dir.divideScalar(len));
-    let best = null, bestDist = len;
-    for (const obs of obstacles) {
-      _box.copy(obs.userData.bounds).expandByScalar(p.radius);
-      let d = Infinity;
-      if (_box.containsPoint(from)) d = 0;
-      else if (_ray.intersectBox(_box, _hit)) d = _hit.distanceTo(from);
-      if (d <= bestDist) { bestDist = d; best = 'obstacle'; }
-    }
-    if (p.type !== 'ENEMY_ATK' && isTargetActive()) {
-      _sphere.set(pokemonMesh.position, 0.85);
-      const d = sphereHitDistance(from);
-      if (d <= bestDist) { bestDist = d; best = 'pokemon'; }
-    }
-    if (p.type === 'ENEMY_ATK') {
-      _sphere.set(camera.position, 0.65);
-      const d = sphereHitDistance(from);
-      if (d <= bestDist) { bestDist = d; best = 'player'; }
-    }
-    return best;
-  }
-
-  function handleHit(p, target) {
-    if (target === 'obstacle') {
-      // 1) 지형지물(장애물) 충돌 -> 은폐물 뒤에 있으면 막힘
-      logStatus(p.type === 'ENEMY_ATK'
-        ? '🧱 은폐물이 포켓몬의 공격을 막아냈습니다!'
-        : '🧱 지형지물에 가로막혀 튕겨 나갔습니다! 각도를 바꾸세요.');
-    } else if (target === 'pokemon') {
-      // 2) 포켓몬 피격/포획
-      if (p.type === 'PLAYER_ATK') {
-        pokeData.hp = Math.max(10, pokeData.hp - 25);
-        updateHpUI();
-        logStatus(`⚡ 명중! 포켓몬의 체력이 줄어들어 회피율이 감소했습니다! (HP: ${pokeData.hp}%)`);
-      } else {
-        // 체력이 낮을수록 포획 성공률 증가
-        const catchChance = (100 - pokeData.hp) / 100 + 0.25;
-        if (Math.random() < catchChance) capturePokemon();
-        else logStatus('💥 포켓몬이 포켓볼을 튕겨냈습니다! 먼저 [내 공격]으로 체력을 깎으세요.');
-      }
-    } else if (target === 'player') {
-      // 3) 적 반격이 플레이어(카메라)에 명중
-      triggerDamageFlash();
-      logStatus('💥 포켓몬의 공격에 맞았습니다! 은폐물을 앞에 설치하면 막을 수 있어요.');
-    }
-  }
-
-  function updateProjectiles(dt) {
-    for (let i = projectiles.length - 1; i >= 0; i--) {
-      const p = projectiles[i];
-      p.age += dt;
-      _prev.copy(p.mesh.position);
-      p.mesh.position.addScaledVector(p.vel, dt);
-      if (p.gravity) { // 등가속도 운동을 정확히 적분
-        p.mesh.position.y -= 0.5 * p.gravity * dt * dt;
-        p.vel.y -= p.gravity * dt;
-      }
-      p.mesh.rotation.x += 9 * dt;
-
-      const target = findFirstHit(p, _prev, p.mesh.position);
-      let remove = false;
-      if (target) {
-        handleHit(p, target);
-        remove = true;
-      } else if (p.mesh.position.y < 0 || p.age > 4 || p.mesh.position.distanceTo(camera.position) > 30) {
-        // [수정] 바닥(y=0)에 닿으면 제거 (기존엔 바닥을 뚫고 y=-2까지 떨어짐)
-        if (p.type === 'POKEBALL' && isTargetActive()) logStatus('포켓볼이 빗나갔습니다. 조준점을 포켓몬에 맞춰 보세요.');
-        remove = true;
-      }
-      if (remove) {
-        scene.remove(p.mesh);
-        projectiles.splice(i, 1);
-      }
-    }
-  }
-
   let loopErrorShown = false;
   function animate() {
     requestAnimationFrame(animate);
     const dt = Math.min(clock.getDelta(), 0.05); // 탭 전환 뒤 큰 시간 점프 방지
     elapsed += dt;
     try {
+      fitCameraFov();
       updateCameraOrientation();
-      if (!scanner.open) { // 카드를 스캔하는 동안엔 전투를 잠시 멈춤
+      if (!scanner.open) { // 카드를 스캔하는 동안엔 전투·사물 인식을 잠시 멈춤
+        if (isArMode() && DETECTOR.state === 'off') ensureDetector();
+        runDetection(performance.now());
         updatePokemon(dt);
         updateProjectiles(dt);
       }
+      if (pokemonMesh.visible) playAnimatedFrames(dt);
+      updateHandBall(dt);
+      updateRing(dt);
       updateEffects(dt);
       updateIndicator();
-      if (!scanner.open) renderer.render(scene, camera); // 스캔 중엔 3D를 숨기므로 그리지 않음 (배터리 절약)
+      if (!scanner.open) {
+        renderer.clear();
+        renderer.render(scene, camera);
+        if (handBall.visible) { renderer.clearDepth(); renderer.render(overlayScene, camera); } // 손에 든 공은 맨 앞에
+      }
     } catch (err) {
       if (!loopErrorShown) { loopErrorShown = true; reportError(err); }
     }
@@ -1939,7 +3016,7 @@
   window.addEventListener('resize', onResize);
   window.addEventListener('orientationchange', () => setTimeout(onResize, 250));
 
-  // [추가] 그래픽 컨텍스트 손실(백그라운드 전환 등) 안내
+  // 그래픽 컨텍스트 손실(백그라운드 전환 등) 안내
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();
     logStatus('⚠️ 그래픽이 잠시 초기화됐어요. 자동으로 복구를 시도합니다.');
