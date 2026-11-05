@@ -152,7 +152,7 @@
     .round-btn:disabled:active { transform: none; }
     .ball-slot { position: relative; height: 116px; pointer-events: none; } /* 3D 포켓볼이 이 칸 가운데에 그려짐 */
     #throw-hint {
-      position: absolute; left: 50%; bottom: calc(100% + 2px); transform: translateX(-50%);
+      position: absolute; left: 50%; bottom: calc(100% + 34px); transform: translateX(-50%);
       white-space: nowrap; font-size: 12px; font-weight: 700; color: #fff;
       background: rgba(15, 23, 42, 0.6); padding: 3px 10px; border-radius: 999px;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
@@ -181,9 +181,9 @@
     .round-btn.cooling { opacity: 0.6; }
     /* [추가] 파트너 이름표 (머리 위에 떠 있음) */
     #partner-tag {
-      position: absolute; left: 0; top: 0; pointer-events: none; min-width: 92px; max-width: 180px;
-      background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 10px;
-      padding: 4px 8px 5px; color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap;
+      position: absolute; left: 0; top: 0; pointer-events: none; min-width: 78px; max-width: 170px;
+      background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 9px;
+      padding: 3px 7px 4px; color: #fff; font-size: 10px; font-weight: 700; white-space: nowrap;
     }
     #partner-tag.docked { border-color: rgba(249, 115, 22, 0.7); }
     .ptag-hp { height: 5px; background: #334155; border-radius: 999px; overflow: hidden; margin-top: 3px; }
@@ -248,6 +248,179 @@
     .starter-btn img { width: 72px; height: 72px; image-rendering: pixelated; }
     .starter-btn small { font-size: 11px; color: #94a3b8; font-weight: 600; }
     .mbtn:focus-visible, .starter-btn:focus-visible, #walk-pill:focus-visible { outline: 2px solid #fde047; outline-offset: 2px; }
+    /* [추가] 던질 볼 고르기 */
+    .ball-pick {
+      position: absolute; left: 50%; bottom: calc(100% + 2px); transform: translateX(-50%); pointer-events: auto;
+      border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(15, 23, 42, 0.78); color: #fff; border-radius: 999px;
+      font: inherit; font-size: 12px; font-weight: 800; padding: 4px 10px; white-space: nowrap; cursor: pointer; touch-action: manipulation;
+    }
+    .ball-pick.great { border-color: #60a5fa; background: rgba(37, 99, 235, 0.55); }
+    .ball-pick.ultra { border-color: #facc15; background: rgba(39, 39, 42, 0.85); color: #fde68a; }
+    .ball-pick:focus-visible { outline: 2px solid #fde047; outline-offset: 2px; }
+    /* [추가] 희귀도 · NEW · 색이 다른 포켓몬 */
+    .wild-tags { display: inline-flex; align-items: center; gap: 5px; }
+    .rarity { font-size: 11px; letter-spacing: -1px; color: #fbbf24; font-weight: 900; margin-left: 4px; }
+    .rarity.r1 { color: #94a3b8; } .rarity.r2 { color: #7dd3fc; } .rarity.r3 { color: #fbbf24; } .rarity.r4 { color: #f472b6; }
+    .wild-tags .rarity { margin-left: 0; }
+    .new-chip { font-size: 10px; font-weight: 900; color: #052e16; background: #4ade80; border-radius: 999px; padding: 0 6px; line-height: 1.5; }
+    .mon-card.shiny { border-color: rgba(250, 204, 21, 0.6); box-shadow: inset 0 0 18px rgba(250, 204, 21, 0.12); }
+    .mon-grow { font-size: 12px; color: #fde68a; line-height: 1.4; }
+    .mon-vs { font-size: 11px; font-weight: 800; border-radius: 8px; padding: 2px 7px; align-self: flex-start; background: rgba(255, 255, 255, 0.08); color: #cbd5e1; }
+    .mon-vs.up { background: rgba(34, 197, 94, 0.16); color: #86efac; }
+    .mon-vs.down { background: rgba(239, 68, 68, 0.16); color: #fca5a5; }
+    .mon-vs.none { background: rgba(100, 116, 139, 0.25); color: #94a3b8; }
+    .mbtn-evo.dim { background: rgba(124, 58, 237, 0.28); }
+    /* [추가] 가방 위쪽: 도감 · 경험치 · 볼 · 정렬 */
+    .bag-stats { display: flex; flex-wrap: wrap; gap: 6px; }
+    .stat-chip {
+      display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #cbd5e1; padding: 5px 10px;
+      border-radius: 999px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12); font-family: inherit;
+    }
+    .stat-chip b { color: #fde68a; }
+    .dex-chip { cursor: pointer; color: #fff; border-color: rgba(56, 189, 248, 0.6); background: rgba(14, 165, 233, 0.18); touch-action: manipulation; }
+    .bag-sort { display: flex; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-shrink: 0; }
+    .bag-sort button {
+      flex-shrink: 0; border: 1px solid rgba(255, 255, 255, 0.16); background: transparent; color: #cbd5e1; border-radius: 999px;
+      font: inherit; font-size: 12px; font-weight: 700; padding: 4px 10px; cursor: pointer; touch-action: manipulation;
+    }
+    .bag-sort button[aria-pressed="true"] { background: #f97316; border-color: #f97316; color: #fff; }
+    /* [추가] 도감 화면 */
+    #dex { z-index: 8; }
+    .dex-panel { height: 100%; }
+    .dex-big { font-size: 30px; font-weight: 900; color: #fff; line-height: 1.1; }
+    .dex-big span { font-size: 13px; font-weight: 700; color: #cbd5e1; }
+    .dex-bar { height: 8px; border-radius: 999px; background: #334155; overflow: hidden; margin: 6px 0 4px; }
+    .dex-bar div { height: 100%; background: linear-gradient(90deg, #38bdf8, #a78bfa); }
+    .dex-sub, .dex-next { font-size: 12px; color: #cbd5e1; margin: 0; }
+    .dex-next { color: #fde68a; }
+    .dex-gens { display: flex; gap: 4px; overflow-x: auto; flex-shrink: 0; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+    .dex-gen {
+      flex-shrink: 0; border: 1px solid rgba(255, 255, 255, 0.16); background: transparent; color: #cbd5e1; border-radius: 10px;
+      font: inherit; font-size: 12px; font-weight: 700; padding: 5px 9px; cursor: pointer; touch-action: manipulation;
+    }
+    .dex-gen.on { background: #0ea5e9; border-color: #0ea5e9; color: #fff; }
+    .dex-gen.done::after { content: ' 🏆'; }
+    .dex-grid {
+      flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 6px; align-content: start;
+    }
+    .dex-cell {
+      position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 2px 5px;
+      border-radius: 10px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); min-width: 0;
+    }
+    .dex-cell small { font-size: 9px; color: #64748b; }
+    .dex-cell img { width: 52px; height: 52px; image-rendering: pixelated; }
+    .dex-cell.s1 img { filter: brightness(0) invert(0.45); opacity: 0.75; }
+    .dex-cell.s2, .dex-cell.s3 { background: rgba(56, 189, 248, 0.08); border-color: rgba(56, 189, 248, 0.25); }
+    .dex-cell.s3 { border-color: rgba(250, 204, 21, 0.55); }
+    .dex-cell span { font-size: 10px; color: #e2e8f0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dex-cell.s0 span { color: #475569; }
+    .dex-cell i { position: absolute; top: 2px; right: 4px; font-style: normal; font-size: 11px; }
+    .dex-q { width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: #334155; }
+    .evo-note { color: #fde68a; font-weight: 800; }
+    /* [추가] 타입 칩 · 상성 표시 */
+    .type-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; margin: -1px 0 7px; min-height: 19px; }
+    .tchips { display: inline-flex; gap: 4px; }
+    .tchip {
+      font-size: 11px; font-weight: 800; line-height: 1.4; padding: 1px 7px; border-radius: 999px;
+      color: #fff; white-space: nowrap;
+    }
+    .tchips.mini { margin-left: 4px; vertical-align: 1px; gap: 3px; }
+    .tchips.mini .tchip { font-size: 9px; padding: 0 5px; line-height: 1.45; }
+    .matchup {
+      margin-left: auto; font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 999px; line-height: 1.4;
+      background: rgba(255, 255, 255, 0.1); color: #e2e8f0; white-space: nowrap;
+    }
+    .matchup.up { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+    .matchup.down { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .matchup.none { background: rgba(100, 116, 139, 0.32); color: #cbd5e1; }
+    .btn-atk { position: relative; }
+    .round-btn .atk-mult {
+      position: absolute; top: -5px; right: -7px; font-size: 11px; font-weight: 900; line-height: 1.35;
+      padding: 0 6px; border-radius: 999px; background: #475569; color: #fff; border: 2px solid #0f172a;
+    }
+    .round-btn .atk-mult.up { background: #16a34a; }
+    .round-btn .atk-mult.down { background: #dc2626; }
+    .round-btn .atk-mult.zero { background: #334155; color: #94a3b8; }
+    /* [추가] 기술 연출: 떠오르는 피해 숫자 · 상성 문구 · 기술 이름 */
+    #fx-layer { position: fixed; top: 0; left: 0; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+    .fx-text {
+      position: absolute; left: 0; top: 0; white-space: nowrap; will-change: transform, opacity;
+      font-weight: 900; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.85), 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    .fx-text.dmg { font-size: 25px; letter-spacing: -0.01em; }
+    .fx-text.dmg-super { font-size: 33px; color: #fde047; }
+    .fx-text.dmg-weak { font-size: 19px; color: #cbd5e1; }
+    .fx-text.dmg-none { font-size: 18px; color: #94a3b8; }
+    .fx-text.dmg-taken { color: #fca5a5; font-size: 22px; }
+    .fx-text.dmg-taken.dmg-super { color: #f87171; font-size: 28px; }
+    .fx-text.dmg-hit { font-size: 18px; color: #fef08a; }
+    .fx-text.eff, .fx-text.move {
+      font-size: 13px; padding: 4px 11px; border-radius: 999px; text-shadow: none; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    .fx-text.eff-super { background: linear-gradient(135deg, #f97316, #dc2626); font-size: 15px; }
+    .fx-text.eff-weak { background: rgba(51, 65, 85, 0.94); color: #e2e8f0; }
+    .fx-text.eff-none { background: rgba(30, 41, 59, 0.94); color: #94a3b8; }
+    .fx-text.move { font-size: 13px; border: 2px solid rgba(255, 255, 255, 0.85); }
+    /* [추가] 강한 기술에 맞으면 화면이 흔들림 (카메라 영상과 3D 화면을 함께) */
+    @keyframes fx-shake {
+      0%, 100% { transform: translate(0, 0) scale(1.02); } 20% { transform: translate(-4px, 3px) scale(1.02); }
+      40% { transform: translate(4px, -2px) scale(1.02); } 60% { transform: translate(-3px, 2px) scale(1.02); } 80% { transform: translate(2px, -1px) scale(1.02); }
+    }
+    @keyframes fx-shake-strong {
+      0%, 100% { transform: translate(0, 0) scale(1.04); } 15% { transform: translate(-9px, 5px) scale(1.04); }
+      30% { transform: translate(8px, -6px) scale(1.04); } 45% { transform: translate(-7px, 4px) scale(1.04); }
+      60% { transform: translate(5px, -3px) scale(1.04); } 80% { transform: translate(-3px, 2px) scale(1.04); }
+    }
+    body.fx-shake #ar-canvas, body.fx-shake #camera-feed { animation: fx-shake 0.3s linear; }
+    body.fx-shake-strong #ar-canvas, body.fx-shake-strong #camera-feed { animation: fx-shake-strong 0.42s linear; }
+
+    /* [추가] 진화 확인 창 */
+    #evo-confirm { z-index: 8; align-items: center; }
+    .evo-panel { max-width: 380px; text-align: center; align-items: stretch; }
+    .evo-preview { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 6px 0; }
+    .evo-preview img { width: 104px; height: 104px; object-fit: contain; background: rgba(255, 255, 255, 0.06); border-radius: 16px; }
+    .evo-preview img.pixel, .evo-figure img.pixel { image-rendering: pixelated; }
+    .evo-arrow { font-size: 24px; color: #c4b5fd; }
+    .evo-req { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #cbd5e1; line-height: 1.45; }
+    .evo-req .row { display: flex; justify-content: space-between; gap: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 7px 10px; }
+    .evo-req .ok { color: #86efac; font-weight: 800; }
+    .evo-req .no { color: #fca5a5; font-weight: 800; }
+    .evo-buttons { display: flex; gap: 8px; }
+    .sbtn-evo { background: linear-gradient(135deg, #a855f7, #7c3aed); border-color: transparent; }
+    /* [추가] 진화 연출: 어두운 배경 + 회전하는 빛줄기 + 하얀 실루엣이 번갈아 바뀌다가 새 모습 */
+    #evo-stage {
+      position: fixed; top: 0; left: 0; inset: 0; z-index: 9; overflow: hidden; color: #fff;
+      background: radial-gradient(circle at 50% 42%, #1e1b4b 0%, #0b1023 55%, #020617 100%);
+    }
+    .evo-rays {
+      position: absolute; left: 50%; top: 42%; width: 190vmax; height: 190vmax; transform: translate(-50%, -50%);
+      background: repeating-conic-gradient(rgba(255, 255, 255, 0.12) 0deg 5deg, rgba(255, 255, 255, 0) 5deg 15deg);
+      -webkit-mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, 0.6) 22%, transparent 48%);
+      mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, 0.6) 22%, transparent 48%);
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    #evo-stage.rays .evo-rays { opacity: 1; animation: evo-spin 14s linear infinite; }
+    @keyframes evo-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+    #evo-sparks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    .evo-figure {
+      position: absolute; left: 50%; top: 42%; width: min(68vmin, 340px); height: min(68vmin, 340px); transform: translate(-50%, -50%);
+    }
+    .evo-figure img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; will-change: transform, opacity; }
+    .evo-figure img.sil { filter: brightness(0) invert(1) drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)); }
+    .evo-flash {
+      position: absolute; top: 0; left: 0; inset: 0; pointer-events: none; opacity: 0;
+      background: radial-gradient(circle at 50% 42%, #fff 0%, rgba(255, 255, 255, 0.92) 30%, rgba(255, 255, 255, 0) 78%);
+    }
+    .evo-msg {
+      position: absolute; left: 16px; right: 16px; top: calc(42% + min(34vmin, 170px) + 18px);
+      text-align: center; font-size: 19px; font-weight: 800; line-height: 1.45; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    }
+    .evo-info { position: absolute; left: 16px; right: 16px; top: calc(42% + min(34vmin, 170px) + 76px); display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: #cbd5e1; }
+    .evo-info .tchips .tchip { font-size: 12px; padding: 2px 9px; }
+    .evo-btn { position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); transform: translateX(-50%); min-width: 180px; }
+    #evo-stop { color: #e2e8f0; border-color: rgba(255, 255, 255, 0.35); }
+    @media (prefers-reduced-motion: reduce) { #evo-stage.rays .evo-rays { animation: none; } }
 
     /* [추가] 카드 스캔 화면 */
     #photo-view {
@@ -365,6 +538,9 @@
   <!-- 피격 효과 -->
   <div id="damage-flash"></div>
 
+  <!-- [추가] 기술 연출 글자 (피해 숫자 · 상성 문구 · 기술 이름) -->
+  <div id="fx-layer" aria-hidden="true"></div>
+
   <!-- UI 오버레이 -->
   <div id="ui-layer">
     <div class="top-hud">
@@ -372,6 +548,7 @@
         <span id="poke-name">야생의 피카츄</span>
         <span class="state-badge" id="poke-state">배회 중</span>
       </div>
+      <div class="type-row"><span class="tchips" id="wild-types"></span><span class="wild-tags" id="wild-tags"></span><span class="matchup" id="matchup" hidden></span></div>
       <div class="hp-bar-bg" role="progressbar" aria-label="포켓몬 체력" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
         <div class="hp-bar-fill" id="hp-fill"></div>
       </div>
@@ -394,15 +571,15 @@
         <button class="round-btn btn-card" id="btn-card" type="button" aria-label="카드를 비춰 포켓몬 소환">🃏<span>카드</span></button>
         <button class="round-btn btn-change" id="btn-change" type="button" aria-label="다른 포켓몬 소환">🔄<span>교체</span></button>
       </div>
-      <div class="ball-slot" id="ball-slot"><span id="throw-hint">포켓볼을 위로 휙 밀어서 던지기</span></div>
+      <div class="ball-slot" id="ball-slot"><button class="ball-pick poke" id="ball-pick" type="button">🔴 몬스터볼</button><span id="throw-hint">포켓볼을 위로 휙 밀어서 던지기</span></div>
       <div class="ctrl-side right">
         <button class="round-btn btn-bag" id="btn-bag" type="button" aria-label="내 포켓몬 (강화·진화·파트너 바꾸기)">🎒<span>가방</span></button>
-        <button class="round-btn btn-atk" id="btn-atk" type="button" aria-label="파트너에게 기술 명령 (파트너가 없으면 직접 공격)" disabled>⚡<span>공격</span></button>
+        <button class="round-btn btn-atk" id="btn-atk" type="button" aria-label="파트너에게 기술 명령 (파트너가 없으면 직접 공격)" disabled>⚡<span>공격</span><span class="atk-mult" id="atk-mult" hidden></span></button>
       </div>
     </div>
 
     <!-- [추가] 파트너 이름표 · 걸음 표시 · 경험치 알림 -->
-    <div id="partner-tag" hidden><span id="partner-tag-name"></span><div class="ptag-hp"><div id="partner-tag-hp"></div></div></div>
+    <div id="partner-tag" hidden><span id="partner-tag-name"></span><span class="tchips mini" id="partner-tag-types"></span><div class="ptag-hp"><div id="partner-tag-hp"></div></div></div>
     <button id="walk-pill" type="button"><span id="walk-text">👣 40m</span><span class="walk-bar"><span id="walk-fill"></span></span></button>
     <div id="exp-float" aria-live="polite"></div>
   </div>
@@ -414,8 +591,30 @@
         <strong>🎒 내 포켓몬 <span id="bag-count"></span></strong>
         <button class="sbtn sbtn-ghost" id="btn-bag-close" type="button">닫기</button>
       </div>
-      <p class="bag-exp">모은 경험치 <b id="bag-exp">0</b> · 파트너와 같이 싸우면 모이고, 강화·진화에 써요</p>
+      <div class="bag-stats">
+        <button class="stat-chip dex-chip" id="btn-dex" type="button">📖 도감 <b id="bag-dex">0</b>/1025</button>
+        <span class="stat-chip">경험치 <b id="bag-exp">0</b></span>
+        <span class="stat-chip" title="슈퍼볼 · 하이퍼볼">🔵 <b id="bag-great">0</b> 🟡 <b id="bag-ultra">0</b></span>
+      </div>
+      <p class="bag-exp" id="bag-tip"></p>
+      <div class="bag-sort" id="bag-sort" role="group" aria-label="정렬">
+        <button type="button" data-sort="recent">최근</button><button type="button" data-sort="cp">전투력</button><button type="button" data-sort="match">상대에게 유리한 순</button><button type="button" data-sort="dex">도감 번호</button>
+      </div>
       <div id="bag-list" class="bag-list"></div>
+    </div>
+  </section>
+
+  <!-- [추가] 📖 포켓몬 도감 -->
+  <section id="dex" class="sheet" hidden aria-label="포켓몬 도감">
+    <div class="sheet-panel dex-panel">
+      <div class="sheet-head">
+        <strong>📖 포켓몬 도감</strong>
+        <button class="sbtn sbtn-ghost" id="btn-dex-close" type="button">닫기</button>
+      </div>
+      <div class="dex-summary" id="dex-summary"></div>
+      <p class="dex-next" id="dex-next"></p>
+      <div class="dex-gens" id="dex-gens" role="group" aria-label="세대"></div>
+      <div class="dex-grid" id="dex-grid"></div>
     </div>
   </section>
 
@@ -427,6 +626,38 @@
       <div id="starter-list" class="starter-grid"></div>
       <button class="sbtn sbtn-ghost" id="btn-starter-skip" type="button">나중에 (처음 잡은 포켓몬이 파트너가 돼요)</button>
     </div>
+  </section>
+
+  <!-- [추가] 진화 확인 창 (내가 고를 때만 진화 · 자동 진화 없음) -->
+  <section id="evo-confirm" class="sheet" hidden aria-label="진화 확인">
+    <div class="sheet-panel evo-panel">
+      <strong class="sheet-title" id="evo-q">진화시킬까요?</strong>
+      <div class="evo-preview">
+        <img id="evo-from-img" alt="">
+        <span class="evo-arrow" aria-hidden="true">➜</span>
+        <img id="evo-to-img" alt="">
+      </div>
+      <div class="evo-req" id="evo-req"></div>
+      <div class="evo-buttons">
+        <button class="sbtn sbtn-ghost" id="evo-cancel" type="button">취소</button>
+        <button class="sbtn sbtn-evo" id="evo-go" type="button">✨ 진화시키기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- [추가] 진화 연출 (전체 화면) -->
+  <section id="evo-stage" hidden aria-label="진화">
+    <div class="evo-rays" aria-hidden="true"></div>
+    <canvas id="evo-sparks" aria-hidden="true"></canvas>
+    <div class="evo-figure" aria-hidden="true">
+      <img id="evo-old" alt=""><img id="evo-old-sil" class="sil" alt="">
+      <img id="evo-new" alt=""><img id="evo-new-sil" class="sil" alt="">
+    </div>
+    <div class="evo-flash" id="evo-flash" aria-hidden="true"></div>
+    <div class="evo-msg" id="evo-msg" aria-live="polite"></div>
+    <div class="evo-info" id="evo-info"></div>
+    <button class="sbtn sbtn-ghost evo-btn" id="evo-stop" type="button">진화 멈추기</button>
+    <button class="sbtn sbtn-evo evo-btn" id="evo-done" type="button" hidden>좋아요!</button>
   </section>
 
   <!-- [추가] 카드 스캔 화면 -->
@@ -1672,9 +1903,9 @@
   const DETECTOR = { state: 'off', instance: null, lastRun: 0, interval: 450, failures: 0, delegate: 'GPU', make: null };
   const effects = [];
   const projectiles = [];
-  const sheets = { bag: false, starter: false };               // 내 포켓몬·첫 파트너 화면이 열려 있는지
+  const sheets = { bag: false, starter: false, evo: false, dex: false };   // 내 포켓몬·첫 파트너·진화·도감 화면이 열려 있는지
   const encounter = { partnerHelped: false, interactedAt: 0 };  // 지금 야생 포켓몬과의 승부 기록
-  const uiPaused = () => scanner.open || sheets.bag || sheets.starter;
+  const uiPaused = () => scanner.open || sheets.bag || sheets.starter || sheets.evo || sheets.dex;
 
   // 받침 유무에 맞는 조사 (피카츄가 / 리자몽이)
   function josa(word, withBatchim, withoutBatchim) {
@@ -1856,6 +2087,33 @@
       if (scanner.open) refreshScannerNotice();
     }
   }
+  // [추가] 카메라 화면의 밝기·색을 살펴 포켓몬 색을 살짝 맞춤 → 어두운 방에선 어둡게, 노란 조명이면 따뜻하게
+  const lightCv = document.createElement('canvas');
+  lightCv.width = lightCv.height = 16;
+  const lightCtx = lightCv.getContext('2d', { willReadFrequently: true });
+  const tintTarget = new THREE.Color(1, 1, 1);
+  let lightAt = 0;
+  function updateSceneLight(now, dt) {
+    if (now >= lightAt) {
+      lightAt = now + 600;
+      tintTarget.setRGB(1, 1, 1);
+      if (isCameraLive()) {
+        try {
+          lightCtx.drawImage(video, 0, 0, 16, 16);
+          const d = lightCtx.getImageData(0, 0, 16, 16).data;
+          let r = 0, g = 0, b = 0;
+          for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; }
+          const n = d.length / 4 * 255;
+          r /= n; g /= n; b /= n;
+          const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b, l = Math.max(lum, 0.05);
+          const level = THREE.MathUtils.clamp(0.6 + lum * 0.85, 0.66, 1.1);
+          const cast = (c) => level * (0.82 + 0.18 * THREE.MathUtils.clamp(c / l, 0.6, 1.4));
+          tintTarget.setRGB(cast(r), cast(g), cast(b));
+        } catch (_) { /* 영상 픽셀을 못 읽으면 원래 색 */ }
+      }
+    }
+    sceneTint.value.lerp(tintTarget, Math.min(1, dt * 2));   // 갑자기 바뀌지 않게 천천히
+  }
   camChip.addEventListener('click', () => {
     if (isCameraLive()) {
       if (isArMode()) logStatus('📷 AR 모드로 실행 중이에요. 휴대폰을 천천히 돌려 주변 가구를 비춰 보세요.');
@@ -2009,31 +2267,246 @@
     const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
     return { rect: new THREE.Vector4(x0 / W, 1 - (y1 + 1) / H, cw / W, ch / H), aspect: cw / ch };
   }
-  function makeAnimatedVisual(gif) {
-    // 원본 GIF는 아주 작아서(피카츄 60×60) 그대로 키우면 흐릿함 → 픽셀을 정수 배로 또렷하게 키운 뒤 텍스처로 씀
-    const src = document.createElement('canvas');
-    src.width = gif.width; src.height = gif.height;
-    const sctx = src.getContext('2d');
-    const k = Math.max(1, Math.min(4, Math.ceil(256 / Math.max(gif.width, gif.height))));
-    const cv = document.createElement('canvas');
-    cv.width = gif.width * k; cv.height = gif.height * k;
-    const ctx = cv.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    const frames = gif.frames.map((f) => new ImageData(f.rgba, gif.width, gif.height));
-    const draw = (i) => {
-      sctx.putImageData(frames[i], 0, 0);
-      ctx.clearRect(0, 0, cv.width, cv.height);
-      ctx.drawImage(src, 0, 0, cv.width, cv.height);
+  // [추가] GIF는 투명도가 '있다/없다'뿐이라 확대하면 테두리가 계단처럼 깨짐 → 프레임마다 테두리를 다듬음
+  //        ① 투명한 칸에 이웃 색을 채워(2칸) 확대해도 테두리가 거뭇해지지 않게
+  //        ② 2배로 키우면서 계단 모서리를 대각선으로 메우고 깎음 (픽셀 아트 확대법 EPX)
+  //        ③ 5칸 가우시안으로 살짝 흐림 → 셰이더가 알파 0.5에서 화면 1픽셀 폭으로 잘라 매끈한 윤곽선
+  //        (보이는 프레임만 그때그때 처리해 메모리를 아낌 · 버퍼는 재사용)
+  function makeEdgeSmoother(W, H) {
+    const N = W * H, W2 = W * 2, H2 = H * 2;
+    const col = new Uint8ClampedArray(N * 4);
+    const mask = new Uint8Array(N), filled = new Uint8Array(N), next = new Uint8Array(N);
+    const m2 = new Float32Array(W2 * H2), t2 = new Float32Array(W2 * H2);
+    const out = new ImageData(W2, H2);
+    const o = out.data;
+    return function smooth(src) {
+      col.set(src);
+      for (let i = 0; i < N; i++) mask[i] = filled[i] = src[i * 4 + 3] > 0 ? 1 : 0;
+      for (let pass = 0; pass < 2; pass++) {                       // ① 색 번지기
+        next.set(filled);
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          const i = y * W + x;
+          if (filled[i]) continue;
+          let r = 0, g = 0, b = 0, n = 0;
+          for (let dy = -1; dy <= 1; dy++) {
+            const yy = y + dy;
+            if (yy < 0 || yy >= H) continue;
+            for (let dx = -1; dx <= 1; dx++) {
+              const xx = x + dx;
+              if (xx < 0 || xx >= W || !filled[yy * W + xx]) continue;
+              const j = (yy * W + xx) * 4;
+              r += col[j]; g += col[j + 1]; b += col[j + 2]; n++;
+            }
+          }
+          if (n) { const j = i * 4; col[j] = r / n; col[j + 1] = g / n; col[j + 2] = b / n; next[i] = 1; }
+        }
+        filled.set(next);
+      }
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {   // ② EPX 2배
+        const i = y * W + x, P = mask[i];
+        const A = y > 0 ? mask[i - W] : P, B = x < W - 1 ? mask[i + 1] : P;
+        const C = x > 0 ? mask[i - 1] : P, D = y < H - 1 ? mask[i + W] : P;
+        const q = 2 * y * W2 + 2 * x;
+        m2[q] = (C === A && C !== D && A !== B) ? A : P;
+        m2[q + 1] = (A === B && A !== C && B !== D) ? B : P;
+        m2[q + W2] = (D === C && D !== B && C !== A) ? C : P;
+        m2[q + W2 + 1] = (B === D && B !== A && D !== C) ? D : P;
+      }
+      for (let y = 0; y < H2; y++) {                                // ③ 가로 [1,4,6,4,1]/16
+        const row = y * W2;
+        for (let x = 0; x < W2; x++) {
+          const i = row + x;
+          t2[i] = (6 * m2[i] + 4 * ((x > 0 ? m2[i - 1] : 0) + (x < W2 - 1 ? m2[i + 1] : 0))
+                + (x > 1 ? m2[i - 2] : 0) + (x < W2 - 2 ? m2[i + 2] : 0)) / 16;
+        }
+      }
+      for (let y = 0; y < H2; y++) {                                //    세로 + 색(가장 가까운 원본 칸)
+        const row = y * W2, srow = (y >> 1) * W;
+        for (let x = 0; x < W2; x++) {
+          const i = row + x;
+          const a = (6 * t2[i] + 4 * ((y > 0 ? t2[i - W2] : 0) + (y < H2 - 1 ? t2[i + W2] : 0))
+                  + (y > 1 ? t2[i - 2 * W2] : 0) + (y < H2 - 2 ? t2[i + 2 * W2] : 0)) / 16;
+          const j = (srow + (x >> 1)) * 4, k = i * 4;
+          o[k] = col[j]; o[k + 1] = col[j + 1]; o[k + 2] = col[j + 2]; o[k + 3] = a * 255 + 0.5;
+        }
+      }
+      return out;
     };
-    draw(0);
-    const texture = new THREE.CanvasTexture(cv);
-    texture.minFilter = THREE.LinearFilter;
-    texture.generateMipmaps = false;
-    const { rect, aspect } = alphaBounds(gif.frames.map((f) => f.rgba), gif.width, gif.height);
+  }
+  // [추가] GPU 픽셀아트 확대: 작은 GIF 프레임을 EPX(Scale2x) 규칙으로 두 번 키워 4배로 만듦
+  //        — 계단처럼 꺾인 테두리와 안쪽 검은 윤곽선이 대각선으로 매끈하게 이어짐 (에뮬레이터의 화질 개선 필터와 같은 원리)
+  //        프레임이 바뀔 때만 작은 원본(예: 60×60)을 올려 GPU가 한 번 그려 둠 → 매 화면마다 드는 비용 없음
+  const UPSCALE_FS = `
+    uniform sampler2D uSrc;
+    uniform vec2 uSize;     // 원본 크기
+    uniform vec2 uOrigin;   // 결과를 그릴 위치 (렌더 타깃 픽셀, 왼쪽 아래 기준)
+    uniform vec2 uOut;      // 결과 크기
+    uniform float uFlip;    // 1 = 원본이 렌더 타깃(위아래가 뒤집혀 저장됨)
+    uniform float uTol;     // 이 정도 색 차이까지는 '같은 색'으로 봄 (3D 렌더링이라 미세한 음영 차이가 있음)
+    vec4 px(vec2 p) {
+      p = clamp(p, vec2(0.0), uSize - 1.0);
+      vec2 uv = (p + 0.5) / uSize;
+      if (uFlip > 0.5) uv.y = 1.0 - uv.y;
+      return texture2D(uSrc, uv);
+    }
+    bool same(vec4 a, vec4 b) {
+      bool ca = a.a < 0.5, cb = b.a < 0.5;
+      if (ca || cb) return ca == cb;
+      vec3 d = abs(a.rgb - b.rgb);
+      return d.r + d.g + d.b < uTol;
+    }
+    vec4 epx(vec4 P, vec4 A, vec4 B, vec4 C, vec4 D, vec2 f) {   // A 위, B 오른쪽, C 왼쪽, D 아래
+      if (f.y < 0.5) {
+        if (f.x < 0.5) return (same(C, A) && !same(C, D) && !same(A, B)) ? A : P;
+        return (same(A, B) && !same(A, C) && !same(B, D)) ? B : P;
+      }
+      if (f.x < 0.5) return (same(D, C) && !same(D, B) && !same(C, A)) ? C : P;
+      return (same(B, D) && !same(B, A) && !same(D, C)) ? D : P;
+    }
+    vec4 s2(vec2 q) {        // 2배 그림의 한 칸 (q = 2배 좌표)
+      vec2 p = floor(q * 0.5);
+      return epx(px(p), px(p + vec2(0.0, -1.0)), px(p + vec2(1.0, 0.0)), px(p + vec2(-1.0, 0.0)), px(p + vec2(0.0, 1.0)), q - p * 2.0);
+    }
+    void main() {
+      vec2 o = floor(gl_FragCoord.xy - uOrigin);
+      o.y = uOut.y - 1.0 - o.y;                       // 그림 좌표 (위가 0)
+      vec4 c = s2(o);
+      float a = step(0.5, c.a);
+      gl_FragColor = vec4(c.rgb * a, a);              // 미리 곱한 알파
+    }`;
+  const upscaleScene = new THREE.Scene();
+  const upscaleCam = new THREE.Camera();
+  const upscaleUniforms = {
+    uSrc: { value: null }, uSize: { value: new THREE.Vector2(1, 1) }, uOrigin: { value: new THREE.Vector2() },
+    uOut: { value: new THREE.Vector2(1, 1) }, uFlip: { value: 0 }, uTol: { value: 0.16 }
+  };
+  const upscaleQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+    uniforms: upscaleUniforms, fragmentShader: UPSCALE_FS,
+    vertexShader: 'void main() { gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    depthTest: false, depthWrite: false, blending: THREE.NoBlending
+  }));
+  upscaleQuad.frustumCulled = false;
+  upscaleScene.add(upscaleQuad);
+  // 한 번에 2배씩: 원본(W×H) → 결과 칸(2W×2H). 4배는 두 번 거침 (픽셀마다 5칸만 읽어 가벼움)
+  function renderUpscaled(rt, srcTex, W, H, flip, ox, oy, dw, dh) {
+    upscaleUniforms.uSrc.value = srcTex;
+    upscaleUniforms.uSize.value.set(W, H);
+    upscaleUniforms.uOrigin.value.set(ox, oy);
+    upscaleUniforms.uOut.value.set(dw, dh);
+    upscaleUniforms.uFlip.value = flip ? 1 : 0;
+    rt.viewport.set(ox, oy, dw, dh);
+    const prev = renderer.getRenderTarget();
+    renderer.setRenderTarget(rt);
+    renderer.clear(true, false, false);
+    renderer.render(upscaleScene, upscaleCam);
+    renderer.setRenderTarget(prev);
+  }
+  const makeMidTarget = (w, h) => {
+    const t = new THREE.WebGLRenderTarget(w, h, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false, stencilBuffer: false });
+    t.texture.generateMipmaps = false;
+    return t;
+  };
+  function upscale4(rt, mid, srcTex, W, H, ox, oy) {          // 원본 → 2배(mid) → 4배(rt의 정해진 칸)
+    renderUpscaled(mid, srcTex, W, H, false, 0, 0, W * 2, H * 2);
+    renderUpscaled(rt, mid.texture, W * 2, H * 2, true, ox, oy, W * 4, H * 4);
+  }
+  // 처음 한 번 GPU 확대가 제대로 되는지 작은 그림으로 확인 (안 되는 기기는 CPU 방식으로)
+  let gpuUpscale = null;
+  function gpuUpscaleWorks() {
+    if (gpuUpscale !== null) return gpuUpscale;
+    let rt = null, tex = null, mid = null;
+    try {
+      const d = new Uint8Array(3 * 3 * 4);
+      for (const i of [0, 4, 8]) d.set([255, 0, 0, 255], i * 4);      // 왼쪽 위 → 오른쪽 아래 대각선
+      tex = new THREE.DataTexture(d, 3, 3, THREE.RGBAFormat);
+      tex.magFilter = tex.minFilter = THREE.NearestFilter;
+      tex.generateMipmaps = false;
+      tex.needsUpdate = true;
+      rt = new THREE.WebGLRenderTarget(16, 16, { depthBuffer: false, stencilBuffer: false });
+      mid = makeMidTarget(6, 6);
+      upscale4(rt, mid, tex, 3, 3, 2, 2);
+      const at = (x, y) => { const b = new Uint8Array(4); renderer.readRenderTargetPixels(rt, 2 + x, 2 + 11 - y, 1, 1, b); return b; };
+      const tl = at(1, 1), tr = at(10, 1), ctr = at(6, 6), seam = at(4, 2);
+      gpuUpscale = tl[0] > 200 && tl[3] > 200 && tr[3] < 50 && ctr[0] > 200 && ctr[3] > 200 && seam[3] > 200;
+    } catch (_) {
+      gpuUpscale = false;
+    } finally {
+      if (rt) rt.dispose();
+      if (mid) mid.dispose();
+      if (tex) tex.dispose();
+    }
+    if (!gpuUpscale) console.warn('[AR Battle] GPU 확대를 쓸 수 없어 CPU 방식으로 그려요');
+    return gpuUpscale;
+  }
+  function makeAnimatedVisual(gif) {
+    // [수정] 원본 GIF(3D 모델 애니메이션)는 아주 작아서(피카츄 60×60) 그대로 키우면 테두리가 계단처럼 깨짐
+    //        → GPU에서 픽셀아트 확대(4배) 후 2의 거듭제곱 크기 텍스처(밉맵 가능)에 담고, 셰이더가 테두리를 매끈하게 자름
+    const W = gif.width, H = gif.height;
+    const frames = gif.frames.map((f) => (f.rgba instanceof Uint8Array ? f.rgba : new Uint8Array(f.rgba.buffer, f.rgba.byteOffset, f.rgba.length)));
+    const b = alphaBounds(frames, W, H);
     const delays = gif.frames.map((f) => (f.delay <= 1 ? 10 : f.delay) * 10); // 브라우저와 같게: 0~1은 0.1초
-    return { kind: 'animated', texture, rect, aspect, draw, frames, delays, idx: 0, t: 0 };
+    const vis = { kind: 'animated', aspect: b.aspect, frames, delays, idx: 0, t: 0, lastUsed: performance.now() };
+    if (gpuUpscaleWorks()) {
+      const m = Math.max(W, H);
+      const twice = 4 * m + 8 <= 512;                        // 작은 그림은 4배, 큰 그림은 2배
+      const scale = twice ? 4 : 2;
+      const dw = W * scale, dh = H * scale;
+      let S = 64;
+      while (S < Math.max(dw, dh) + 8) S *= 2;               // 가장자리 4px 여백 (밉맵 번짐 방지)
+      const ox = Math.floor((S - dw) / 2), oy = Math.floor((S - dh) / 2);
+      const rt = new THREE.WebGLRenderTarget(S, S, {
+        minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false, stencilBuffer: false
+      });
+      rt.texture.generateMipmaps = true;                     // 멀리서 작게 보여도 깨지지 않게
+      const srcTex = new THREE.DataTexture(frames[0], W, H, THREE.RGBAFormat);
+      srcTex.magFilter = srcTex.minFilter = THREE.NearestFilter;
+      srcTex.generateMipmaps = false;
+      const mid = twice ? makeMidTarget(W * 2, H * 2) : null;
+      vis.texture = rt.texture;
+      vis.rect = new THREE.Vector4((ox + b.rect.x * dw) / S, (oy + b.rect.y * dh) / S, b.rect.z * dw / S, b.rect.w * dh / S);
+      vis.draw = (i) => {
+        srcTex.image.data = frames[i];
+        srcTex.needsUpdate = true;
+        if (twice) upscale4(rt, mid, srcTex, W, H, ox, oy);
+        else renderUpscaled(rt, srcTex, W, H, false, ox, oy, dw, dh);
+      };
+      vis.dispose = () => { rt.dispose(); srcTex.dispose(); if (mid) mid.dispose(); };
+      vis.draw(0);
+      return vis;
+    }
+    // CPU 방식: 테두리를 다듬은 2배 프레임을 고품질 보간으로 키워 캔버스에 그림
+    const src = document.createElement('canvas');
+    src.width = W * 2; src.height = H * 2;
+    const sctx = src.getContext('2d');
+    const S = Math.max(W, H) <= 128 ? 256 : 512;
+    const k = (S - 8) / Math.max(W, H);
+    const dw = Math.round(W * k), dh = Math.round(H * k);
+    const ox = Math.round((S - dw) / 2), oy = Math.round((S - dh) / 2);
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = S;
+    const ctx = cv.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    const smooth = makeEdgeSmoother(W, H);
+    const texture = new THREE.CanvasTexture(cv);
+    texture.premultiplyAlpha = true;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.generateMipmaps = true;
+    vis.texture = texture;
+    vis.rect = new THREE.Vector4((ox + b.rect.x * dw) / S, 1 - (oy + dh) / S + b.rect.y * dh / S, b.rect.z * dw / S, b.rect.w * dh / S);
+    vis.draw = (i) => {
+      sctx.putImageData(smooth(frames[i]), 0, 0);
+      ctx.clearRect(0, 0, S, S);
+      ctx.drawImage(src, ox, oy, dw, dh);
+      texture.needsUpdate = true;
+    };
+    vis.dispose = () => texture.dispose();
+    vis.draw(0);
+    return vis;
   }
   function makeStaticVisual(texture, kind) {
+    texture.premultiplyAlpha = true;                         // [수정] 테두리를 부드럽게 (어두운 번짐 없이)
+    texture.needsUpdate = true;
     let rect = new THREE.Vector4(0, 0, 1, 1), aspect = 1;
     try {
       const img = texture.image;
@@ -2050,8 +2523,10 @@
     return { kind, texture, rect, aspect };
   }
 
-  const githubArtUrl = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
-  const githubGifUrl = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${id}.gif`;
+  // [수정] shiny = 색이 다른 포켓몬 그림
+  const SPRITE_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+  const githubArtUrl = (id, shiny) => `${SPRITE_BASE}/other/official-artwork/${shiny ? 'shiny/' : ''}${id}.png`;
+  const githubGifUrl = (id, shiny) => `${SPRITE_BASE}/other/showdown/${shiny ? 'shiny/' : ''}${id}.gif`;
   const textureLoader = new THREE.TextureLoader();
   textureLoader.setCrossOrigin('anonymous');
   const visualJobs = new Map();     // 'gif:25' / 'png:25' → Promise<visual|null> (성공한 것만 남김)
@@ -2078,9 +2553,30 @@
       clearTimeout(timer);
     }
   }
+  // [추가] 움직이는 그림은 GPU 메모리를 쓰므로 최근 것 몇 개만 남기고 오래 안 보인 것은 정리 (다시 필요하면 새로 불러옴)
+  const ANIM_KEEP = 8;
+  const animCache = new Map();      // key → visual
+  function rememberAnimated(key, vis) {
+    animCache.set(key, vis);
+    if (animCache.size <= ANIM_KEEP) return;
+    const now = performance.now();
+    let oldKey = null, old = null;
+    for (const [k, v] of animCache) {
+      if (v === vis || v.pinned || now - v.lastUsed < 3000) continue;   // 지금 화면에 있거나 방금 불러온 것은 그대로
+      if (!old || v.lastUsed < old.lastUsed) { oldKey = k; old = v; }
+    }
+    if (!old) return;
+    animCache.delete(oldKey);
+    visualJobs.delete(oldKey);
+    try { old.dispose(); } catch (_) { /* 이미 정리됨 */ }
+  }
   function cachedJob(key, make) {
     if (visualJobs.has(key)) return visualJobs.get(key);
-    const job = make().catch(() => null).then((v) => { if (!v) visualJobs.delete(key); return v; });
+    const job = make().catch(() => null).then((v) => {
+      if (!v) visualJobs.delete(key);
+      else if (v.kind === 'animated') { v.lastUsed = performance.now(); rememberAnimated(key, v); }
+      return v;
+    });
     visualJobs.set(key, job);
     return job;
   }
@@ -2093,38 +2589,38 @@
       return null;
     }
   }
-  function loadAnimatedVisual(id) {
-    return cachedJob('gif:' + id, async () => {
-      if (localGifs !== 'absent') {
+  function loadAnimatedVisual(id, shiny) {
+    return cachedJob('gif:' + (shiny ? 's' : '') + id, async () => {
+      if (localGifs !== 'absent' && !shiny) {
         const buf = await fetchBytes(`sprites/${id}.gif`, 4000);
         const vis = buf && gifToVisual(buf);
         if (vis) { localGifs = 'present'; return vis; }
         if (localGifs === 'unknown') localGifs = 'absent';
       }
       if (githubBlockedByPolicy || DEX_NO_ANIM.has(id)) return null;
-      const buf = await fetchBytes(githubGifUrl(id), 9000);
+      const buf = await fetchBytes(githubGifUrl(id, shiny), 9000);
       return buf ? gifToVisual(buf) : null;
     });
   }
   // [추가] 뒷모습 움직이는 그림 (내 파트너용 — 게임처럼 등을 보이며 상대를 바라봄)
-  const githubBackGifUrl = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/${id}.gif`;
-  function loadBackVisual(id) {
-    return cachedJob('back:' + id, async () => {
+  const githubBackGifUrl = (id, shiny) => `${SPRITE_BASE}/other/showdown/back/${shiny ? 'shiny/' : ''}${id}.gif`;
+  function loadBackVisual(id, shiny) {
+    return cachedJob('back:' + (shiny ? 's' : '') + id, async () => {
       if (githubBlockedByPolicy || DEX_NO_ANIM.has(id)) return null;
-      const buf = await fetchBytes(githubBackGifUrl(id), 9000);
+      const buf = await fetchBytes(githubBackGifUrl(id, shiny), 9000);
       return buf ? gifToVisual(buf) : null;
     });
   }
-  const iconUrl = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`; // 목록용 작은 그림
-  function loadStaticVisual(id) {
-    return cachedJob('png:' + id, async () => {
-      if (localSprites !== 'absent') {
+  const iconUrl = (id, shiny) => `${SPRITE_BASE}/${shiny ? 'shiny/' : ''}${id}.png`; // 목록용 작은 그림
+  function loadStaticVisual(id, shiny) {
+    return cachedJob('png:' + (shiny ? 's' : '') + id, async () => {
+      if (localSprites !== 'absent' && !shiny) {
         const tex = await loadTexture(`sprites/${id}.png`);
         if (tex) { localSprites = 'present'; return makeStaticVisual(tex, 'official'); }
         if (localSprites === 'unknown') localSprites = 'absent';
       }
       if (githubBlockedByPolicy) return null;
-      const tex = await loadTexture(githubArtUrl(id));
+      const tex = await loadTexture(githubArtUrl(id, shiny));
       return tex ? makeStaticVisual(tex, 'official') : null;
     });
   }
@@ -2208,6 +2704,7 @@
     dodgeRate: 0.45,
     size: new THREE.Vector2(POKE_HEIGHT, POKE_HEIGHT), // 너비·높이 (m)
     canFlip: true, facing: 1, hop: 0, lean: 0, crouch: 1,
+    vel: new THREE.Vector3(), maxWalk: 1.4, accel: 2.6, hover: 0, dodgeT: 0, turnT: -1, turnTo: 1, // [추가] 부드러운 이동
     react: null,                      // { kind: 'hit' | 'attack', t, fired }
     hideObj: null, travelT: 0,
     appearFrom: new THREE.Vector3(), appearT: 0, appearDur: 0.45
@@ -2222,35 +2719,104 @@
       p.x += uSway * p.y * p.y;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
     }`;
+  // [수정] 텍스처는 '미리 곱한 알파'라 반투명 테두리가 부드럽게 섞이고, 카메라 화면 밝기에 맞춘 색조(uTint)를 곱함
   const SPRITE_FS = `
     uniform sampler2D uMap;
     uniform vec4 uRect;
     uniform float uFlip;
     uniform float uFlash;
+    uniform vec3 uTint;
     varying vec2 vUv;
     void main() {
       vec2 uv = vec2(mix(vUv.x, 1.0 - vUv.x, uFlip), vUv.y);
-      vec4 c = texture2D(uMap, uRect.xy + uv * uRect.zw);
-      if (c.a < 0.12) discard;
-      gl_FragColor = vec4(mix(c.rgb, vec3(1.0), uFlash), c.a);
+      vec2 t = uRect.xy + uv * uRect.zw;
+      vec4 c = texture2D(uMap, t);
+      // 테두리: 미리 매끈하게 다듬은 알파를 화면 1픽셀 폭으로 깔끔하게 자름 (글꼴 렌더링과 같은 방식 → 계단·흐림 없음)
+      float w = max(fwidth(c.a) * 0.7, 0.002);
+      float alpha = smoothstep(0.5 - w, 0.5 + w, c.a);
+      if (alpha < 0.02) discard;
+      vec3 col = c.rgb / max(c.a, 0.004);                    // 미리 곱한 색 → 원래 색
+      col = mix(col * uTint, vec3(1.0), uFlash);
+      gl_FragColor = vec4(col * alpha, alpha);
     }`;
+  const sceneTint = { value: new THREE.Color(1, 1, 1) };     // 야생·파트너가 함께 씀
   const spriteUniforms = {
     uMap: { value: null }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) },
-    uFlip: { value: 0 }, uFlash: { value: 0 }, uSway: { value: 0 }
+    uFlip: { value: 0 }, uFlash: { value: 0 }, uSway: { value: 0 }, uTint: sceneTint
   };
   const spriteGeo = new THREE.PlaneGeometry(1, 1, 6, 6);
   spriteGeo.translate(0, 0.5, 0);                     // 원점을 발밑으로 → 크기가 변해도 발이 바닥에 붙어 있음
   const pokemonMat = new THREE.ShaderMaterial({
     uniforms: spriteUniforms, vertexShader: SPRITE_VS, fragmentShader: SPRITE_FS,
-    transparent: true, side: THREE.DoubleSide
+    transparent: true, premultipliedAlpha: true, side: THREE.DoubleSide, extensions: { derivatives: true }
   });
   const pokemonMesh = new THREE.Mesh(spriteGeo, pokemonMat);
   pokemonMesh.visible = false;
   pokemonMesh.renderOrder = 2;
   scene.add(pokemonMesh);
+  // [추가] 사물에 가려진 부분만 점선으로: 가림막이 스텐실에 표시한 곳 중 '포켓몬이 더 뒤에 있는' 픽셀만 그림
+  //        (보이는 부분은 위의 원래 그림이 그대로 그려짐) — 윤곽은 점선, 안쪽은 옅은 점무늬
+  const XRAY_FS = `
+    uniform sampler2D uMap;
+    uniform vec4 uRect;
+    uniform float uFlip;
+    uniform vec2 uEdge;
+    uniform float uDot;
+    uniform vec3 uColor;
+    varying vec2 vUv;
+    float alphaAt(vec2 uv) {
+      if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) return 0.0;
+      return texture2D(uMap, uRect.xy + uv * uRect.zw).a;
+    }
+    void main() {
+      vec2 uv = vec2(mix(vUv.x, 1.0 - vUv.x, uFlip), vUv.y);
+      if (alphaAt(uv) < 0.4) discard;
+      float mn = min(min(alphaAt(uv + vec2(uEdge.x, 0.0)), alphaAt(uv - vec2(uEdge.x, 0.0))),
+                     min(alphaAt(uv + vec2(0.0, uEdge.y)), alphaAt(uv - vec2(0.0, uEdge.y))));
+      vec2 cell = floor(gl_FragCoord.xy / uDot);
+      if (mn < 0.4) {                                        // 테두리: 점선
+        if (mod(cell.x + cell.y, 2.0) < 0.5) discard;
+        gl_FragColor = vec4(uColor, 1.0) * 0.95;
+      } else {                                               // 안쪽: 성긴 점무늬
+        vec2 q = fract(gl_FragCoord.xy / (uDot * 2.6)) - 0.5;
+        if (dot(q, q) > 0.05) discard;
+        gl_FragColor = vec4(uColor, 1.0) * 0.4;
+      }
+    }`;
+  const xrayUniforms = {
+    uMap: spriteUniforms.uMap, uRect: spriteUniforms.uRect, uFlip: spriteUniforms.uFlip, uSway: spriteUniforms.uSway,
+    uEdge: { value: new THREE.Vector2(0.02, 0.02) }, uDot: { value: 3 }, uColor: { value: new THREE.Color(0xe0f7ff) }
+  };
+  const pokemonXray = new THREE.Mesh(spriteGeo, new THREE.ShaderMaterial({
+    uniforms: xrayUniforms, vertexShader: SPRITE_VS, fragmentShader: XRAY_FS,
+    transparent: true, premultipliedAlpha: true, depthWrite: false, depthFunc: THREE.GreaterDepth, side: THREE.DoubleSide,
+    stencilWrite: true, stencilRef: 1, stencilFunc: THREE.EqualStencilFunc, stencilWriteMask: 0,
+    stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.KeepStencilOp
+  }));
+  pokemonXray.renderOrder = 1;                               // 원래 그림·파트너보다 먼저 (가림막 깊이만 비교)
+  pokemonMesh.add(pokemonXray);
+  // 점선 굵기·간격을 화면 픽셀 기준으로 맞춤 (포켓몬이 멀어져도 같은 굵기)
+  function updateXrayEdge() {
+    pokemonXray.visible = realObjects.some((o) => o.active);   // 가릴 사물이 없으면 점선 그리기를 쉼
+    if (!pokemonXray.visible) return;
+    const pr = renderer.getPixelRatio();
+    const dist = Math.max(0.3, camera.position.distanceTo(pokemonMesh.position));
+    const pxPerM = window.innerHeight * pr / 2 / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * dist);
+    xrayUniforms.uEdge.value.set(2.2 * pr / Math.max(4, pokemonMesh.scale.x * pxPerM), 2.2 * pr / Math.max(4, pokemonMesh.scale.y * pxPerM));
+    xrayUniforms.uDot.value = 3 * pr;
+  }
+  // [수정] 가장자리가 부드럽게 퍼지는 그림자 (바닥에 놓인 느낌)
+  const SHADOW_TEX = (() => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d'), grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grd.addColorStop(0, 'rgba(0,0,0,0.5)'); grd.addColorStop(0.55, 'rgba(0,0,0,0.3)'); grd.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+  })();
   const pokeShadow = new THREE.Mesh(
-    new THREE.CircleGeometry(1, 28),
-    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.38, depthWrite: false })
+    new THREE.PlaneGeometry(2.2, 2.2),
+    new THREE.MeshBasicMaterial({ map: SHADOW_TEX, transparent: true, depthWrite: false })
   );
   pokeShadow.rotation.x = -Math.PI / 2;
   pokeShadow.visible = false;
@@ -2287,6 +2853,8 @@
     // 카드로 부른 포켓몬은 내 파트너와 비슷한 레벨로 (공정한 승부), 야생은 종류에 맞는 레벨로
     const level = info.level || (!DEX[info.id] ? 10 : opts.fromCard ? fairLevel() : wildLevelFor(info.id));
     info = Object.assign(DEX[info.id] ? battleInfo(info.id, level) : {}, info, { level }); // 카드의 이름 등은 그대로 유지
+    // [추가] 색이 다른 포켓몬: 야생에서 1/64 확률 (카드로 부른 포켓몬은 카드 모습 그대로)
+    info.shiny = opts.shiny != null ? !!opts.shiny : !!DEX[info.id] && !opts.fromCard && Math.random() < SHINY_RATE;
     currentPokemon = info;
     encounter.partnerHelped = false;
     encounter.interactedAt = performance.now();
@@ -2295,11 +2863,15 @@
     pokeShadow.visible = false;
     cancelCatch();
     clearProjectiles();
+    clearFloats();                                          // [추가] 이전 승부의 피해 숫자는 지움
     onBallFinished(0);
     Object.assign(pokeData, {
       hp: 100, state: 'SPAWNING', stateTimer: 0, react: null, hideObj: null, crouch: 1,
-      speed: info.speed || DEFAULT_STATS.speed, dodgeRate: info.dodgeRate || DEFAULT_STATS.dodgeRate
+      speed: info.speed || DEFAULT_STATS.speed, dodgeRate: info.dodgeRate || DEFAULT_STATS.dodgeRate,
+      maxWalk: 0.8 + (info.speed || DEFAULT_STATS.speed) * 14, accel: 1.6 + (info.speed || DEFAULT_STATS.speed) * 25,
+      hover: DEX[info.id] && levitates(info.id) ? 0.26 : 0, turnT: -1, dodgeT: 0
     });
+    pokeData.vel.set(0, 0, 0);
     pokeData.pos.copy(START_POS);
     pokeData.targetPos.copy(START_POS);
     pokeData.lastPos.copy(START_POS);
@@ -2308,7 +2880,8 @@
     spriteUniforms.uFlash.value = 0;
     updateHpUI();
     updateControls();
-    $('poke-name').textContent = `야생의 ${info.name} Lv.${info.level}`;
+    $('poke-name').textContent = `${info.shiny ? '✨ ' : ''}야생의 ${info.name} Lv.${info.level}`;
+    updateWildTags();
     setBadge('⏳ 등장 중', '#64748b');
     logStatus(opts.fromCard ? `🃏 ${info.name} 카드에서 포켓몬을 불러내는 중…`
       : opts.fromWalk ? '👣 수풀이 흔들려요… 무언가 다가와요!' : `${info.name}의 모습을 불러오는 중…`);
@@ -2322,11 +2895,15 @@
       applyVisual(vis);
       if (!first) return;                               // 나중에 온 더 좋은 그림은 교체만
       startAppearance(!!opts.fromCard);
-      const name = info.name;
+      const name = info.name, wild = info.shiny ? '✨ 색이 다른' : '야생의';
       let msg = opts.fromCard ? `🃏 카드에서 ${name}${josa(name, '이', '가')} 나타났다!`
-        : opts.fromWalk ? `👣 걷다 보니 야생의 ${name}${josa(name, '이', '가')} 나타났다!`
-        : `야생의 ${name}${josa(name, '이', '가')} 나타났다!`;
-      msg += DEX[info.id] ? ` (Lv.${info.level} · ${typeNames(info.id)})` : ` (Lv.${info.level})`;
+        : opts.fromWalk ? `👣 걷다 보니 ${wild} ${name}${josa(name, '이', '가')} 나타났다!`
+        : `${wild} ${name}${josa(name, '이', '가')} 나타났다!`;
+      msg += DEX[info.id] ? ` (Lv.${info.level} · ${typeNames(info.id)} · ${stars(rarityOf(info.id))})` : ` (Lv.${info.level})`;
+      if (DEX[info.id]) {                                   // [추가] 도감: 본 포켓몬으로 기록, 처음 잡을 수 있는 포켓몬이면 알려 줌
+        if (dexState(info.id) < DEX_CAUGHT) msg += ' 🆕 도감에 없는 포켓몬!';
+        if (setDex(info.id, DEX_SEEN)) saveSoon();
+      }
       if (opts.fled) msg = `${opts.fled}${josa(opts.fled, '은', '는')} 어디론가 가 버렸다… ${msg}`;
       if (vis.kind === 'card') msg += ' (카드 그림으로 표시)';
       else if (vis.kind === 'placeholder') msg += ' (그림을 불러오지 못해 대체 이미지로 표시)';
@@ -2336,12 +2913,24 @@
       if (vis.kind === 'card' || vis.kind === 'placeholder') setTimeout(explainImageFailure, 1600);
     };
     const fallbackTimer = setTimeout(() => fallbackVisual(info).then(show), 2500);
-    const settle = (vis) => {
-      if (vis) { clearTimeout(fallbackTimer); show(vis); }
-      if (--pending === 0 && shownRank === 0) { clearTimeout(fallbackTimer); fallbackVisual(info).then(show); }
+    // [추가] 움직이는 영상이 곧 올 수 있으면 정지 그림을 먼저 띄우지 않고 잠깐(최대 1.6초) 기다림
+    const t0 = performance.now();
+    let gifDone = !DEX[info.id] || DEX_NO_ANIM.has(info.id), held = null;
+    const showHeld = () => { if (held && seq === spawnSeq) { const v = held; held = null; clearTimeout(fallbackTimer); show(v); } };
+    const settle = (vis, isGif) => {
+      if (isGif) gifDone = true;
+      if (vis && vis.kind === 'official' && !gifDone) {
+        held = vis;
+        setTimeout(showHeld, Math.max(0, 1600 - (performance.now() - t0)));
+      } else if (vis) {
+        if (isGif) held = null;
+        clearTimeout(fallbackTimer);
+        show(vis);
+      } else if (isGif) showHeld();                            // 영상이 없으면 공식 그림을 바로
+      if (--pending === 0 && shownRank === 0 && !held) { clearTimeout(fallbackTimer); fallbackVisual(info).then(show); }
     };
-    loadAnimatedVisual(info.id).then(settle);
-    loadStaticVisual(info.id).then(settle);
+    loadAnimatedVisual(info.id, info.shiny).then((v) => settle(v, true));
+    loadStaticVisual(info.id, info.shiny).then((v) => settle(v, false));
   }
 
   const _fwd = new THREE.Vector3();
@@ -2349,6 +2938,11 @@
     pokemonMesh.visible = true;
     pokeShadow.visible = true;
     pokeData.appearT = 0;
+    if (currentPokemon.shiny) {                             // [추가] 색이 다른 포켓몬 등장 연출
+      setTimeout(() => { if (pokemonMesh.visible) shinySparkle(impactPoint(bodyCenter(_impC), _impP), 1, true); }, 380);
+      setTimeout(() => showToast('✨ 색이 다른 포켓몬!'), 300);
+      twinkle.wild = performance.now() + 2200;
+    }
     if (fromCard) {
       // 카드를 비추던 화면 가운데 앞(1.3m)에서 튀어나와 바닥으로 내려옴
       _fwd.set(0, 0, -1).applyQuaternion(camera.quaternion);
@@ -2387,16 +2981,22 @@
     }
   }
 
-  // 걷기: 목표까지 부드럽게 다가가되 최대 속도를 넘지 않음 (프레임레이트와 무관)
-  const MAX_WALK = 2.0, MAX_DASH = 5.5;
-  const frameLerp = (perFrame, dt) => 1 - Math.pow(1 - perFrame, dt * 60);
-  function moveToward(target, dt, maxSpeed, k) {
-    _tmp.subVectors(target, pokeData.pos);
-    const dist = _tmp.length();
-    if (dist < 1e-4) return 0;
-    const step = Math.min(dist * frameLerp(k, dt), maxSpeed * dt);
-    pokeData.pos.addScaledVector(_tmp, step / dist);
-    return dist - step;
+  // [수정] 부드러운 이동: 속도를 서서히 올리고, 도착할 때는 미리 줄이는 '관성' 이동 (깡충거림 없음, 프레임레이트와 무관)
+  const MAX_DASH = 4.2, DASH_ACCEL = 16;
+  const _steer = new THREE.Vector3();
+  const levitates = (id) => DEX[id].types.includes(2) || DEX[id].types.includes(7); // 비행·고스트 타입은 떠다님
+  function steer(body, target, dt, maxSpeed, accel, passThrough) {
+    _steer.subVectors(target, body.pos).setY(0);
+    const dist = _steer.length();
+    const desired = dist < 1e-3 ? 0 : passThrough ? maxSpeed : Math.min(maxSpeed, Math.sqrt(2 * accel * 0.8 * dist));
+    if (dist > 1e-3) _steer.multiplyScalar(desired / dist);
+    _steer.sub(body.vel);                                    // 목표 속도와의 차이를 가속도 한도 안에서만 줄임
+    const dv = _steer.length(), maxDv = accel * dt;
+    if (dv > maxDv) _steer.multiplyScalar(maxDv / dv);
+    body.vel.add(_steer);
+    body.pos.addScaledVector(body.vel, dt);
+    body.pos.y = 0;
+    return dist;
   }
   function updatePokemon(dt) {
     if (pokeData.state === 'APPEARING') { updateAppearing(dt); return; }
@@ -2410,9 +3010,9 @@
     if (pokeData.stateTimer <= 0) chooseNextState();
     const dodging = pokeData.state === 'DODGE';
     const goal = pokeData.path.length ? pokeData.path[0] : pokeData.targetPos;
-    const remain = moveToward(goal, dt, dodging ? MAX_DASH : MAX_WALK, (dodging ? 2.6 : 1.4) * pokeData.speed);
-    if (pokeData.path.length > 1 && remain < 0.2) pokeData.path.shift();
-    if (dodging && pokeData.pos.distanceTo(pokeData.targetPos) < 0.25) pokeData.targetPos.y = 0; // 점프 후 착지
+    const through = pokeData.path.length > 1;               // 중간 경유지는 멈추지 않고 지나감
+    const remain = steer(pokeData, goal, dt, dodging ? MAX_DASH : pokeData.maxWalk, dodging ? DASH_ACCEL : pokeData.accel, through);
+    if (through && remain < 0.3) pokeData.path.shift();
     animatePokemon(dt);
   }
 
@@ -2555,68 +3155,81 @@
     return [to.clone()];
   }
 
-  // [추가] 포켓몬 움직임: 걸을 때 깡충깡충·찌그러짐, 가는 방향으로 기울기·돌아보기,
-  //        가만히 있을 땐 숨쉬기, 맞으면 하얗게 번쩍·흔들림, 공격할 땐 움츠렸다 튀어나오기
+  // [수정] 포켓몬 움직임 — 깡충거림 없이 부드럽게: 걸을 땐 아주 살짝 흔들림, 떠다니는 포켓몬은 둥실둥실,
+  //        방향을 바꿀 땐 종이를 뒤집듯 부드럽게 돌아섬, 가만히 있을 땐 숨쉬기 (몸 동작은 GIF 영상이 담당)
   const _right = new THREE.Vector3(), _toCam = new THREE.Vector3();
   function animatePokemon(dt) {
-    const moved = _tmp.subVectors(pokeData.pos, pokeData.lastPos);
     pokeData.lastPos.copy(pokeData.pos);
-    const inv = 1 / Math.max(dt, 1e-3);
     _right.set(1, 0, 0).applyQuaternion(camera.quaternion);
-    const vxScreen = moved.dot(_right) * inv;           // 화면 기준 좌우 속도
-    const speed = Math.hypot(moved.x, moved.z) * inv;
-    if (pokeData.canFlip && Math.abs(vxScreen) > 0.3) pokeData.facing = vxScreen > 0 ? -1 : 1; // 그림은 왼쪽을 봄 → 오른쪽으로 갈 땐 뒤집기
+    const v = pokeData.vel;
+    const vxScreen = v.x * _right.x + v.z * _right.z;         // 화면 기준 좌우 속도
+    const moving = Math.min(1, Math.hypot(v.x, v.z) / 1.2);
+    // 방향 전환 (그림은 왼쪽을 봄 → 오른쪽으로 갈 땐 뒤집기): 가로로 접혔다 펴지며 바뀜
+    const want = pokeData.canFlip && Math.abs(vxScreen) > 0.25 ? (vxScreen > 0 ? -1 : 1) : pokeData.facing;
+    if (pokeData.turnT < 0 && want !== pokeData.facing) { pokeData.turnT = 0; pokeData.turnTo = want; }
+    let turnScale = 1;
+    if (pokeData.turnT >= 0) {
+      pokeData.turnT = Math.min(1, pokeData.turnT + dt / 0.26);
+      if (pokeData.turnT >= 0.5) pokeData.facing = pokeData.turnTo;
+      turnScale = Math.max(0.08, Math.abs(Math.cos(Math.PI * pokeData.turnT)));
+      if (pokeData.turnT >= 1) pokeData.turnT = -1;
+    }
     spriteUniforms.uFlip.value = pokeData.canFlip && pokeData.facing < 0 ? 1 : 0;
-    const moving = Math.min(1, speed / 1.5);
-    pokeData.hop += dt * (4 + 7 * moving);
-    const s = Math.abs(Math.sin(pokeData.hop));
-    const hopY = s * 0.16 * moving;
-    let sx = 1 + (1 - s) * 0.08 * moving, sy = 1 - (1 - s) * 0.1 * moving;
-    const breathe = Math.sin(elapsed * 3.1) * 0.03 * (1 - moving);
-    sx -= breathe * 0.5; sy += breathe;
+    pokeData.hop += dt * (2 + 6 * moving);
+    const breathe = Math.sin(elapsed * 2.6) * 0.022 * (1 - moving);
+    let sx = 1 - breathe * 0.5, sy = 1 + breathe;
     // 숨을 땐 사물 높이에 맞춰 웅크림 (낮은 사물이면 더 납작하게) — 귀 끝 정도만 살짝 보임
     const hideObj = pokeData.state === 'HIDE' ? pokeData.hideObj : null;
     const crouchGoal = hideObj && pokeData.pos.distanceTo(pokeData.targetPos) < 0.6
-      ? THREE.MathUtils.clamp(hideObj.size.y * 0.92 / pokeData.size.y, 0.55, 0.92) : 1;
-    pokeData.crouch += (crouchGoal - pokeData.crouch) * Math.min(1, dt * 8);
-    sy *= pokeData.crouch; sx *= 1 + (1 - pokeData.crouch) * 0.25;
-    if (pokeData.pos.y > 0.05) { sy *= 1.08; sx *= 0.95; }                                         // 점프 중엔 길쭉하게
+      ? THREE.MathUtils.clamp((hideObj.size.y * 0.92 - pokeData.hover * 0.3) / pokeData.size.y, 0.55, 0.92) : 1;
+    pokeData.crouch += (crouchGoal - pokeData.crouch) * Math.min(1, dt * 6);
+    sy *= pokeData.crouch; sx *= 1 + (1 - pokeData.crouch) * 0.2;
+    // 높이: 걷는 포켓몬은 1~2cm만 오르내림, 떠다니는 포켓몬은 천천히 둥실, 피할 때만 짧고 낮게 점프
+    let y = pokeData.hover ? pokeData.hover * (0.4 + 0.6 * pokeData.crouch) + Math.sin(elapsed * 1.7) * 0.045
+      : Math.abs(Math.sin(pokeData.hop)) * 0.016 * moving;
+    if (pokeData.state === 'DODGE') { pokeData.dodgeT += dt; y += 0.2 * Math.sin(Math.PI * Math.min(1, pokeData.dodgeT / 0.42)); }
     let flash = 0, shake = 0, lunge = 0;
     const r = pokeData.react;
     if (r) {
       r.t += dt;
-      if (r.kind === 'hit') {
-        const k = Math.max(0, 1 - r.t / 0.35);
-        flash = k; shake = Math.sin(r.t * 70) * 0.06 * k;
-        if (r.t > 0.35) pokeData.react = null;
-      } else if (r.kind === 'attack') {
-        if (r.t < 0.2) { sy *= 0.86; sx *= 1.1; }                            // 움츠리기
-        else if (r.t < 0.36) {                                               // 튀어나오며 발사
-          sx *= 1.12; sy *= 1.12; lunge = 0.35;
-          if (!r.fired) { r.fired = true; firePokemonCounterAttack(); }
-        } else if (r.t > 0.6) pokeData.react = null;
+      if (r.kind === 'hit') {                              // [수정] 상성이 좋을수록 더 크게 움찔·밀려남
+        const pw = r.power || 1, dur = 0.3 + 0.1 * pw;
+        const k = Math.max(0, 1 - r.t / dur);
+        flash = k * k * Math.min(1, 0.55 + 0.45 * pw); shake = Math.sin(r.t * 55) * 0.03 * pw * k;
+        lunge = -0.07 * pw * k * k;
+        if (r.t > dur) pokeData.react = null;
+      } else if (r.kind === 'attack') {                      // 천천히 움츠렸다가 앞으로 쭉 나오며 발사
+        const u = r.t;
+        const crouch = u < 0.24 ? Math.sin(u / 0.24 * Math.PI / 2) : Math.max(0, 1 - (u - 0.24) / 0.12);
+        sy *= 1 - 0.09 * crouch; sx *= 1 + 0.05 * crouch;
+        if (u >= 0.24 && u < 0.56) lunge = Math.sin((u - 0.24) / 0.32 * Math.PI) * 0.28;
+        if (u >= 0.24 && !r.fired) { r.fired = true; firePokemonCounterAttack(); }
+        if (u > 0.62) pokeData.react = null;
       }
     }
     _toCam.set(camera.position.x - pokeData.pos.x, 0, camera.position.z - pokeData.pos.z).normalize();
     pokemonMesh.position.set(
       pokeData.pos.x + _right.x * shake + _toCam.x * lunge,
-      pokeData.pos.y + hopY,
+      y,
       pokeData.pos.z + _right.z * shake + _toCam.z * lunge);
-    pokemonMesh.scale.set(pokeData.size.x * sx, pokeData.size.y * sy, 1);
+    pokemonMesh.scale.set(pokeData.size.x * sx * turnScale, pokeData.size.y * sy, 1);
     pokemonMesh.lookAt(camera.position.x, pokemonMesh.position.y, camera.position.z); // 항상 플레이어를 바라봄
-    const targetLean = THREE.MathUtils.clamp(vxScreen * 0.06, -0.18, 0.18);
-    pokeData.lean += (targetLean - pokeData.lean) * Math.min(1, dt * 6);
-    spriteUniforms.uSway.value = pokeData.lean + Math.sin(elapsed * 2.2) * 0.025;
+    const targetLean = THREE.MathUtils.clamp(vxScreen * 0.05, -0.1, 0.1);
+    pokeData.lean += (targetLean - pokeData.lean) * Math.min(1, dt * 4);
+    spriteUniforms.uSway.value = pokeData.lean + Math.sin(elapsed * 1.9) * 0.012;
     spriteUniforms.uFlash.value = flash;
     pokeShadow.position.set(pokeData.pos.x, 0.01, pokeData.pos.z);
-    const shadowR = pokeData.size.x * 0.38 * (1 - Math.min(0.5, (hopY + pokeData.pos.y) * 0.8));
+    const shadowR = pokeData.size.x * 0.4 * (1 - Math.min(0.45, y * 0.9));
     pokeShadow.scale.set(shadowR, shadowR, 1);
+    updateXrayEdge();
   }
   // 움직이는 그림(GIF) 프레임 넘기기 — 야생과 파트너가 같은 그림을 써도 한 프레임에 한 번만 넘김
   let frameNo = 0;
   function playAnimatedFrames(v, dt) {
-    if (!v || v.kind !== 'animated' || v.frames.length < 2 || v.lastFrame === frameNo) return;
+    if (!v || v.kind !== 'animated' || v.lastFrame === frameNo) return;
     v.lastFrame = frameNo;
+    v.lastUsed = performance.now();
+    if (v.frames.length < 2) return;
     v.t += dt * 1000;
     let changed = false, guard = 0;
     while (v.t >= v.delays[v.idx] && guard++ < 12) {
@@ -2624,10 +3237,7 @@
       v.idx = (v.idx + 1) % v.frames.length;
       changed = true;
     }
-    if (changed) {
-      v.draw(v.idx);
-      v.texture.needsUpdate = true;
-    }
+    if (changed) v.draw(v.idx);
   }
 
   // 포켓몬 회피 AI 판정 (체력이 높을수록 더 잘 피함) — 화면에서 잘 보이게 옆으로 점프
@@ -2640,10 +3250,10 @@
       pokeData.path.length = 0;
       _right.set(1, 0, 0).applyQuaternion(camera.quaternion).setY(0).normalize();
       const side = Math.random() > 0.5 ? 1 : -1;
-      const t = pokeData.pos.clone().addScaledVector(_right, side * 1.5);
-      if (pointInsideObject(t, 0.3)) t.copy(pokeData.pos).addScaledVector(_right, -side * 1.5);
-      t.y = 0.55; // 점프
+      const t = pokeData.pos.clone().addScaledVector(_right, side * 1.4);
+      if (pointInsideObject(t, 0.3)) t.copy(pokeData.pos).addScaledVector(_right, -side * 1.4);
       pokeData.targetPos.copy(t);
+      pokeData.dodgeT = 0;                                   // 짧고 낮은 점프는 animatePokemon에서
       setBadge('⚡ 고속 회피!', '#eab308');
       logStatus('포켓몬이 날아오는 궤적을 보고 재빠르게 피했습니다!');
     }
@@ -2679,7 +3289,10 @@
     const key = REAL_OBJECT_TYPES[n] ? n : (OBJECT_ALIASES[n] || OBJECT_ALIASES[n.replace(/\s+/g, '')]);
     return key ? Object.assign({ key }, REAL_OBJECT_TYPES[key]) : null;
   }
-  const OCCLUDER_MAT = new THREE.MeshBasicMaterial({ colorWrite: false }); // 깊이만 기록 → 뒤의 3D 물체가 가려짐
+  // 깊이만 기록 → 뒤의 3D 물체가 가려짐. [추가] 스텐실에 '가림막 자리'를 표시 → 가려진 부분을 점선으로 그릴 때 사용
+  const OCCLUDER_MAT = new THREE.MeshBasicMaterial({
+    colorWrite: false, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp
+  });
   const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
   const UNIT_EDGES = new THREE.EdgesGeometry(UNIT_BOX);
   const MAX_REAL_OBJECTS = 6;
@@ -2900,25 +3513,36 @@
     effects.push({ kind: 'outline', mesh: lines, t: 0, dur: 1.6 });
   }
   const RING_GEO = new THREE.RingGeometry(0.35, 0.5, 48);
-  function spawnRing(at, color, size) {
+  function spawnRing(at, color, size, delay = 0, alpha = 0.9) {
     const mat = new THREE.MeshBasicMaterial({
-      color, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
+      color, transparent: true, opacity: alpha, side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending, depthWrite: false
     });
     const ring = new THREE.Mesh(RING_GEO, mat);
     ring.position.copy(at);
     ring.lookAt(camera.position);
     ring.scale.setScalar(size);
+    ring.renderOrder = 6;
+    ring.visible = delay <= 0;
     scene.add(ring);
-    effects.push({ kind: 'ring', mesh: ring, t: 0, dur: 0.8, base: size });
+    effects.push({ kind: 'ring', mesh: ring, t: -delay / 0.8, dur: 0.8, base: size, alpha });
   }
   function updateEffects(dt) {
     for (let i = effects.length - 1; i >= 0; i--) {
       const e = effects[i];
       e.t += dt / e.dur;
+      if (e.t < 0) continue;                                // [추가] 조금 늦게 시작하는 연출
+      e.mesh.visible = true;
       if (e.kind === 'ring') {
         e.mesh.scale.setScalar(e.base * (1 + e.t * 3));
-        e.mesh.material.opacity = 0.9 * Math.max(0, 1 - e.t);
+        e.mesh.material.opacity = (e.alpha || 0.9) * Math.max(0, 1 - e.t);
+      } else if (e.kind === 'slash') {                       // [추가] 할퀴기: 빠르게 그어졌다가 사라짐
+        const grow = 1 - Math.pow(1 - Math.min(1, e.t / 0.3), 3);
+        e.mesh.scale.x = Math.max(0.001, e.len * grow);
+        e.mesh.material.opacity = 0.95 * (e.t < 0.5 ? 1 : Math.max(0, 1 - (e.t - 0.5) / 0.5));
+      } else if (e.kind === 'flash') {                       // [추가] 맞는 순간 번쩍
+        e.mesh.scale.setScalar(Math.max(0.01, e.base * (0.5 + e.t * 1.3)));
+        e.mesh.material.opacity = Math.max(0, 1 - e.t) * (e.t < 0.15 ? e.t / 0.15 : 1);
       } else {
         e.mesh.material.opacity = 0.95 * Math.max(0, 1 - e.t);
       }
@@ -2926,28 +3550,571 @@
     }
   }
 
+  // 7-1. [추가] 타입별 기술 연출 — 18가지 타입마다 다른 파티클(불꽃·물방울·잎·번개·얼음 조각…), 맞을 때 터지는 효과,
+  //      떠오르는 피해 숫자와 상성 문구, 화면 흔들림. 파티클은 GPU 점 스프라이트 두 묶음(빛 더하기 / 덮어 그리기)으로 가볍게 그림
+  const FX_SHAPE = { glow: 0, spark: 1, leaf: 2, drop: 3, shard: 4, bubble: 5, flame: 6, star: 7 };
+  // 모양 아틀라스(4×2칸): 빨강 = 몸통 밝기, 초록 = 하얗게 빛나는 부분 (셰이더가 타입 색을 입힘)
+  const FX_ATLAS = (() => {
+    const C = 64, cv = document.createElement('canvas');
+    cv.width = C * 4; cv.height = C * 2;
+    const g = cv.getContext('2d');
+    const BODY = 'rgb(255,0,0)', HOT = 'rgb(255,255,0)';
+    const cell = (i, fn) => { g.save(); g.translate((i % 4) * C + C / 2, Math.floor(i / 4) * C + C / 2); fn(); g.restore(); };
+    const radial = (r0, stops) => { const gr = g.createRadialGradient(0, 0, 0, 0, 0, r0); stops.forEach(([o, c]) => gr.addColorStop(o, c)); return gr; };
+    cell(FX_SHAPE.glow, () => {
+      g.fillStyle = radial(30, [[0, 'rgba(255,255,0,1)'], [0.22, 'rgba(255,160,0,0.95)'], [0.55, 'rgba(255,0,0,0.45)'], [1, 'rgba(255,0,0,0)']]);
+      g.fillRect(-32, -32, 64, 64);
+    });
+    cell(FX_SHAPE.spark, () => {
+      g.fillStyle = radial(16, [[0, 'rgba(255,255,0,1)'], [1, 'rgba(255,0,0,0)']]);
+      g.fillRect(-16, -16, 32, 32);
+      g.fillStyle = BODY;
+      g.beginPath(); g.moveTo(0, -29); g.lineTo(4, -4); g.lineTo(29, 0); g.lineTo(4, 4); g.lineTo(0, 29); g.lineTo(-4, 4); g.lineTo(-29, 0); g.lineTo(-4, -4); g.closePath(); g.fill();
+      g.fillStyle = HOT; g.beginPath(); g.arc(0, 0, 4, 0, Math.PI * 2); g.fill();
+    });
+    cell(FX_SHAPE.leaf, () => {
+      g.rotate(-0.6);
+      g.fillStyle = BODY;
+      g.beginPath(); g.moveTo(0, -27); g.quadraticCurveTo(18, -6, 0, 27); g.quadraticCurveTo(-18, -6, 0, -27); g.fill();
+      g.strokeStyle = 'rgb(140,0,0)'; g.lineWidth = 2.5;
+      g.beginPath(); g.moveTo(0, -20); g.lineTo(0, 24); g.stroke();
+    });
+    cell(FX_SHAPE.drop, () => {
+      g.fillStyle = BODY;
+      g.beginPath(); g.moveTo(0, -27); g.bezierCurveTo(9, -12, 17, 0, 17, 9); g.arc(0, 9, 17, 0, Math.PI); g.bezierCurveTo(-17, 0, -9, -12, 0, -27); g.fill();
+      g.fillStyle = HOT; g.beginPath(); g.ellipse(-6, 7, 3.5, 6, -0.35, 0, Math.PI * 2); g.fill();
+    });
+    cell(FX_SHAPE.shard, () => {
+      g.rotate(0.35);
+      g.fillStyle = BODY;
+      g.beginPath(); g.moveTo(0, -29); g.lineTo(9, 2); g.lineTo(0, 27); g.lineTo(-9, 2); g.closePath(); g.fill();
+      g.fillStyle = HOT; g.beginPath(); g.moveTo(0, -27); g.lineTo(4, 2); g.lineTo(0, 22); g.closePath(); g.fill();
+    });
+    cell(FX_SHAPE.bubble, () => {
+      g.fillStyle = 'rgba(255,0,0,0.28)'; g.beginPath(); g.arc(0, 0, 24, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = BODY; g.lineWidth = 4; g.beginPath(); g.arc(0, 0, 24, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = HOT; g.beginPath(); g.ellipse(-9, -9, 5, 3.5, -0.8, 0, Math.PI * 2); g.fill();
+    });
+    cell(FX_SHAPE.flame, () => {
+      const gr = g.createLinearGradient(0, 28, 0, -28);
+      gr.addColorStop(0, 'rgba(255,255,0,1)'); gr.addColorStop(0.45, 'rgba(255,120,0,1)'); gr.addColorStop(1, 'rgba(255,0,0,0.85)');
+      g.fillStyle = gr;
+      g.beginPath(); g.moveTo(0, -29); g.bezierCurveTo(13, -10, 19, 4, 17, 13); g.arc(0, 13, 17, 0, Math.PI); g.bezierCurveTo(-19, 4, -13, -10, 0, -29); g.fill();
+    });
+    cell(FX_SHAPE.star, () => {
+      g.fillStyle = BODY;
+      g.beginPath();
+      for (let k = 0; k < 10; k++) { const r = k % 2 ? 11 : 27, a = -Math.PI / 2 + k * Math.PI / 5; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+      g.closePath(); g.fill();
+      g.fillStyle = HOT; g.beginPath(); g.arc(0, 0, 6, 0, Math.PI * 2); g.fill();
+    });
+    const tex = new THREE.CanvasTexture(cv);
+    tex.minFilter = THREE.LinearFilter;                       // 밉맵을 쓰면 옆 칸 모양이 번져 들어옴
+    tex.generateMipmaps = false;
+    return tex;
+  })();
+  const FX_VS = `
+    attribute float aSize;
+    attribute vec4 aColor;
+    attribute vec3 aMisc;     // 모양 번호, 회전, 하얗게 빛나는 정도
+    uniform float uScale;
+    varying vec4 vColor;
+    varying vec3 vMisc;
+    void main() {
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = clamp(aSize * uScale / max(0.05, -mv.z), 1.0, 256.0);
+      gl_Position = projectionMatrix * mv;
+      vColor = aColor;
+      vMisc = aMisc;
+    }`;
+  const FX_FS = `
+    uniform sampler2D uAtlas;
+    varying vec4 vColor;
+    varying vec3 vMisc;
+    void main() {
+      vec2 p = gl_PointCoord - 0.5;
+      float c = cos(vMisc.y), s = sin(vMisc.y);
+      p = vec2(c * p.x + s * p.y, -s * p.x + c * p.y) + 0.5;
+      if (p.x < 0.0 || p.y < 0.0 || p.x > 1.0 || p.y > 1.0) discard;
+      float shape = floor(vMisc.x + 0.5);
+      float col = mod(shape, 4.0), row = floor(shape / 4.0);
+      vec4 t = texture2D(uAtlas, vec2((col + p.x) * 0.25, 1.0 - (row + p.y) * 0.5));
+      float a = t.a * vColor.a;
+      if (a < 0.004) discard;
+      vec3 rgb = mix(vColor.rgb * t.r, vec3(1.0), t.g * vMisc.z);
+      gl_FragColor = vec4(rgb * a, a);
+    }`;
+  const fxScale = { value: 800 };
+  const FX_K = 14;  // 파티클 하나의 상태: 속도3, 나이, 수명, 크기 시작·끝, 투명도, 중력, 감속, 회전 속도, 흔들림, 위상, 하얀 정도
+  function makeParticlePool(cap, additive) {
+    const geo = new THREE.BufferGeometry();
+    const attr = (n) => new THREE.BufferAttribute(new Float32Array(cap * n), n).setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute('position', attr(3));
+    geo.setAttribute('aSize', attr(1));
+    geo.setAttribute('aColor', attr(4));
+    geo.setAttribute('aMisc', attr(3));
+    geo.setDrawRange(0, 0);
+    const mat = new THREE.ShaderMaterial({
+      uniforms: { uAtlas: { value: FX_ATLAS }, uScale: fxScale }, vertexShader: FX_VS, fragmentShader: FX_FS,
+      transparent: true, depthWrite: false, premultipliedAlpha: true,
+      blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending
+    });
+    const points = new THREE.Points(geo, mat);
+    points.frustumCulled = false;
+    points.renderOrder = 6;
+    scene.add(points);
+    return { cap, n: 0, geo, points, st: new Float32Array(cap * FX_K), rgb: new Float32Array(cap * 3) };
+  }
+  const fxAdd = makeParticlePool(900, true), fxNorm = makeParticlePool(600, false);
+  function fxSpawn(pool, x, y, z, vx, vy, vz, life, s0, s1, alpha, grav, drag, spin, wob, color, shape, hot) {
+    if (pool.n >= pool.cap) return;
+    const i = pool.n++;
+    const pos = pool.geo.attributes.position.array, misc = pool.geo.attributes.aMisc.array, st = pool.st;
+    pos[i * 3] = x; pos[i * 3 + 1] = y; pos[i * 3 + 2] = z;
+    misc[i * 3] = shape; misc[i * 3 + 1] = Math.random() * Math.PI * 2; misc[i * 3 + 2] = hot;
+    const k = i * FX_K;
+    st[k] = vx; st[k + 1] = vy; st[k + 2] = vz; st[k + 3] = 0; st[k + 4] = life; st[k + 5] = s0; st[k + 6] = s1;
+    st[k + 7] = alpha; st[k + 8] = grav; st[k + 9] = drag; st[k + 10] = spin; st[k + 11] = wob; st[k + 12] = Math.random() * 6.3; st[k + 13] = 0;
+    pool.rgb[i * 3] = color.r; pool.rgb[i * 3 + 1] = color.g; pool.rgb[i * 3 + 2] = color.b;
+  }
+  function fxUpdatePool(pool, dt) {
+    const a = pool.geo.attributes;
+    const pos = a.position.array, size = a.aSize.array, col = a.aColor.array, misc = a.aMisc.array, st = pool.st, rgb = pool.rgb;
+    let i = 0;
+    while (i < pool.n) {
+      const k = i * FX_K;
+      st[k + 3] += dt;
+      if (st[k + 3] >= st[k + 4]) {                           // 수명 끝 → 마지막 파티클을 이 자리로 옮김
+        const j = --pool.n;
+        if (i !== j) {
+          for (let q = 0; q < 3; q++) { pos[i * 3 + q] = pos[j * 3 + q]; misc[i * 3 + q] = misc[j * 3 + q]; rgb[i * 3 + q] = rgb[j * 3 + q]; }
+          for (let q = 0; q < FX_K; q++) st[k + q] = st[j * FX_K + q];
+        }
+        continue;
+      }
+      const damp = Math.max(0, 1 - st[k + 9] * dt);
+      st[k] *= damp; st[k + 2] *= damp;
+      st[k + 1] = st[k + 1] * damp - st[k + 8] * dt;
+      const age = st[k + 3], u = age / st[k + 4];
+      const wob = st[k + 11] ? Math.cos(st[k + 12] + age * 9) * st[k + 11] * dt : 0;
+      pos[i * 3] += st[k] * dt + wob;
+      pos[i * 3 + 1] += st[k + 1] * dt;
+      pos[i * 3 + 2] += st[k + 2] * dt - wob * 0.5;
+      misc[i * 3 + 1] += st[k + 10] * dt;
+      size[i] = st[k + 5] + (st[k + 6] - st[k + 5]) * u;
+      const fade = Math.min(1, u / 0.08) * (u < 0.55 ? 1 : 1 - (u - 0.55) / 0.45);
+      col[i * 4] = rgb[i * 3]; col[i * 4 + 1] = rgb[i * 3 + 1]; col[i * 4 + 2] = rgb[i * 3 + 2]; col[i * 4 + 3] = st[k + 7] * fade;
+      i++;
+    }
+    pool.geo.setDrawRange(0, pool.n);
+    if (pool.n || pool.wasLive) {
+      a.position.needsUpdate = a.aSize.needsUpdate = a.aColor.needsUpdate = a.aMisc.needsUpdate = true;
+    }
+    pool.wasLive = pool.n > 0;
+  }
+  // 타입별 설정: c 색, s 모양, add 빛 더하기(1)/덮기(0), g 중력(+아래 −위), sp 퍼지는 속도, up 위로 솟는 정도, sz 크기, life 수명,
+  //             spin 회전, wob 흔들림, hot 하얗게 빛나는 정도, 특수: bolt 번개 줄기, rings 염동 고리, slash 할퀴기, swirl 소용돌이, ground 땅에서 솟음
+  const FX_TYPES = [
+    { c: ['#ffffff', '#f5f5f4', '#e7e5e4'], s: ['star', 'glow'], add: 1, g: 0, sp: 2.4, sz: [0.07, 0.15], life: [0.35, 0.6], spin: 3, star: 1 },
+    { c: ['#fdba74', '#f97316', '#fde68a', '#ef4444'], s: ['spark', 'glow'], add: 1, g: 0, sp: 3.6, sz: [0.07, 0.16], life: [0.25, 0.45], star: 1 },
+    { c: ['#eef2ff', '#c4b5fd', '#ffffff'], s: ['shard', 'shard', 'glow'], add: 1, g: -0.3, sp: 3.0, sz: [0.1, 0.2], life: [0.45, 0.75], spin: 9, swirl: 1 },
+    { c: ['#d8b4fe', '#a855f7', '#7e22ce'], s: ['bubble'], add: 0, g: -0.9, sp: 1.6, sz: [0.05, 0.12], life: [0.6, 1.0], wob: 0.6, hot: 0.7 },
+    { c: ['#ca8a04', '#a16207', '#d6b37a', '#78350f'], s: ['shard', 'glow'], add: 0, g: 6, sp: 2.4, up: 2.4, sz: [0.04, 0.1], life: [0.5, 0.9], spin: 8, hot: 0, ground: 1 },
+    { c: ['#a8a29e', '#78716c', '#d6c68a'], s: ['shard'], add: 0, g: 8, sp: 3.0, up: 1.6, sz: [0.05, 0.13], life: [0.5, 0.9], spin: 10, hot: 0.25, rocks: 1 },
+    { c: ['#bef264', '#84cc16', '#d9f99d'], s: ['spark', 'glow'], add: 1, g: 0.5, sp: 2.6, sz: [0.04, 0.09], life: [0.3, 0.55], wob: 0.8 },
+    { c: ['#7c3aed', '#5b21b6', '#a78bfa'], s: ['glow'], add: 1, g: -0.6, sp: 1.2, sz: [0.12, 0.24], life: [0.6, 1.1], wob: 0.9, hot: 0 },
+    { c: ['#f1f5f9', '#cbd5e1', '#94a3b8'], s: ['spark', 'shard'], add: 1, g: 3, sp: 4.2, sz: [0.03, 0.08], life: [0.25, 0.5], spin: 6 },
+    { c: ['#fde047', '#fb923c', '#f97316', '#ef4444'], s: ['flame', 'glow'], add: 1, g: -1.8, sp: 2.2, sz: [0.1, 0.2], shrink: 1, life: [0.35, 0.7] },
+    { c: ['#93c5fd', '#60a5fa', '#3b82f6', '#dbeafe'], s: ['drop', 'bubble'], add: 0, g: 7, sp: 2.6, up: 1.4, sz: [0.04, 0.1], life: [0.45, 0.8], hot: 0.8 },
+    { c: ['#86efac', '#4ade80', '#22c55e', '#15803d'], s: ['leaf'], add: 0, g: 1.0, sp: 2.4, sz: [0.06, 0.12], life: [0.6, 1.0], spin: 7, wob: 0.5, hot: 0 },
+    { c: ['#fef08a', '#facc15', '#fef9c3', '#ffffff'], s: ['spark'], add: 1, g: 0, sp: 4.6, sz: [0.05, 0.12], life: [0.18, 0.38], spin: 4, bolt: 1 },
+    { c: ['#f9a8d4', '#f472b6', '#e879f9'], s: ['glow', 'star'], add: 1, g: -0.2, sp: 1.8, sz: [0.07, 0.15], life: [0.4, 0.8], rings: 1 },
+    { c: ['#a5f3fc', '#e0f2fe', '#ffffff', '#67e8f9'], s: ['shard', 'star'], add: 1, g: 1.2, sp: 2.8, sz: [0.04, 0.11], life: [0.5, 0.9], spin: 5 },
+    { c: ['#a78bfa', '#7c3aed', '#6366f1', '#67e8f9'], s: ['glow', 'spark'], add: 1, g: 0, sp: 3.0, sz: [0.08, 0.18], life: [0.4, 0.75], swirl: 1 },
+    { c: ['#4c1d95', '#1e1b4b', '#581c87', '#111827'], s: ['shard', 'glow'], add: 0, g: 0, sp: 2.6, sz: [0.06, 0.14], life: [0.35, 0.65], spin: 6, hot: 0, slash: 1 },
+    { c: ['#fbcfe8', '#f9a8d4', '#ffffff', '#f0abfc'], s: ['star', 'spark'], add: 1, g: -0.4, sp: 2.0, sz: [0.05, 0.12], life: [0.5, 0.9], spin: 4 }
+  ].map((T) => Object.assign(T, { cols: T.c.map((h) => new THREE.Color(h)), shapes: T.s.map((n) => FX_SHAPE[n]) }));
+  const NO_EFFECT_FX = { cols: [new THREE.Color('#94a3b8'), new THREE.Color('#cbd5e1')], shapes: [FX_SHAPE.glow], add: 0, g: -0.3, sp: 0.7, sz: [0.08, 0.16], life: [0.5, 0.8], hot: 0.2 };
+  const pick = (arr) => arr[(Math.random() * arr.length) | 0];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const _fxDir = new THREE.Vector3(), _fxAxis = new THREE.Vector3(), _fxTan = new THREE.Vector3();
+  // 한 점에서 사방으로 터지는 파티클 (strength: 상성·큰 기술일수록 크고 많게)
+  function fxBurst(T, at, n, strength = 1, opts = {}) {
+    const pool = T.add ? fxAdd : fxNorm;
+    if (T.swirl || opts.swirl) _fxAxis.set(0, 0, -1).applyQuaternion(camera.quaternion);
+    for (let k = 0; k < n; k++) {
+      _fxDir.set(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1));
+      if (_fxDir.lengthSq() < 1e-4) _fxDir.set(0, 1, 0);
+      _fxDir.normalize();
+      const sp = T.sp * rnd(0.45, 1) * (opts.speed || 1) * (0.75 + 0.25 * strength);
+      let vx = _fxDir.x * sp, vy = _fxDir.y * sp + (T.up || 0) * rnd(0.5, 1), vz = _fxDir.z * sp;
+      if (T.swirl || opts.swirl) {                            // 화면 축을 따라 빙글 도는 소용돌이
+        _fxTan.crossVectors(_fxAxis, _fxDir).normalize().multiplyScalar(sp * 1.2);
+        vx = vx * 0.35 + _fxTan.x; vy = vy * 0.35 + _fxTan.y; vz = vz * 0.35 + _fxTan.z;
+      }
+      const sz = rnd(T.sz[0], T.sz[1]) * (opts.size || 1) * (0.8 + 0.25 * strength);
+      const r = (opts.spread || 0.08) * Math.random();
+      const shape = pick(T.shapes);
+      const alpha = (opts.alpha || 1) * (T.add && shape === FX_SHAPE.glow ? 0.55 : 0.95);   // 빛무리끼리 겹치면 하얗게 타 버려서 옅게
+      fxSpawn(pool, at.x + _fxDir.x * r, at.y + _fxDir.y * r, at.z + _fxDir.z * r, vx, vy, vz,
+        rnd(T.life[0], T.life[1]) * (opts.life || 1), sz, T.shrink ? sz * 0.25 : sz * 0.7, alpha,
+        T.g, opts.drag != null ? opts.drag : 1.6, rnd(-1, 1) * (T.spin || 2), T.wob || 0, pick(T.cols), shape, T.hot == null ? 0.85 : T.hot);
+    }
+  }
+  // 날아가는 기술 뒤에 남는 꼬리
+  function fxTrail(T, from, to, n, big) {
+    const pool = T.add ? fxAdd : fxNorm;
+    for (let k = 0; k < n; k++) {
+      const f = Math.random();
+      const sz = rnd(T.sz[0], T.sz[1]) * (big ? 0.95 : 0.7);
+      fxSpawn(pool, from.x + (to.x - from.x) * f + rnd(-0.03, 0.03), from.y + (to.y - from.y) * f + rnd(-0.03, 0.03), from.z + (to.z - from.z) * f + rnd(-0.03, 0.03),
+        rnd(-0.35, 0.35), rnd(-0.35, 0.35) - T.g * 0.04, rnd(-0.35, 0.35), rnd(T.life[0], T.life[1]) * 0.55, sz, T.shrink ? sz * 0.2 : sz * 0.4,
+        0.9, T.g * 0.25, 2.5, rnd(-1, 1) * (T.spin || 2), (T.wob || 0) * 0.5, pick(T.cols), pick(T.shapes), T.hot == null ? 0.85 : T.hot);
+    }
+  }
+  // ⚡ 번개 줄기: 카메라를 향한 얇은 띠 두 겹(하얀 심 + 노란 빛)을 매 프레임 지그재그로 다시 그려 번쩍임
+  const BOLT_SEG = 10;
+  const bolts = [];
+  function makeRibbon(color, opacity) {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array((BOLT_SEG + 1) * 6), 3).setUsage(THREE.DynamicDrawUsage));
+    const idx = [];
+    for (let i = 0; i < BOLT_SEG; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    geo.setIndex(idx);
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+    }));
+    mesh.frustumCulled = false;
+    mesh.renderOrder = 6;
+    scene.add(mesh);
+    return mesh;
+  }
+  function spawnBolt(fromFn, toFn, dur, opts = {}) {
+    const b = { core: makeRibbon(0xffffff, 1), glow: makeRibbon(opts.color || 0xfacc15, 0.55), fromFn, toFn, t: 0, dur,
+      width: opts.width || 0.03, jag: opts.jag || 0.16, follow: opts.follow || null, nextJag: 0, offs: new Float32Array((BOLT_SEG + 1) * 2) };
+    bolts.push(b);
+    return b;
+  }
+  const _bA = new THREE.Vector3(), _bB = new THREE.Vector3(), _bD = new THREE.Vector3(), _bS = new THREE.Vector3(), _bN = new THREE.Vector3(), _bP = new THREE.Vector3();
+  function updateBolts(dt) {
+    for (let i = bolts.length - 1; i >= 0; i--) {
+      const b = bolts[i];
+      b.t += dt;
+      if (b.follow && !projectiles.includes(b.follow)) { b.follow = null; b.t = Math.max(b.t, b.dur - 0.08); }
+      if (b.t >= b.dur && !b.follow) {
+        for (const m of [b.core, b.glow]) { scene.remove(m); m.geometry.dispose(); m.material.dispose(); }
+        bolts.splice(i, 1);
+        continue;
+      }
+      b.fromFn(_bA); b.toFn(_bB);
+      _bD.subVectors(_bB, _bA);
+      const len = _bD.length();
+      if (len < 1e-3) continue;
+      _bD.divideScalar(len);
+      _bP.addVectors(_bA, _bB).multiplyScalar(0.5);
+      _bS.subVectors(camera.position, _bP).cross(_bD).normalize();   // 화면에서 줄기에 수직인 방향
+      _bN.crossVectors(_bD, _bS).normalize();
+      if (b.t >= b.nextJag) {                                // 0.05초마다 모양이 바뀌며 번쩍임
+        b.nextJag = b.t + 0.05;
+        for (let k = 0; k <= BOLT_SEG; k++) {
+          const env = Math.sin(Math.PI * k / BOLT_SEG) * b.jag * Math.sqrt(len);
+          b.offs[k * 2] = rnd(-1, 1) * env; b.offs[k * 2 + 1] = rnd(-0.5, 0.5) * env;
+        }
+        b.core.material.opacity = rnd(0.7, 1);
+      }
+      const fade = b.follow ? 1 : Math.max(0, 1 - Math.max(0, b.t - (b.dur - 0.12)) / 0.12);
+      b.core.material.opacity = Math.min(b.core.material.opacity, fade);
+      b.glow.material.opacity = 0.55 * fade;
+      for (const [m, w] of [[b.core, b.width], [b.glow, b.width * 2.4]]) {
+        const arr = m.geometry.attributes.position.array;
+        for (let k = 0; k <= BOLT_SEG; k++) {
+          const f = k / BOLT_SEG;
+          const x = _bA.x + _bD.x * len * f + _bS.x * b.offs[k * 2] + _bN.x * b.offs[k * 2 + 1];
+          const y = _bA.y + _bD.y * len * f + _bS.y * b.offs[k * 2] + _bN.y * b.offs[k * 2 + 1];
+          const z = _bA.z + _bD.z * len * f + _bS.z * b.offs[k * 2] + _bN.z * b.offs[k * 2 + 1];
+          const o = k * 6;
+          arr[o] = x + _bS.x * w; arr[o + 1] = y + _bS.y * w; arr[o + 2] = z + _bS.z * w;
+          arr[o + 3] = x - _bS.x * w; arr[o + 4] = y - _bS.y * w; arr[o + 5] = z - _bS.z * w;
+        }
+        m.geometry.attributes.position.needsUpdate = true;
+      }
+    }
+  }
+  // 날아가는 기술의 몸통: 타입 색 빛무리 + 하얀 심 (땅·바위는 돌덩이, 악은 검은 구슬)
+  const GLOW_TEX = (() => {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 64;
+    const g = cv.getContext('2d');
+    const gr = g.createRadialGradient(32, 32, 0, 32, 32, 31);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.3, 'rgba(255,255,255,0.75)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(cv);
+  })();
+  const ROCK_GEO = new THREE.IcosahedronGeometry(0.09, 0);
+  const coreMats = new Map();
+  function coreMaterials(type) {
+    if (!coreMats.has(type)) {
+      const T = FX_TYPES[type], col = T.cols[1] || T.cols[0];
+      coreMats.set(type, {
+        glow: new THREE.SpriteMaterial({ map: GLOW_TEX, color: col, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: type === 16 ? 0.55 : 0.9 }),
+        core: type === 16 ? new THREE.SpriteMaterial({ map: GLOW_TEX, color: 0x1e1033, depthWrite: false, transparent: true })
+          : new THREE.SpriteMaterial({ map: GLOW_TEX, color: 0xffffff, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }),
+        rock: new THREE.MeshStandardMaterial({ color: T.cols[0], roughness: 0.9, flatShading: true })
+      });
+    }
+    return coreMats.get(type);
+  }
+  function makeAttackCore(type, scale) {
+    const m = coreMaterials(type), g = new THREE.Group();
+    const glow = new THREE.Sprite(m.glow);
+    glow.scale.setScalar(0.55 * scale);
+    glow.userData.base = 0.55 * scale;
+    glow.renderOrder = 6;
+    g.add(glow);
+    let core;
+    if (type === 4 || type === 5) { core = new THREE.Mesh(ROCK_GEO, m.rock); core.scale.setScalar(scale); }
+    else { core = new THREE.Sprite(m.core); core.scale.setScalar(0.22 * scale); }
+    core.renderOrder = 6;
+    g.add(core);
+    g.userData.glow = glow;
+    return g;
+  }
+  // 할퀴기(악), 번쩍임, 염동 고리 같은 짧은 연출은 effects 목록에서 함께 움직임
+  const SLASH_GEO = new THREE.PlaneGeometry(1, 1);
+  function spawnSlash(at, delay) {
+    const ang = (Math.random() < 0.5 ? -1 : 1) * rnd(0.55, 0.95);
+    for (const [color, thick, add] of [[0x2e1065, 0.07, false], [0xe9d5ff, 0.022, true]]) {
+      const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide,
+        blending: add ? THREE.AdditiveBlending : THREE.NormalBlending });
+      const mesh = new THREE.Mesh(SLASH_GEO, mat);
+      mesh.position.copy(at);
+      mesh.lookAt(camera.position);
+      mesh.rotateZ(ang);
+      mesh.renderOrder = 7;
+      mesh.scale.set(0.001, thick, 1);
+      scene.add(mesh);
+      effects.push({ kind: 'slash', mesh, t: -delay / 0.42, dur: 0.42, len: rnd(0.75, 0.95) });
+    }
+  }
+  function spawnFlash(at, color, size, delay = 0) {
+    const mat = new THREE.SpriteMaterial({ map: GLOW_TEX, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 });
+    const sp = new THREE.Sprite(mat);
+    sp.position.copy(at);
+    sp.renderOrder = 7;
+    sp.scale.setScalar(0.01);
+    scene.add(sp);
+    effects.push({ kind: 'flash', mesh: sp, t: -delay / 0.32, dur: 0.32, base: size });
+  }
+  // 맞은 자리에서 터지는 효과 (strength: 효과 굉장 1.7 · 보통 1 · 별로 0.55)
+  const _imp = new THREE.Vector3();
+  function fxImpact(type, at, strength, big) {
+    const T = FX_TYPES[type];
+    if (strength <= 0) {                                      // 효과 없음: 회색 연기만 살짝
+      fxBurst(NO_EFFECT_FX, at, 8, 0.6, { speed: 0.6 });
+      return;
+    }
+    const s = strength * (big ? 1.25 : 1);
+    const n = Math.round(24 * s);
+    if (T.ground) {                                          // 땅: 발밑에서 흙과 돌이 솟구침
+      _imp.set(at.x, 0.03, at.z);
+      fxBurst(T, _imp, n, s, { spread: 0.25 });
+      spawnFlatRing(_imp, T.cols[0], 0.2 * s);
+    } else {
+      fxBurst(T, at, n, s);
+    }
+    if (T.rocks) for (let k = 0; k < Math.round(5 * s); k++) {   // 바위: 위에서 돌이 떨어짐
+      _imp.set(at.x + rnd(-0.3, 0.3), at.y + rnd(0.5, 0.9), at.z + rnd(-0.3, 0.3));
+      fxSpawn(fxNorm, _imp.x, _imp.y, _imp.z, 0, -rnd(1, 2), 0, 0.5, 0.12, 0.1, 1, 9, 0.2, rnd(-6, 6), 0, pick(T.cols), FX_SHAPE.shard, 0.25);
+    }
+    const col = T.cols[1] || T.cols[0];
+    const fs = Math.min(s, 1.8);
+    spawnFlash(at, type === 16 ? 0x7c3aed : col, 0.42 * fs);
+    if (T.star) spawnFlash(at, 0xffffff, 0.26 * fs, 0.04);
+    if (T.rings) for (let k = 0; k < 3; k++) spawnRing(at, col.getHex(), 0.13 * s, k * 0.12, 0.7);
+    else if (!T.ground) spawnRing(at, col.getHex(), 0.1 * s, 0, 0.5);
+    if (T.slash) { spawnSlash(at, 0); spawnSlash(at, 0.09); }
+    if (T.bolt) for (let k = 0; k < Math.round(2 + s * 1.5); k++) {
+      const end = new THREE.Vector3(rnd(-1, 1), rnd(-0.6, 1), rnd(-1, 1)).normalize().multiplyScalar(rnd(0.3, 0.55) * s).add(at);
+      const start = at.clone();
+      spawnBolt((o) => o.copy(start), (o) => o.copy(end), rnd(0.14, 0.24), { width: 0.012, jag: 0.3 });
+    }
+  }
+  // 바닥에 눕힌 고리 (땅 타입 충격파)
+  function spawnFlatRing(at, color, size) {
+    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false });
+    const ring = new THREE.Mesh(RING_GEO, mat);
+    ring.position.copy(at);
+    ring.rotation.x = -Math.PI / 2;
+    ring.scale.setScalar(size);
+    ring.renderOrder = 6;
+    scene.add(ring);
+    effects.push({ kind: 'ring', mesh: ring, t: 0, dur: 0.7, base: size });
+  }
+  // 기술을 쓸 때 시전자 주변에 모이는 빛
+  function fxCharge(type, at, big) {
+    const T = FX_TYPES[type];
+    fxBurst(T, at, big ? 14 : 7, 0.7, { speed: 0.5, size: 0.7, life: 0.7 });
+    spawnRing(at, (T.cols[1] || T.cols[0]).getHex(), big ? 0.1 : 0.07, 0, 0.45);
+  }
+  // ---- 떠오르는 글자 (피해 숫자 · 상성 문구 · 기술 이름) — 3D 위치를 따라다니며 위로 떠오름
+  const fxLayer = $('fx-layer');
+  const floats = [];
+  const _fl = new THREE.Vector3(), _flc = new THREE.Vector3();
+  function floatText(pos, text, cls, opts = {}) {
+    if (!fxLayer) return null;
+    const el = document.createElement('div');
+    el.className = 'fx-text ' + cls;
+    el.textContent = text;
+    if (opts.bg) { el.style.background = opts.bg; el.style.color = opts.fg || '#fff'; }
+    el.style.opacity = '0';
+    fxLayer.appendChild(el);
+    floats.push({ el, pos: pos.clone(), t: -(opts.delay || 0), dur: opts.dur || 1.1, rise: opts.rise == null ? 0.28 : opts.rise, dy: opts.dy || 0 });
+    return el;
+  }
+  function clearFloats() {
+    for (const f of floats) f.el.remove();
+    floats.length = 0;
+  }
+  function updateFloats(dt) {
+    for (let i = floats.length - 1; i >= 0; i--) {
+      const f = floats[i];
+      f.t += dt;
+      if (f.t < 0) continue;
+      const u = f.t / f.dur;
+      if (u >= 1) { f.el.remove(); floats.splice(i, 1); continue; }
+      _fl.copy(f.pos);
+      _fl.y += f.rise * (1 - Math.pow(1 - Math.min(1, u * 1.4), 2));
+      _flc.copy(_fl).applyMatrix4(camera.matrixWorldInverse);
+      if (_flc.z >= 0) { f.el.style.opacity = '0'; continue; }
+      _fl.project(camera);
+      const x = (_fl.x + 1) / 2 * window.innerWidth, y = (1 - _fl.y) / 2 * window.innerHeight + f.dy;   // dy: 화면에서 위아래로 띄우기
+      const pop = u < 0.1 ? 0.5 + u / 0.1 * 0.7 : u < 0.2 ? 1.2 - (u - 0.1) / 0.1 * 0.2 : 1;
+      f.el.style.opacity = String(u > 0.72 ? (1 - u) / 0.28 : 1);
+      f.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%) scale(${pop.toFixed(3)})`;
+    }
+  }
+  // 화면 흔들림 (카메라 영상과 3D 화면을 같이 흔들어 어긋나지 않게)
+  const REDUCED_MOTION = (() => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (_) { return false; } })();
+  let shakeTimer = 0;
+  function shakeScreen(strong) {
+    if (REDUCED_MOTION) return;
+    const b = document.body;
+    b.classList.remove('fx-shake', 'fx-shake-strong');
+    void b.offsetWidth;
+    b.classList.add(strong ? 'fx-shake-strong' : 'fx-shake');
+    clearTimeout(shakeTimer);
+    shakeTimer = setTimeout(() => b.classList.remove('fx-shake', 'fx-shake-strong'), 480);
+  }
+  // 상성 표시용
+  const fmtMult = (f) => (f === 0.25 ? '¼' : f === 0.5 ? '½' : String(f));
+  function effClass(eff) { return eff === 0 ? 'none' : eff >= 2 ? 'super' : eff < 1 ? 'weak' : 'normal'; }
+  function effStrength(eff) { return eff === 0 ? 0 : eff >= 4 ? 2.1 : eff >= 2 ? 1.7 : eff < 1 ? 0.55 : 1; }
+  function typeTextColor(type) {
+    const c = new THREE.Color(DEX_TYPE_COLORS[type]);
+    return 0.299 * c.r + 0.587 * c.g + 0.114 * c.b > 0.62 ? '#1f2937' : '#fff';
+  }
+  // 맞은 쪽에 피해 숫자와 상성 문구 띄우기 (taken: 내 파트너가 맞음)
+  const _hd = new THREE.Vector3();
+  function showHitText(at, dmg, eff, taken) {
+    const head = _hd.copy(at);
+    head.y += 0.12;
+    const cls = effClass(eff);
+    if (eff === 0) floatText(head, '0', 'dmg dmg-none');
+    else floatText(head, `-${dmg}`, 'dmg ' + (taken ? 'dmg-taken' : 'dmg-' + cls) + (taken && eff >= 2 ? ' dmg-super' : ''));
+    if (cls !== 'normal') {                                  // 상성 문구는 숫자 바로 위에 붙어서 함께 떠오름
+      const txt = eff === 0 ? '효과가 없는 것 같다… ×0' : eff >= 2 ? `효과가 굉장했다! ×${fmtMult(eff)}` : `효과가 별로인 듯하다… ×${fmtMult(eff)}`;
+      floatText(head, txt, 'eff eff-' + cls, { delay: 0.06, dur: 1.4, dy: eff >= 2 ? -54 : -40 });
+    }
+  }
+  // [추가] 색이 다른 포켓몬: 나타날 때 금빛 별이 터지고, 이후에도 가끔 반짝임 (파트너도)
+  const SHINY_RATE = 1 / 64;
+  const SHINY_FX = { cols: ['#fde68a', '#ffffff', '#fef3c7', '#fcd34d'].map((h) => new THREE.Color(h)), shapes: [FX_SHAPE.star, FX_SHAPE.spark],
+    add: 1, g: -0.25, sp: 1.3, sz: [0.05, 0.11], life: [0.6, 1.0], spin: 3, hot: 0.9 };
+  const twinkle = { wild: 0, partner: 0 };
+  function shinySparkle(center, size, big) {
+    fxBurst(SHINY_FX, center, big ? 28 : 5, 1, { spread: big ? 0.12 : size * 0.45, speed: big ? 1 : 0.3, size: big ? 1 : 0.8 });
+    if (big) spawnRing(center, 0xfde68a, 0.12, 0, 0.7);
+  }
+  function updateShinyTwinkle(now) {
+    if (currentPokemon.shiny && isTargetActive() && pokemonMesh.visible && now > twinkle.wild) {
+      twinkle.wild = now + 2000 + Math.random() * 1400;
+      shinySparkle(impactPoint(bodyCenter(_impC), _impP), Math.max(pokeData.size.x, pokeData.size.y), false);
+    }
+    if (partner.mon && partner.mon.shiny && partnerMesh.visible && now > twinkle.partner) {
+      twinkle.partner = now + 2600 + Math.random() * 1800;
+      shinySparkle(impactPoint(partnerBody(_impC), _impP), Math.max(partner.size.x, partner.size.y), false);
+    }
+  }
+  // 위쪽 정보창의 희귀도 ★ · 도감에 없는 포켓몬이면 NEW
+  function updateWildTags() {
+    const el = $('wild-tags');
+    if (!el) return;
+    el.textContent = '';
+    const id = currentPokemon.id;
+    if (!DEX[id]) return;
+    const st = document.createElement('span');
+    st.className = 'rarity r' + rarityOf(id);
+    st.textContent = stars(rarityOf(id));
+    st.title = `희귀도 ${rarityOf(id)}단계`;
+    el.appendChild(st);
+    if (dexState(id) < DEX_CAUGHT) {
+      const n = document.createElement('span');
+      n.className = 'new-chip';
+      n.textContent = 'NEW';
+      n.title = '아직 잡은 적 없는 포켓몬';
+      el.appendChild(n);
+    }
+  }
+  // 맞은 자리: 몸 가운데에서 카메라 쪽으로 살짝 앞 (그림에 가려지지 않게)
+  const _impC = new THREE.Vector3(), _impP = new THREE.Vector3();
+  function impactPoint(center, out) {
+    _fxDir.subVectors(camera.position, center).normalize();
+    return out.copy(center).addScaledVector(_fxDir, 0.18);
+  }
+  function updateFx(dt) {
+    fxScale.value = renderer.getDrawingBufferSize(_fxSize).y / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
+    fxUpdatePool(fxAdd, dt);
+    fxUpdatePool(fxNorm, dt);
+    updateBolts(dt);
+    updateFloats(dt);
+  }
+  const _fxSize = new THREE.Vector2();
+
   // 7. 발사체 (⚡ 내 공격, 포켓몬의 반격, 던진 포켓볼) — 속도는 초당 단위, 재질 공유
   const PROJECTILE = {
     PLAYER_ATK: { speed: 16.8, gravity: 0, radius: 0.12 },
     ENEMY_ATK: { speed: 7.5, gravity: 0, radius: 0.16 }
   };
-  const BOLT_GEO = new THREE.SphereGeometry(0.12, 16, 16);
-  const BOLT_MAT = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
-  const ORB_GEO = new THREE.SphereGeometry(0.16, 16, 16);
-  const ORB_MAT = new THREE.MeshBasicMaterial({ color: 0xa855f7 });
-  const BALL_PARTS = (() => {
+  // [수정] 볼 종류별 색: 몬스터볼(빨강) · 슈퍼볼(파랑) · 하이퍼볼(검정+노랑)
+  const BALL_LOOK = { poke: { top: 0xef4444, band: 0x111111 }, great: { top: 0x2563eb, band: 0x111111 }, ultra: { top: 0x27272a, band: 0xfacc15 } };
+  const BALL_GEO = (() => {
     const radius = 0.22;
-    return [
-      [new THREE.SphereGeometry(radius, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.2 })],
-      [new THREE.SphereGeometry(radius, 20, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })],
-      [new THREE.CylinderGeometry(radius * 1.02, radius * 1.02, 0.04, 20), new THREE.MeshBasicMaterial({ color: 0x111111 })],
-      [new THREE.CylinderGeometry(0.06, 0.06, 0.03, 16).rotateX(Math.PI / 2).translate(0, 0, radius), new THREE.MeshBasicMaterial({ color: 0xf8fafc })]
-    ];
+    return {
+      top: new THREE.SphereGeometry(radius, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+      bottom: new THREE.SphereGeometry(radius, 20, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+      band: new THREE.CylinderGeometry(radius * 1.02, radius * 1.02, 0.04, 20),
+      button: new THREE.CylinderGeometry(0.06, 0.06, 0.03, 16).rotateX(Math.PI / 2).translate(0, 0, radius)
+    };
   })();
-  function createPokeballMesh() {
-    const group = new THREE.Group();
-    for (const [geo, mat] of BALL_PARTS) group.add(new THREE.Mesh(geo, mat));
+  const BALL_SHARED = { bottom: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 }), button: new THREE.MeshBasicMaterial({ color: 0xf8fafc }) };
+  const ballMatCache = {};
+  function ballMats(type) {
+    if (!ballMatCache[type]) {
+      const L = BALL_LOOK[type] || BALL_LOOK.poke;
+      ballMatCache[type] = { top: new THREE.MeshStandardMaterial({ color: L.top, roughness: 0.2 }), band: new THREE.MeshBasicMaterial({ color: L.band }) };
+    }
+    return ballMatCache[type];
+  }
+  function createPokeballMesh(type = 'poke') {
+    const m = ballMats(type), group = new THREE.Group();
+    group.add(new THREE.Mesh(BALL_GEO.top, m.top), new THREE.Mesh(BALL_GEO.bottom, BALL_SHARED.bottom),
+      new THREE.Mesh(BALL_GEO.band, m.band), new THREE.Mesh(BALL_GEO.button, BALL_SHARED.button));
     return group;
+  }
+  function setBallLook(group, type) {
+    const m = ballMats(type);
+    group.children[0].material = m.top;
+    group.children[2].material = m.band;
   }
 
   // ⚡ 내 공격: 카메라 방향(조준점)으로 발사 → 조준점이 겨누는 지점(포켓몬 거리)에 도달
@@ -2957,10 +4124,13 @@
     _fwd.set(0, 0, -1).applyQuaternion(camera.quaternion);
     const aimDist = THREE.MathUtils.clamp(camera.position.distanceTo(bodyCenter()), 1.5, 12);
     const delta = camera.position.clone().addScaledVector(_fwd, aimDist).sub(start);
-    const bolt = new THREE.Mesh(BOLT_GEO, BOLT_MAT);
+    const bolt = makeAttackCore(12, 0.85);                  // [수정] 전기 타입 연출 (꼬리 불꽃 + 번개 줄기)
     bolt.position.copy(start);
     scene.add(bolt);
-    projectiles.push({ mesh: bolt, vel: delta.normalize().multiplyScalar(spec.speed), type: 'PLAYER_ATK', age: 0, gravity: 0, radius: spec.radius });
+    const p = { mesh: bolt, vel: delta.normalize().multiplyScalar(spec.speed), type: 'PLAYER_ATK', age: 0, gravity: 0, radius: spec.radius,
+      fxType: 12, big: false, trailAcc: 0, spin: 0 };
+    projectiles.push(p);
+    spawnBolt((o) => o.copy(start), (o) => o.copy(bolt.position), 2, { follow: p, width: 0.012, jag: 0.08 });
   }
   function clearProjectiles(type) {
     for (let i = projectiles.length - 1; i >= 0; i--) {
@@ -2975,7 +4145,7 @@
     if (!isTargetActive()) return;
     encounter.interactedAt = performance.now();
     if (partner.mon && partner.hp > 0) {
-      if (!partnerAttack(true)) logStatus(partner.evolving ? '파트너가 진화하는 중이에요!' : '파트너가 다음 기술을 준비하고 있어요…');
+      if (!partnerAttack(true)) logStatus('파트너가 다음 기술을 준비하고 있어요…');
       return;
     }
     launchBolt();
@@ -2987,17 +4157,23 @@
   function firePokemonCounterAttack() {
     if (!isTargetActive()) return;
     const spec = PROJECTILE.ENEMY_ATK;
-    const orb = new THREE.Mesh(ORB_GEO, ORB_MAT);
-    bodyCenter(orb.position);
     // [추가] 파트너가 나와 있으면 절반은 파트너를 노림
     const atPartner = partnerActive() && Math.random() < 0.5;
+    // [추가] 야생 포켓몬도 자기 타입 기술을 씀 (파트너에게는 가장 잘 듣는 타입으로)
+    const wid = currentPokemon.id;
+    const moveType = !DEX[wid] ? 0 : atPartner ? bestMoveType(wid, partner.mon.id) : pick(DEX[wid].types);
+    const orb = makeAttackCore(moveType, 1.0);
+    bodyCenter(orb.position);
     const target = atPartner ? partnerBody(new THREE.Vector3()) : camera.position.clone();
     const vel = target.sub(orb.position).normalize().multiplyScalar(spec.speed);
     scene.add(orb);
-    projectiles.push({ mesh: orb, vel, type: 'ENEMY_ATK', age: 0, gravity: 0, radius: spec.radius });
+    const p = { mesh: orb, vel, type: 'ENEMY_ATK', age: 0, gravity: 0, radius: spec.radius, fxType: moveType, moveType, big: false, trailAcc: 0, spin: 7 };
+    projectiles.push(p);
+    fxCharge(moveType, orb.position, false);
+    if (FX_TYPES[moveType].bolt) spawnBolt((o) => bodyCenter(o), (o) => o.copy(orb.position), 3, { follow: p });
     setBadge('🔥 반격 중!', '#ef4444');
-    const pn = atPartner ? DEX[partner.mon.id].name : '';
-    logStatus(atPartner ? `주의! 야생 포켓몬이 ${pn}${josa(pn, '을', '를')} 노려요!` : '주의! 포켓몬이 나를 향해 공격을 날렸습니다!');
+    const pn = atPartner ? DEX[partner.mon.id].name : '', move = MOVE_NAMES[moveType][0];
+    logStatus(atPartner ? `주의! ${currentPokemon.name}의 ${move}! ${pn}${josa(pn, '을', '를')} 노려요!` : `주의! ${currentPokemon.name}의 ${move}! 나를 향해 날아와요!`);
   }
   function capturePokemon() {
     pokeData.state = 'CAPTURED';
@@ -3007,20 +4183,27 @@
     clearProjectiles('ENEMY_ATK');
     clearProjectiles('PARTNER_ATK');
     setBadge('✨ 포획 성공!', '#22c55e');
-    const name = currentPokemon.name, lv = currentPokemon.level;
+    const name = currentPokemon.name, lv = currentPokemon.level, id = currentPokemon.id, shiny = !!currentPokemon.shiny;
     const helper = partner.mon && partner.hp > 0 && encounter.partnerHelped ? partner.mon : null;
-    let msg = `🎉 신난다! ${name}${josa(name, '을', '를')} 잡았다! (Lv.${lv})`;
-    if (DEX[currentPokemon.id]) {
-      const { first } = addMon(currentPokemon.id, lv);
-      msg += ' 🎒 내 포켓몬에 넣었어요.';
-      if (first) msg += ` 이제 ${name}${josa(name, '이', '가')} 옆에서 함께 싸워요!`;
+    const msg = `🎉 ${shiny ? '✨ ' : ''}${name}${josa(name, '을', '를')} 잡았다! (Lv.${lv})`;
+    // [수정] 경험치: 파트너와 같이 싸웠으면 전부, 혼자 잡았으면 절반 + 처음 잡은 종류면 보너스
+    let gain = Math.round(catchExp(lv) * (helper ? 1 : 0.5));
+    const notes = [];
+    if (DEX[id]) {
+      const r = addMon(id, lv, shiny);
+      notes.push(`🍬 ${DEX[familyRoot(id)].name} 사탕 +${r.candy}`);
+      if (r.newSpecies) {
+        gain += newSpeciesExp(lv);
+        notes.push(`🆕 도감 ${dexCount(DEX_CAUGHT)}/${DEX_MAX}`);
+      }
+      if (r.first) notes.push(`이제 ${name}${josa(name, '이', '가')} 옆에서 함께 싸워요!`);
+      r.rewards.forEach((t, i) => setTimeout(() => showToast(t.split('!')[0] + '!'), 1100 + i * 1000));
+      notes.push(...r.rewards.map((t) => '🎁 ' + t.replace('📖 ', '')));
+      updateWildTags();
     }
-    if (helper) {
-      const gain = catchExp(lv), hn = DEX[helper.id].name;
-      gainExp(gain);
-      msg += ` 같이 싸운 ${hn} 덕분에 경험치 +${gain}!`;
-    }
-    logStatus(msg + (walk.pending ? '' : ' 걸어 다니면 새 포켓몬을 만나요.'));
+    gainExp(gain);
+    notes.push(helper ? `경험치 +${gain}` : `경험치 +${gain} (파트너와 같이 싸우면 2배)`);
+    logStatus(`${msg} ${notes.join(' · ')}`);
     updateControls();
   }
 
@@ -3070,6 +4253,7 @@
   function handleHit(p, hit) {
     if (hit.kind === 'object') {
       const o = hit.obj, name = o.def.ko;
+      if (p.fxType != null) fxImpact(p.fxType, p.mesh.position, 0.6, false);   // [추가] 사물에 막혀 터짐
       if (p.type === 'ENEMY_ATK') logStatus(`${o.def.icon} ${name}${josa(name, '이', '가')} 포켓몬의 공격을 막아 줬어요!`);
       else if (p.type === 'POKEBALL') logStatus(`${o.def.icon} 포켓볼이 ${name}에 맞고 튕겼어요! 포켓몬이 나올 때를 노리세요.`);
       else if (p.type === 'PARTNER_ATK') logStatus(`${o.def.icon} 파트너의 공격이 ${name}에 가로막혔어요! 포켓몬이 나올 때를 노려요.`);
@@ -3080,7 +4264,10 @@
       if (p.type === 'PLAYER_ATK') {
         pokeData.hp = Math.max(10, pokeData.hp - 25);
         updateHpUI();
-        pokeData.react = { kind: 'hit', t: 0 };
+        pokeData.react = { kind: 'hit', t: 0, power: 1 };
+        const at = impactPoint(bodyCenter(_impC), _impP);
+        fxImpact(12, at, 1, false);
+        floatText(at, '⚡ 명중!', 'dmg dmg-hit');
         logStatus(`⚡ 명중! 포켓몬의 체력이 줄어들어 회피율이 감소했습니다! (HP: ${pokeData.hp}%)`);
         return 'remove';
       }
@@ -3088,8 +4275,13 @@
       startCatch(p);
       return 'catch';
     }
-    if (hit.kind === 'partner') { damagePartner(); return 'remove'; }
-    triggerDamageFlash();
+    if (hit.kind === 'partner') { damagePartner(p); return 'remove'; }
+    triggerDamageFlash(p.fxType);                            // [수정] 기술 타입 색으로 화면이 번쩍 + 흔들림
+    shakeScreen(true);
+    if (p.fxType != null) {
+      _fwd.set(0, -0.12, -1).applyQuaternion(camera.quaternion);
+      fxBurst(FX_TYPES[p.fxType], _impP.copy(camera.position).addScaledVector(_fwd, 0.75), 14, 0.8, { size: 0.45, speed: 0.55 });
+    }
     logStatus('💥 포켓몬의 공격에 맞았습니다!');
     return 'remove';
   }
@@ -3104,6 +4296,13 @@
         p.vel.y -= p.gravity * dt;
       }
       p.mesh.rotation.x += (p.spin === undefined ? 9 : p.spin) * dt;
+      if (p.fxType != null && !p.dead) {                      // [추가] 타입별 꼬리 + 빛무리 맥박
+        p.trailAcc += dt * (p.big ? 80 : 46);
+        const n = Math.floor(p.trailAcc);
+        if (n > 0) { p.trailAcc -= n; fxTrail(FX_TYPES[p.fxType], _prev, p.mesh.position, n, p.big); }
+        const g = p.mesh.userData.glow;
+        if (g) g.scale.setScalar(g.userData.base * (1 + 0.16 * Math.sin(p.age * 32)));
+      }
       let remove = false, keepMesh = false;
       const hit = p.resting ? null : findFirstHit(p, _prev, p.mesh.position);
       if (hit) {
@@ -3239,11 +4438,18 @@
     const s = throwState.screen || ballSlotPoint();
     const start = screenToWorld(s.x, s.y, handDist(), new THREE.Vector3());
     assistThrow(dir, v, start);
-    const ball = createPokeballMesh();
+    const kind = ballCount(collection.ball) > 0 ? collection.ball : 'poke';   // [추가] 고른 볼을 던짐 (좋은 볼은 1개 씀)
+    const ball = createPokeballMesh(kind);
     ball.scale.setScalar(BALL_SCALE);
     ball.position.copy(start);
     scene.add(ball);
-    projectiles.push({ mesh: ball, vel: dir.multiplyScalar(v), type: 'POKEBALL', age: 0, gravity: BALL_GRAVITY, radius: BALL_RADIUS, spin: 16 });
+    projectiles.push({ mesh: ball, vel: dir.multiplyScalar(v), type: 'POKEBALL', age: 0, gravity: BALL_GRAVITY, radius: BALL_RADIUS, spin: 16, ball: kind });
+    if (kind !== 'poke') {
+      collection.balls[kind] = Math.max(0, collection.balls[kind] - 1);
+      if (!collection.balls[kind]) collection.ball = 'poke';
+      saveCollection();
+      updateBallPick();
+    }
     throwState.ready = false;
     throwState.screen = null;
     throwState.showHint = false;
@@ -3298,7 +4504,7 @@
     ringGroup.quaternion.copy(camera.quaternion);
     ringOuter.scale.setScalar(R);
     ringInner.scale.setScalar(R * ringRatio());
-    const c = catchChanceBase();
+    const c = catchChanceBase() * (BALLS[collection.ball] || BALLS.poke).mult;   // 좋은 볼을 고르면 링 색도 쉬워짐
     ringInner.material.color.set(c >= 0.6 ? 0x22c55e : c >= 0.35 ? 0xeab308 : 0xef4444);
   }
 
@@ -3318,7 +4524,8 @@
   function startCatch(p) {
     const [label, mult] = ringBonus(p.mesh.position);
     if (label) showToast(label);
-    const success = Math.random() < Math.min(0.97, catchChanceBase() * mult);
+    const B = BALLS[p.ball] || BALLS.poke;                    // [추가] 슈퍼볼 ×1.5 · 하이퍼볼 ×2
+    const success = Math.random() < Math.min(0.97, catchChanceBase() * mult * B.mult);
     const roll = Math.random();
     catchSeq = {
       phase: 'absorb', t: 0, ball: p.mesh, success, label,
@@ -3329,7 +4536,8 @@
     pokeData.react = null;
     clearProjectiles('ENEMY_ATK');
     setBadge('🔴 포획 중…', '#ef4444');
-    logStatus(label ? `${label} 링 안에 명중했어요!` : '포켓볼이 명중했어요! 링 안을 맞히면 더 잘 잡혀요.');
+    const bt = B.mult > 1 ? ` (${B.name} ×${B.mult})` : '';
+    logStatus(label ? `${label} 링 안에 명중했어요!${bt}` : `포켓볼이 명중했어요!${bt} 링 안을 맞히면 더 잘 잡혀요.`);
     updateControls();
   }
   function updateCatch(dt) {
@@ -3421,8 +4629,12 @@
     $('status-log').textContent = msg;
   }
   let flashTimer = 0;
-  function triggerDamageFlash() {
+  function triggerDamageFlash(type) {
     const flash = $('damage-flash');
+    if (type != null) {                                      // [추가] 맞은 기술의 타입 색으로
+      const c = new THREE.Color(DEX_TYPE_COLORS[type]);
+      flash.style.background = `rgba(${Math.round(c.r * 255)}, ${Math.round(c.g * 255)}, ${Math.round(c.b * 255)}, 0.42)`;
+    } else flash.style.background = '';
     flash.style.opacity = '1';
     clearTimeout(flashTimer);
     flashTimer = setTimeout(() => { flash.style.opacity = '0'; }, 220);
@@ -3583,7 +4795,8 @@
     safeTop = hud.bottom + 30;
     // [추가] 걸음 표시: 세로 화면은 HUD 바로 아래 오른쪽, 가로 화면(HUD가 왼쪽)은 오른쪽 위
     walkPill.style.top = `${Math.round(window.innerWidth > window.innerHeight && hud.right < window.innerWidth - 120 ? hud.top : hud.bottom + 8)}px`;
-    safeBottom = document.querySelector('.bottom-controls').getBoundingClientRect().top - 10;
+    const pick = ballPick && ballPick.getBoundingClientRect();    // [추가] 볼 고르기 버튼도 피함
+    safeBottom = Math.min(document.querySelector('.bottom-controls').getBoundingClientRect().top, pick && pick.height ? pick.top : Infinity) - 10;
     if (safeBottom - safeTop < 60) { safeTop = window.innerHeight * 0.3; safeBottom = window.innerHeight * 0.7; }
   }
   function updateIndicator() {
@@ -3609,55 +4822,172 @@
   const COLLECTION_KEY = 'arBattle.collection.v1';
   const MAX_MONS = 300;
   const STARTERS = [4, 7, 1, 909, 912, 906]; // 파이리·꼬부기·이상해씨 / 뜨아거·꾸왁스·나오하 (9세대)
-  const collection = { exp: 0, partnerUid: null, mons: [], starterAsked: false, persistent: true };
+  // [수정] 수집 요소: 📖 도감(본/잡은/색이 다른) · 🍬 진화 계열별 사탕 · 🔵🟡 좋은 볼 · 도감 보상
+  const collection = { exp: 0, partnerUid: null, mons: [], starterAsked: false, persistent: true,
+    candy: {}, dex: '', balls: { great: 0, ultra: 0 }, ball: 'poke', rewards: [], walkCandy: 0, gift: null };
   const totalExpFor = (lv) => Math.round(0.4 * lv * lv * lv);
   const levelUpCost = (lv) => totalExpFor(lv + 1) - totalExpFor(lv);
-  const catchExp = (lv) => Math.round(20 + lv * lv * 0.9 + lv * 6);   // 같이 싸워서 잡았을 때
+  const catchExp = (lv) => Math.round(20 + lv * lv * 0.9 + lv * 6);   // 잡았을 때 (파트너 없이 잡으면 절반)
   const hitExp = (lv) => 2 + Math.round(lv / 2);                       // 파트너 공격이 들어갔을 때
   const releaseExp = (lv) => 5 + lv * 3;                               // 놓아주면 돌려받는 경험치
+  const newSpeciesExp = (lv) => 40 + lv * 4;                           // 도감에 처음 등록하면 보너스
   const newUid = () => 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  // 도감: 번호마다 한 글자 (0 모름 · 1 봤음 · 2 잡음 · 3 색이 다른 모습도 잡음)
+  const DEX_SEEN = 1, DEX_CAUGHT = 2, DEX_SHINY = 3;
+  const dexState = (id) => +(collection.dex[id] || 0);
+  function setDex(id, st) {
+    if (!DEX[id] || dexState(id) >= st) return false;
+    collection.dex = collection.dex.slice(0, id) + st + collection.dex.slice(id + 1);
+    return true;
+  }
+  function dexCount(min, from = 1, to = DEX_MAX) {
+    let n = 0;
+    for (let i = from; i <= to; i++) if (+collection.dex[i] >= min) n++;
+    return n;
+  }
+  // 진화 계열의 대표 포켓몬 (사탕은 계열끼리 같이 씀: 파이리·리자드·리자몽 = 파이리 사탕, 아기 포켓몬 피츄 = 피카츄 사탕)
+  function familyRoot(id) {
+    let r = id;
+    for (let k = 0; k < 4; k++) { const f = DEX[r].from; if (!f || DEX[f].baby) break; r = f; }
+    if (DEX[r].baby && DEX[r].evos.length) r = DEX[r].evos[0].to;
+    return r;
+  }
+  function evoStageOf(id) { let n = 0; for (let r = id; DEX[r].from && n < 4; r = DEX[r].from) n++; return n; }
+  const candyOf = (id) => collection.candy[familyRoot(id)] || 0;
+  function addCandy(id, n) { const f = familyRoot(id); collection.candy[f] = Math.max(0, (collection.candy[f] || 0) + n); }
+  // 희귀도 ★1~4: 원작 포획률이 낮을수록 귀함, 전설·환상은 ★4
+  function rarityOf(id) {
+    const sp = DEX[id];
+    if (sp.legendary || sp.mythical) return 4;
+    return sp.capture <= 45 ? 3 : sp.capture <= 120 ? 2 : 1;
+  }
+  const stars = (n) => '★'.repeat(n);
+  // 볼: 몬스터볼은 무제한, 슈퍼볼·하이퍼볼은 도감 보상·걷기로 얻음
+  const BALLS = {
+    poke: { name: '몬스터볼', icon: '🔴', mult: 1 },
+    great: { name: '슈퍼볼', icon: '🔵', mult: 1.5 },
+    ultra: { name: '하이퍼볼', icon: '🟡', mult: 2 }
+  };
+  const ballCount = (t) => (t === 'poke' ? Infinity : collection.balls[t] || 0);
+  // 도감 보상: 잡은 종류 수가 이만큼 되면 선물
+  const DEX_REWARDS = [
+    { n: 5, great: 3, exp: 0 }, { n: 10, great: 5, exp: 500 }, { n: 20, ultra: 3, exp: 0 }, { n: 30, great: 10, exp: 1500 },
+    { n: 50, ultra: 5, exp: 3000 }, { n: 75, great: 10, ultra: 5, exp: 0 }, { n: 100, ultra: 10, exp: 10000 }
+  ];
+  for (let n = 150; n <= 1025; n += 50) DEX_REWARDS.push({ n, great: 5, ultra: 5, exp: n * 40 });
+  DEX_REWARDS.push({ n: 1025, ultra: 50, exp: 100000 });
+  function rewardText(r) {
+    return [r.great ? `${BALLS.great.icon} 슈퍼볼 ${r.great}` : '', r.ultra ? `${BALLS.ultra.icon} 하이퍼볼 ${r.ultra}` : '',
+      r.exp ? `경험치 ${r.exp.toLocaleString()}` : ''].filter(Boolean).join(' · ');
+  }
+  // 잡은 종류 수가 보상 기준을 넘었으면 지급하고 안내 문구를 돌려줌
+  function claimDexRewards() {
+    const caught = dexCount(DEX_CAUGHT), got = [];
+    for (const r of DEX_REWARDS) {
+      if (caught < r.n || collection.rewards.includes(r.n)) continue;
+      collection.rewards.push(r.n);
+      collection.balls.great += r.great || 0;
+      collection.balls.ultra += r.ultra || 0;
+      if (r.exp) collection.exp += r.exp;
+      got.push(`📖 ${r.n}종 달성! ${rewardText(r)}`);
+    }
+    if (got.length) updateBallPick();
+    return got;
+  }
+  const nextDexReward = () => DEX_REWARDS.find((r) => !collection.rewards.includes(r.n) && r.n > dexCount(DEX_CAUGHT)) || null;
+  // 던질 볼 고르기 (포켓볼 위의 작은 버튼): 몬스터볼 → 슈퍼볼 → 하이퍼볼 순서로 가진 것만
+  const ballPick = $('ball-pick');
+  function updateBallPick() {
+    if (ballCount(collection.ball) <= 0) collection.ball = 'poke';
+    const t = collection.ball, B = BALLS[t];
+    if (typeof handBall !== 'undefined') setBallLook(handBall, t);
+    if (!ballPick) return;
+    ballPick.textContent = `${B.icon} ${B.name}${t === 'poke' ? '' : ' ' + collection.balls[t]}`;
+    ballPick.className = 'ball-pick ' + t;
+    ballPick.setAttribute('aria-label', `던질 볼: ${B.name}${t === 'poke' ? '' : ` ${collection.balls[t]}개`}. 눌러서 바꾸기 (슈퍼볼 ${collection.balls.great}개, 하이퍼볼 ${collection.balls.ultra}개)`);
+  }
+  if (ballPick) ballPick.addEventListener('click', () => {
+    const order = ['poke', 'great', 'ultra'];
+    let i = order.indexOf(collection.ball);
+    for (let k = 0; k < 3; k++) { i = (i + 1) % 3; if (ballCount(order[i]) > 0) break; }
+    if (order[i] === 'poke' && collection.ball === 'poke') { showToast('📖 도감 보상으로 좋은 볼을 받아요'); return; }
+    collection.ball = order[i];
+    saveCollection();
+    updateBallPick();
+    const B = BALLS[collection.ball];
+    showToast(`${B.icon} ${B.name}${B.mult > 1 ? ` 잡기 ×${B.mult}` : ''}`);
+  });
   function loadCollection() {
     try {
       const d = JSON.parse(storageGet(COLLECTION_KEY) || 'null');
-      if (!d || !Array.isArray(d.mons)) return;
+      if (!d || !Array.isArray(d.mons)) { collection.dex = '0'.repeat(DEX_MAX + 1); collection.balls.great = 3; return; }
       collection.exp = Math.max(0, Math.floor(+d.exp || 0));
       collection.starterAsked = !!d.starterAsked;
       collection.mons = d.mons.filter((m) => m && DEX[m.id] && m.level >= 1 && m.level <= 100).slice(0, MAX_MONS)
-        .map((m) => ({ uid: String(m.uid || newUid()), id: m.id | 0, level: m.level | 0, hp: typeof m.hp === 'number' ? m.hp : null, caughtAt: +m.caughtAt || Date.now() }));
+        .map((m) => ({ uid: String(m.uid || newUid()), id: m.id | 0, level: m.level | 0, hp: typeof m.hp === 'number' ? m.hp : null,
+          caughtAt: +m.caughtAt || Date.now(), shiny: !!m.shiny }));
       const keep = collection.mons.find((m) => m.uid === d.partnerUid) || collection.mons[0];
       collection.partnerUid = keep ? keep.uid : null;
+      const dex = typeof d.dex === 'string' ? d.dex.replace(/[^0-3]/g, '0') : '';
+      collection.dex = (dex + '0'.repeat(DEX_MAX + 1)).slice(0, DEX_MAX + 1);
+      if (d.candy && typeof d.candy === 'object') for (const k in d.candy) if (DEX[+k]) collection.candy[+k] = Math.max(0, Math.floor(+d.candy[k] || 0));
+      if (d.balls) { collection.balls.great = Math.max(0, d.balls.great | 0); collection.balls.ultra = Math.max(0, d.balls.ultra | 0); }
+      collection.ball = BALLS[d.ball] ? d.ball : 'poke';
+      collection.rewards = Array.isArray(d.rewards) ? d.rewards.filter((n) => typeof n === 'number') : [];
+      collection.walkCandy = Math.max(0, +d.walkCandy || 0);
+      if ((d.v | 0) < 2) {                                  // 예전 저장값 → 갖고 있던 포켓몬은 도감에 등록 + 사탕·볼 선물
+        const fams = new Set();
+        for (const m of collection.mons) { setDex(m.id, DEX_CAUGHT); fams.add(familyRoot(m.id)); }
+        for (const f of fams) collection.candy[f] = Math.max(collection.candy[f] || 0, 3);
+        collection.balls.great += 3;
+        if (collection.mons.length) { collection.balls.ultra += 1; collection.gift = { fams: fams.size }; }
+        claimDexRewards();
+        saveCollection();
+      }
     } catch (_) { /* 손상된 저장값은 무시 */ }
+    if (collection.dex.length < DEX_MAX + 1) collection.dex = (collection.dex + '0'.repeat(DEX_MAX + 1)).slice(0, DEX_MAX + 1);
   }
+  let saveTimer = 0;
   function saveCollection() {
-    collection.persistent = storageSet(COLLECTION_KEY, JSON.stringify({ v: 1, exp: collection.exp, partnerUid: collection.partnerUid,
-      starterAsked: collection.starterAsked, mons: collection.mons }));
+    clearTimeout(saveTimer);
+    collection.persistent = storageSet(COLLECTION_KEY, JSON.stringify({ v: 2, exp: collection.exp, partnerUid: collection.partnerUid,
+      starterAsked: collection.starterAsked, mons: collection.mons, dex: collection.dex, candy: collection.candy,
+      balls: collection.balls, ball: collection.ball, rewards: collection.rewards, walkCandy: collection.walkCandy }));
     updateBagBadge();
   }
+  function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(saveCollection, 800); }  // 자주 바뀌는 값(본 포켓몬)
   function partnerMon() { return collection.mons.find((m) => m.uid === collection.partnerUid) || null; }
-  function addMon(id, level) {
+  function addMon(id, level, shiny = false) {
     if (collection.mons.length >= MAX_MONS) {               // 가득 차면 가장 오래된 (파트너 아닌) 포켓몬을 내보냄
       const i = collection.mons.findIndex((m) => m.uid !== collection.partnerUid);
       if (i >= 0) collection.mons.splice(i, 1);
     }
-    const mon = { uid: newUid(), id, level, hp: null, caughtAt: Date.now() };
+    const mon = { uid: newUid(), id, level, hp: null, caughtAt: Date.now(), shiny: !!shiny };
     collection.mons.push(mon);
     const first = !partnerMon();
     if (first) collection.partnerUid = mon.uid;
     collection.starterAsked = true;
+    // [추가] 도감 등록 + 사탕 (색이 다른 포켓몬은 사탕 2배)
+    const newSpecies = dexState(id) < DEX_CAUGHT;
+    setDex(id, shiny ? DEX_SHINY : DEX_CAUGHT);
+    const candy = shiny ? 6 : 3;
+    addCandy(id, candy);
+    const rewards = claimDexRewards();
     saveCollection();
     if (first) setPartner(mon);
     if (sheets.bag) renderBag();
-    return { mon, first };
+    return { mon, first, newSpecies, candy, rewards };
   }
   const evolutionOptions = (mon) => DEX[mon.id].evos.filter((e) => mon.level >= e.level);
   const nextEvolutionLevel = (mon) => (DEX[mon.id].evos.length ? Math.min(...DEX[mon.id].evos.map((e) => e.level)) : null);
   const canUpgrade = (mon) => mon.level < 100 && collection.exp >= levelUpCost(mon.level);
+  const canEvolveNow = (mon) => evolutionOptions(mon).some((e) => evolutionCheck(mon, e.to).ok);
   function updateBagBadge() {
-    btnBag.classList.toggle('has-news', collection.mons.some((m) => canUpgrade(m) || evolutionOptions(m).length > 0));
+    btnBag.classList.toggle('has-news', collection.mons.some((m) => canUpgrade(m) || canEvolveNow(m)));
   }
   const expFloat = $('exp-float');
   function gainExp(n) {
-    const before = collection.mons.some((m) => canUpgrade(m) || evolutionOptions(m).length > 0);
+    const before = collection.mons.some((m) => canUpgrade(m) || canEvolveNow(m));
     collection.exp += n;
     saveCollection();
     expFloat.textContent = `+${n} 경험치`;
@@ -3668,10 +4998,11 @@
   }
 
   // ---- 파트너 (내 옆에서 같이 싸우는 포켓몬): 화면 왼쪽 아래 바닥에 서서 따라다님
-  const PARTNER_HEIGHT = 0.62;
-  const partnerUniforms = { uMap: { value: null }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uFlip: { value: 0 }, uFlash: { value: 0 }, uSway: { value: 0 } };
+  const PARTNER_HEIGHT = 0.44;                                // [수정] 약 70% 크기 (상대가 더 잘 보이게)
+  const partnerUniforms = { uMap: { value: null }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uFlip: { value: 0 }, uFlash: { value: 0 }, uSway: { value: 0 }, uTint: sceneTint };
   const partnerMesh = new THREE.Mesh(spriteGeo, new THREE.ShaderMaterial({
-    uniforms: partnerUniforms, vertexShader: SPRITE_VS, fragmentShader: SPRITE_FS, transparent: true, side: THREE.DoubleSide
+    uniforms: partnerUniforms, vertexShader: SPRITE_VS, fragmentShader: SPRITE_FS, transparent: true, premultipliedAlpha: true, side: THREE.DoubleSide,
+    extensions: { derivatives: true }
   }));
   partnerMesh.visible = false;
   partnerMesh.renderOrder = 2;
@@ -3682,21 +5013,22 @@
   scene.add(partnerShadow);
   const partner = {
     mon: null, visual: null, back: false, size: new THREE.Vector2(PARTNER_HEIGHT, PARTNER_HEIGHT),
-    pos: new THREE.Vector3(), lastPos: new THREE.Vector3(), placed: false, hp: 1, maxHp: 1, faintUntil: 0,
-    attackAt: 0, commandReadyAt: 0, hop: 0, react: null, seq: 0, evolving: null, regenAcc: 0, savedAt: 0
+    pos: new THREE.Vector3(), lastPos: new THREE.Vector3(), vel: new THREE.Vector3(), hover: 0, placed: false, hp: 1, maxHp: 1, faintUntil: 0,
+    attackAt: 0, commandReadyAt: 0, hop: 0, react: null, seq: 0, regenAcc: 0, savedAt: 0
   };
   const partnerTag = $('partner-tag'), partnerTagName = $('partner-tag-name'), partnerTagHp = $('partner-tag-hp');
   function partnerBody(out) { return out.set(partner.pos.x, partnerMesh.position.y + partnerMesh.scale.y * 0.5, partner.pos.z); }
   function partnerRadius() { return Math.max(partner.size.x, partner.size.y) * 0.45 + 0.05; }
-  function partnerActive() { return !!partner.mon && partner.hp > 0 && !partner.evolving && partnerMesh.visible && !uiPaused(); }
+  function partnerActive() { return !!partner.mon && partner.hp > 0 && partnerMesh.visible && !uiPaused(); }
   function setPartner(mon) {
     partner.mon = mon || null;
     partnerMesh.visible = partnerShadow.visible = false;
     partner.visual = null;
-    partner.evolving = null;
     if (!mon) { updatePartnerTag(); return; }
     refreshPartnerStats(false);
     partner.placed = false;
+    partner.vel.set(0, 0, 0);
+    partner.hover = levitates(mon.id) ? 0.14 : 0;
     partner.attackAt = performance.now() + 2500;
     loadPartnerVisual(mon);
     updatePartnerTag();
@@ -3720,9 +5052,9 @@
       const w = PARTNER_HEIGHT * vis.aspect, s = w > 1.1 ? 1.1 / w : 1;
       partner.size.set(w * s, PARTNER_HEIGHT * s);
     };
-    loadBackVisual(mon.id).then((v) => show(v, 4, true));     // ① 뒷모습 GIF ② 앞모습 GIF ③ 공식 그림 ④ '?'
-    loadAnimatedVisual(mon.id).then((v) => show(v, 3, false));
-    loadStaticVisual(mon.id).then((v) => show(v, 2, false));
+    loadBackVisual(mon.id, mon.shiny).then((v) => show(v, 4, true));     // ① 뒷모습 GIF ② 앞모습 GIF ③ 공식 그림 ④ '?'
+    loadAnimatedVisual(mon.id, mon.shiny).then((v) => show(v, 3, false));
+    loadStaticVisual(mon.id, mon.shiny).then((v) => show(v, 2, false));
     setTimeout(() => show(makeStaticVisual(getPlaceholderTexture(), 'placeholder'), 1, false), 3500);
   }
   function persistPartnerHp(force) {
@@ -3731,11 +5063,11 @@
     const now = performance.now();
     if (force || now - partner.savedAt > 4000) { partner.savedAt = now; saveCollection(); }
   }
-  // 화면 왼쪽 아래(세로 화면 기준 가로 25%·세로 70%) 바닥 지점 → 휴대폰을 돌리면 파트너가 그쪽으로 따라옴
-  const _pRay = new THREE.Raycaster(), _pNdc = new THREE.Vector2(), _pHome = new THREE.Vector3(), _pDir = new THREE.Vector3();
+  // [수정] 화면 왼쪽 아래 모서리(카드·교체 버튼 바로 위) 바닥 지점 → 휴대폰을 돌리면 파트너가 부드럽게 따라옴
+  const _pRay = new THREE.Raycaster(), _pNdc = new THREE.Vector2(), _pHome = new THREE.Vector3();
   function partnerHomePoint(out) {
     const landscape = window.innerWidth > window.innerHeight;
-    _pNdc.set(landscape ? -0.6 : -0.5, landscape ? -0.25 : -0.4);
+    _pNdc.set(landscape ? -0.76 : -0.64, landscape ? -0.42 : -0.6);
     _pRay.setFromCamera(_pNdc, camera);
     const o = _pRay.ray.origin, d = _pRay.ray.direction, h = Math.max(Math.hypot(d.x, d.z), 1e-3);
     const dist = THREE.MathUtils.clamp(d.y < -0.05 ? o.y / -d.y * h : 3.4, 1.9, 3.4);
@@ -3766,52 +5098,50 @@
       persistPartnerHp(false);
     } else if (partner.hp >= partner.maxHp) partner.regenAcc = 0;
     partnerHomePoint(_pHome);
-    if (!partner.placed) { partner.pos.copy(_pHome); partner.lastPos.copy(_pHome); partner.placed = true; }
-    _pDir.subVectors(_pHome, partner.pos).setY(0);
-    const dist = _pDir.length();
-    if (dist > 6) partner.pos.copy(_pHome);
-    else if (dist > 0.01) partner.pos.addScaledVector(_pDir, Math.min(dist, (1.2 + dist * 2.5) * dt) / dist);
-    if (partner.evolving) updateEvolution(dt);
+    if (!partner.placed) { partner.pos.copy(_pHome); partner.lastPos.copy(_pHome); partner.vel.set(0, 0, 0); partner.placed = true; }
+    if (partner.pos.distanceTo(_pHome) > 6) { partner.pos.copy(_pHome); partner.vel.set(0, 0, 0); }
+    else steer(partner, _pHome, dt, 2.4, 6, false);           // [수정] 관성 있게 부드럽게 따라옴
     animatePartner(dt);
     if (isTargetActive() && now >= partner.attackAt && pokeData.hp > 10) partnerAttack(false); // 자동 공격
   }
   const _pTo = new THREE.Vector3();
-  function animatePartner(dt) {
-    const moved = _tmp.subVectors(partner.pos, partner.lastPos);
+  function animatePartner(dt) {                               // [수정] 깡충거림 없이 부드럽게 (몸 동작은 GIF 영상)
     partner.lastPos.copy(partner.pos);
-    const moving = Math.min(1, Math.hypot(moved.x, moved.z) / Math.max(dt, 1e-3) / 1.2);
-    partner.hop += dt * (4 + 8 * moving);
-    const s = Math.abs(Math.sin(partner.hop));
-    const hopY = s * 0.1 * moving;
-    let sx = 1 + (1 - s) * 0.07 * moving, sy = 1 - (1 - s) * 0.09 * moving;
-    const breathe = Math.sin(elapsed * 3.4 + 1) * 0.03 * (1 - moving);
-    sx -= breathe * 0.5; sy += breathe;
+    const moving = Math.min(1, Math.hypot(partner.vel.x, partner.vel.z) / 1.2);
+    partner.hop += dt * (2 + 6 * moving);
+    const breathe = Math.sin(elapsed * 2.8 + 1) * 0.022 * (1 - moving);
+    let sx = 1 - breathe * 0.5, sy = 1 + breathe;
+    let y = partner.hover ? partner.hover + Math.sin(elapsed * 1.8 + 1) * 0.035 : Math.abs(Math.sin(partner.hop)) * 0.012 * moving;
     let flash = 0, lunge = 0, shake = 0;
     const r = partner.react;
     if (r) {
       r.t += dt;
-      if (r.kind === 'attack') {
-        if (r.t < 0.12) { sy *= 0.88; sx *= 1.08; } else if (r.t < 0.3) { lunge = 0.2; sx *= 1.06; sy *= 1.06; } else if (r.t > 0.45) partner.react = null;
+      if (r.kind === 'attack') {                              // 움츠렸다가 앞으로 쭉
+        const crouch = r.t < 0.14 ? Math.sin(r.t / 0.14 * Math.PI / 2) : Math.max(0, 1 - (r.t - 0.14) / 0.1);
+        sy *= 1 - 0.09 * crouch; sx *= 1 + 0.05 * crouch;
+        if (r.t >= 0.14 && r.t < 0.44) lunge = Math.sin((r.t - 0.14) / 0.3 * Math.PI) * 0.18;
+        if (r.t > 0.5) partner.react = null;
       } else {
-        const k = Math.max(0, 1 - r.t / 0.35);
-        flash = k; shake = Math.sin(r.t * 70) * 0.04 * k;
-        if (r.t > 0.35) partner.react = null;
+        const pw = r.power || 1, dur = 0.3 + 0.1 * pw;
+        const k = Math.max(0, 1 - r.t / dur);
+        flash = k * k * Math.min(1, 0.55 + 0.45 * pw); shake = Math.sin(r.t * 55) * 0.026 * pw * k;
+        lunge = -0.05 * pw * k * k;
+        if (r.t > dur) partner.react = null;
       }
     }
-    if (partner.evolving) { const e = partner.evolving; flash = Math.max(flash, e.flash); sx *= e.scale; sy *= e.scale; }
     _right.set(1, 0, 0).applyQuaternion(camera.quaternion);
     // 상대가 화면에서 어느 쪽에 있는지 보고 몸을 돌림 (뒷모습 그림은 오른쪽 위, 앞모습 그림은 왼쪽을 봄)
     const towardRight = !pokemonMesh.visible || (pokemonMesh.position.x - partner.pos.x) * _right.x + (pokemonMesh.position.z - partner.pos.z) * _right.z >= 0;
     partnerUniforms.uFlip.value = (partner.back ? !towardRight : towardRight) ? 1 : 0;
     _pTo.subVectors(pokemonMesh.visible ? pokemonMesh.position : _pHome, partner.pos).setY(0);
     if (_pTo.lengthSq() > 1e-6) _pTo.normalize();
-    partnerMesh.position.set(partner.pos.x + _right.x * shake + _pTo.x * lunge, hopY, partner.pos.z + _right.z * shake + _pTo.z * lunge);
+    partnerMesh.position.set(partner.pos.x + _right.x * shake + _pTo.x * lunge, y, partner.pos.z + _right.z * shake + _pTo.z * lunge);
     partnerMesh.scale.set(partner.size.x * sx, partner.size.y * sy, 1);
     partnerMesh.lookAt(camera.position.x, partnerMesh.position.y, camera.position.z);
-    partnerUniforms.uSway.value = Math.sin(elapsed * 2.4 + 0.7) * 0.02;
+    partnerUniforms.uSway.value = Math.sin(elapsed * 2.0 + 0.7) * 0.012;
     partnerUniforms.uFlash.value = flash;
     partnerShadow.position.set(partner.pos.x, 0.012, partner.pos.z);
-    const sr = partner.size.x * 0.36 * (1 - Math.min(0.5, hopY * 1.2));
+    const sr = partner.size.x * 0.4 * (1 - Math.min(0.45, y * 1.1));
     partnerShadow.scale.set(sr, sr, 1);
   }
   // 이름표: 파트너 머리 위에 떠 있고, 화면 밖이거나 기절했으면 왼쪽 아래에 붙음
@@ -3821,7 +5151,7 @@
     if (!mon || uiLayer.hidden) { partnerTag.hidden = true; return; }
     partnerTag.hidden = false;
     const fainted = partner.hp <= 0;
-    const label = `${DEX[mon.id].name} Lv.${mon.level}${fainted ? ` · 기절 ${Math.max(0, Math.ceil((partner.faintUntil - performance.now()) / 1000))}초` : ''}`;
+    const label = `${mon.shiny ? '✨' : ''}${DEX[mon.id].name} Lv.${mon.level}${fainted ? ` · 기절 ${Math.max(0, Math.ceil((partner.faintUntil - performance.now()) / 1000))}초` : ''}`;
     if (partnerTagName.textContent !== label) partnerTagName.textContent = label;
     const ratio = partner.hp / partner.maxHp;
     partnerTagHp.style.width = `${Math.round(ratio * 100)}%`;
@@ -3860,11 +5190,52 @@
     return { dmg: eff === 0 ? 0 : Math.max(1, Math.floor(base * stab * eff * (0.85 + Math.random() * 0.15))), eff, maxHp: d.hp };
   }
   const effText = (eff) => (eff === 0 ? '효과가 없는 것 같다…' : eff >= 2 ? '효과가 굉장했다!' : eff < 1 ? '효과가 별로인 듯하다…' : '');
-  const PARTNER_ORB_GEO = new THREE.SphereGeometry(0.1, 14, 14);
-  const orbMats = new Map();
-  function orbMaterial(t) {
-    if (!orbMats.has(t)) orbMats.set(t, new THREE.MeshBasicMaterial({ color: DEX_TYPE_COLORS[t] }));
-    return orbMats.get(t);
+  // [추가] 상성 한눈에 보기: 위쪽 정보창에 상대 타입 + 유리/불리, ⚡ 버튼에 다음 기술 배율, 파트너 이름표에 내 타입
+  const wildTypesEl = $('wild-types'), matchupEl = $('matchup'), atkMultEl = $('atk-mult'), partnerTypesEl = $('partner-tag-types');
+  function typeChip(t) {
+    const el = document.createElement('span');
+    el.className = 'tchip';
+    el.textContent = DEX_TYPES[t];
+    el.style.background = DEX_TYPE_COLORS[t];
+    el.style.color = typeTextColor(t);
+    return el;
+  }
+  function fillTypeChips(el, id) {
+    if (!el) return;
+    el.textContent = '';
+    if (id && DEX[id]) for (const t of DEX[id].types) el.appendChild(typeChip(t));
+  }
+  // 두 포켓몬의 상성: 내 기술 배율, 상대 기술 배율, 종합 판정
+  function matchup(myId, foeId) {
+    const mt = bestMoveType(myId, foeId);
+    const off = typeFactor(mt, DEX[foeId].types), def = typeFactor(bestMoveType(foeId, myId), DEX[myId].types);
+    const score = off === 0 ? 0 : off / Math.max(0.25, def);
+    const cls = off === 0 ? 'none' : score >= 2 ? 'up' : score <= 0.5 ? 'down' : 'even';
+    return { mt, off, def, cls, label: off === 0 ? '✕ 안 통함' : cls === 'up' ? '▲ 유리' : cls === 'down' ? '▼ 불리' : '● 보통' };
+  }
+  let matchupKey = '';
+  function updateMatchupUI() {
+    const w = DEX[currentPokemon.id] ? currentPokemon.id : 0, p = partner.mon ? partner.mon.id : 0;
+    const key = w + ':' + p;
+    if (key === matchupKey) return;
+    matchupKey = key;
+    fillTypeChips(wildTypesEl, w);
+    fillTypeChips(partnerTypesEl, p);
+    if (!matchupEl || !atkMultEl) return;
+    if (!w || !p) {
+      matchupEl.hidden = atkMultEl.hidden = true;
+      btnAtk.setAttribute('aria-label', '직접 번개 공격 (파트너가 있으면 파트너에게 기술 명령)');
+      return;
+    }
+    const m = matchup(p, w);
+    matchupEl.textContent = `${m.label} · 내 기술 ×${fmtMult(m.off)} · 상대 ×${fmtMult(m.def)}`;
+    matchupEl.className = 'matchup ' + m.cls;
+    matchupEl.title = `${DEX[p].name}의 ${DEX_TYPES[m.mt]} 기술은 ×${m.off}, ${DEX[w].name}의 기술은 ×${m.def}로 들어가요`;
+    matchupEl.hidden = false;
+    atkMultEl.textContent = `×${fmtMult(m.off)}`;
+    atkMultEl.className = 'atk-mult ' + (m.off === 0 ? 'zero' : m.off >= 2 ? 'up' : m.off < 1 ? 'down' : '');
+    atkMultEl.hidden = false;
+    btnAtk.setAttribute('aria-label', `파트너에게 ${MOVE_NAMES[m.mt][1]} 명령 (${DEX_TYPES[m.mt]} 타입, 효과 ×${m.off})`);
   }
   function partnerAttack(command) {
     const mon = partner.mon;
@@ -3874,12 +5245,20 @@
     const moveType = bestMoveType(mon.id, currentPokemon.id);
     const from = partnerBody(new THREE.Vector3());
     const to = bodyCenter(new THREE.Vector3());
-    const orb = new THREE.Mesh(PARTNER_ORB_GEO, orbMaterial(moveType));
+    const big = !!command;
+    const orb = makeAttackCore(moveType, big ? 1.35 : 0.85);   // [수정] 타입별 모양·색·꼬리
     orb.position.copy(from);
-    if (command) orb.scale.setScalar(1.7);
     scene.add(orb);
-    projectiles.push({ mesh: orb, vel: to.sub(from).normalize().multiplyScalar(command ? 11 : 9), type: 'PARTNER_ATK', age: 0, gravity: 0,
-      radius: command ? 0.17 : 0.1, power: command ? 80 : 40, moveType, spin: 0 });
+    const p = { mesh: orb, vel: to.sub(from).normalize().multiplyScalar(big ? 11 : 9), type: 'PARTNER_ATK', age: 0, gravity: 0,
+      radius: big ? 0.17 : 0.1, power: big ? 80 : 40, moveType, spin: 7, fxType: moveType, big, trailAcc: 0 };
+    projectiles.push(p);
+    fxCharge(moveType, from, big);
+    if (FX_TYPES[moveType].bolt) spawnBolt((o) => partnerBody(o), (o) => o.copy(orb.position), 3, { follow: p, width: big ? 0.03 : 0.018 });
+    if (big) {                                              // 기술 이름이 파트너 머리 위에 뜸
+      const head = partnerBody(new THREE.Vector3());
+      head.y += partner.size.y * 0.75;
+      floatText(head, `${MOVE_NAMES[moveType][1]}!`, 'move', { bg: DEX_TYPE_COLORS[moveType], fg: typeTextColor(moveType), dur: 1.1, rise: 0.12 });
+    }
     partner.react = { kind: 'attack', t: 0 };
     partner.attackAt = now + 3200 + Math.random() * 1200;
     if (command) {
@@ -3900,20 +5279,30 @@
     const before = pokeData.hp;
     pokeData.hp = Math.max(10, Math.round(pokeData.hp - r.dmg / r.maxHp * 100));
     updateHpUI();
-    if (r.eff > 0) pokeData.react = { kind: 'hit', t: 0 };
+    // [추가] 상성에 따라 터지는 크기·피해 숫자·문구·화면 흔들림이 달라짐
+    const st = effStrength(r.eff), at = impactPoint(bodyCenter(_impC), _impP);
+    fxImpact(p.moveType, at, st, p.big);
+    showHitText(at, r.dmg, r.eff, false);
+    if (r.eff >= 2) shakeScreen(r.eff >= 4 || p.big);
+    if (r.eff > 0) pokeData.react = { kind: 'hit', t: 0, power: st * (p.big ? 1.15 : 1) };
     let msg = effText(r.eff) || '명중!';
     if (before > pokeData.hp) { const g = hitExp(currentPokemon.level); gainExp(g); msg += ` (경험치 +${g})`; }
     const wn = currentPokemon.name;
     if (pokeData.hp <= 10) msg += ` ${wn}${josa(wn, '이', '가')} 지쳤어요! 지금 포켓볼을 던지세요!`;
     logStatus(msg);
   }
-  function damagePartner() {
+  function damagePartner(p) {
     const mon = partner.mon;
     if (!mon || partner.hp <= 0 || !DEX[currentPokemon.id]) return;
-    const moveType = bestMoveType(currentPokemon.id, mon.id);
+    const moveType = p && p.moveType != null ? p.moveType : bestMoveType(currentPokemon.id, mon.id);
     const r = battleDamage(currentPokemon.id, currentPokemon.level, mon.id, mon.level, 45, moveType);
-    partner.hp = Math.max(0, partner.hp - Math.max(r.eff ? 1 : 0, Math.round(r.dmg * 0.6))); // 파트너는 조금 더 튼튼하게
-    partner.react = { kind: 'hit', t: 0 };
+    const dmg = Math.max(r.eff ? 1 : 0, Math.round(r.dmg * 0.6));   // 파트너는 조금 더 튼튼하게
+    partner.hp = Math.max(0, partner.hp - dmg);
+    const st = effStrength(r.eff), at = impactPoint(partnerBody(_impC), _impP);
+    fxImpact(moveType, at, st, false);                     // [추가] 맞은 기술 연출 + 피해 숫자 + 상성 문구
+    showHitText(at, dmg, r.eff, true);
+    if (r.eff >= 2) shakeScreen(false);
+    if (r.eff > 0) partner.react = { kind: 'hit', t: 0, power: st };
     const n = DEX[mon.id].name;
     if (partner.hp <= 0) {
       partner.faintUntil = performance.now() + 20000;
@@ -3925,34 +5314,266 @@
     persistPartnerHp(true);
   }
 
-  // ---- 진화 연출: 하얗게 빛나며 커졌다 작아졌다 → 새 모습
-  function evolveMon(mon, toId) {
-    const fromName = DEX[mon.id].name;
+  // ---- [수정] 진화: 내가 고를 때만 진화 (자동 진화 없음) → 확인 창 → 전체 화면 진화 연출 (도중에 '진화 멈추기' 가능)
+  function evolveMon(mon, toId) {                          // 데이터만 바꿈 (연출은 아래 진화 화면이 담당)
     mon.id = toId;
     mon.hp = null;                                          // 진화하면 체력 가득
     saveCollection();
     if (partner.mon === mon) {
-      partner.evolving = { t: 0, swapped: false, fromName, flash: 0, scale: 1 };
-      partner.react = null;
-    } else {
-      logStatus(`축하합니다! ${fromName}${josa(fromName, '은', '는')} ${DEX[toId].name}${ro(DEX[toId].name)} 진화했다!`);
-    }
-  }
-  function updateEvolution(dt) {
-    const e = partner.evolving;
-    e.t += dt;
-    e.flash = 0.55 + 0.45 * Math.sin(e.t * 12);
-    e.scale = 1 + 0.12 * Math.sin(e.t * 9);
-    if (!e.swapped && e.t > 1.3) { e.swapped = true; loadPartnerVisual(partner.mon); }
-    if (e.t > 2.6) {
-      partner.evolving = null;
+      partner.hover = levitates(toId) ? 0.14 : 0;
       refreshPartnerStats(true);
-      const to = DEX[partner.mon.id].name;
-      spawnRing(partnerBody(new THREE.Vector3()), 0xfde68a, 0.32);
-      showToast('진화 성공!');
-      logStatus(`축하합니다! ${e.fromName}${josa(e.fromName, '은', '는')} ${to}${ro(to)} 진화했다!`);
+      loadPartnerVisual(mon);
+      persistPartnerHp(true);
+    }
+    updateBagBadge();
+  }
+  // [추가] 진화에 드는 사탕: 1단계 → 2단계 5개, 그다음 15개 (같은 계열을 여러 마리 잡을수록 진화가 쉬워짐)
+  const evolutionCandyNeed = (id) => (evoStageOf(id) === 0 ? 5 : 15);
+  function evolutionCandy(mon) { return { family: familyRoot(mon.id), need: evolutionCandyNeed(mon.id), have: candyOf(mon.id) }; }
+  function spendEvolutionCandy(mon) { addCandy(mon.id, -evolutionCandyNeed(mon.id)); }
+  function onEvolved(toId, mon) {                            // 진화한 모습도 도감에 등록 (처음이면 보너스)
+    const isNew = dexState(toId) < DEX_CAUGHT;
+    setDex(toId, mon && mon.shiny ? DEX_SHINY : DEX_CAUGHT);
+    const notes = [];
+    if (isNew) { const g = newSpeciesExp(mon ? mon.level : 10); collection.exp += g; notes.push(`🆕 도감 등록! 경험치 +${g}`); }
+    notes.push(...claimDexRewards());
+    saveCollection();
+    return notes;
+  }
+  // 진화에 필요한 것: 레벨 + (포켓몬 사탕은 수집 기능에서 채움)
+  function evolutionCheck(mon, toId) {
+    const e = DEX[mon.id].evos.find((x) => x.to === toId);
+    const needLv = e ? e.level : 1, candy = evolutionCandy(mon);
+    return { needLv, lvOk: mon.level >= needLv, candy, candyOk: candy.have >= candy.need, ok: mon.level >= needLv && candy.have >= candy.need };
+  }
+  function setEvoImg(img, id, shiny) {                      // 크고 선명한 공식 그림 (못 받으면 작은 그림)
+    img.classList.remove('pixel');
+    img.onerror = () => { img.onerror = null; img.classList.add('pixel'); img.src = iconUrl(id, shiny); };
+    img.src = githubArtUrl(id, shiny);
+  }
+  const evoConfirm = $('evo-confirm'), evoReq = $('evo-req'), evoGo = $('evo-go');
+  let evoAsk = null;
+  function askEvolve(m, toId) {
+    const from = DEX[m.id], to = DEX[toId], c = evolutionCheck(m, toId);
+    evoAsk = { m, toId };
+    $('evo-q').textContent = `${from.name}${josa(from.name, '을', '를')} ${to.name}${ro(to.name)} 진화시킬까요?`;
+    setEvoImg($('evo-from-img'), m.id, m.shiny);
+    setEvoImg($('evo-to-img'), toId, m.shiny);
+    evoReq.textContent = '';
+    const row = (label, value, ok) => {
+      const d = document.createElement('div');
+      d.className = 'row';
+      const a = document.createElement('span'); a.textContent = label;
+      const b = document.createElement('span'); b.textContent = value;
+      if (ok != null) b.className = ok ? 'ok' : 'no';
+      d.append(a, b);
+      evoReq.appendChild(d);
+    };
+    row('레벨', `Lv.${m.level} / 필요 Lv.${c.needLv} ${c.lvOk ? '✓' : '✗'}`, c.lvOk);
+    if (c.candy.need) row(`${DEX[c.candy.family].name} 사탕 🍬`, `${c.candy.have} / ${c.candy.need} ${c.candyOk ? '✓' : '✗'}`, c.candyOk);
+    row('타입', typeNames(toId));
+    row('전투력', `${combatPower(m.id, m.level)} → ${combatPower(toId, m.level)}`);
+    evoGo.disabled = !c.ok;
+    evoGo.textContent = c.ok ? '✨ 진화시키기' : !c.lvOk ? `Lv.${c.needLv}에 진화할 수 있어요` : '사탕이 모자라요';
+    evoConfirm.hidden = false;
+    evoGo.focus();
+  }
+  $('evo-cancel').addEventListener('click', () => { evoConfirm.hidden = true; evoAsk = null; });
+  evoGo.addEventListener('click', () => {
+    if (!evoAsk || !evolutionCheck(evoAsk.m, evoAsk.toId).ok) return;
+    evoConfirm.hidden = true;
+    const { m, toId } = evoAsk;
+    evoAsk = null;
+    startEvolution(m, toId, sheets.bag);
+  });
+
+  // 진화 화면: ① 원래 모습이 하얗게 빛남 ② 하얀 실루엣이 옛 모습↔새 모습으로 점점 빠르게 바뀜 ③ 빛이 터짐 ④ 새 모습 등장
+  //  (깜빡임은 1초에 3번을 넘지 않게 부드럽게 바뀜 — 빛에 민감한 사람도 안전하게)
+  const evoStage = $('evo-stage'), evoMsg = $('evo-msg'), evoInfo = $('evo-info'), evoStop = $('evo-stop'), evoDone = $('evo-done'), evoFlash = $('evo-flash');
+  const evoImg = { old: $('evo-old'), oldSil: $('evo-old-sil'), neu: $('evo-new'), newSil: $('evo-new-sil') };
+  const evoCanvas = $('evo-sparks'), evoCtx = evoCanvas.getContext('2d');
+  const EVO_T = { glow: 1.8, flash: 6.4, commit: 6.75, reveal: 7.0 };
+  const evo = { on: false, mon: null, fromId: 0, toId: 0, fromBag: false, t: 0, last: 0, stopped: false, committed: false, revealed: false, sparks: [], raf: 0, cpBefore: 0 };
+  const smooth01 = (x) => { const u = THREE.MathUtils.clamp(x, 0, 1); return u * u * (3 - 2 * u); };
+  function startEvolution(m, toId, fromBag) {
+    Object.assign(evo, { on: true, mon: m, fromId: m.id, toId, fromBag: !!fromBag, t: 0, last: performance.now(), stopped: false,
+      committed: false, revealed: false, sparks: [], cpBefore: combatPower(m.id, m.level), notes: [] });
+    if (sheets.bag) { sheets.bag = false; bagEl.hidden = true; }
+    sheets.evo = true;
+    uiLayer.hidden = true;
+    setEvoImg(evoImg.old, m.id, m.shiny); setEvoImg(evoImg.oldSil, m.id, m.shiny);
+    setEvoImg(evoImg.neu, toId, m.shiny); setEvoImg(evoImg.newSil, toId, m.shiny);
+    for (const k in evoImg) { evoImg[k].style.opacity = '0'; evoImg[k].style.transform = ''; }
+    evoFlash.style.opacity = '0';
+    evoStage.classList.remove('rays');
+    evoStage.hidden = false;
+    evoStop.hidden = false;
+    evoDone.hidden = true;
+    evoInfo.textContent = '';
+    const n = DEX[m.id].name;
+    evoMsg.textContent = `어라…? ${n}의 모습이…!`;
+    sizeEvoCanvas();
+    cancelAnimationFrame(evo.raf);
+    evo.raf = requestAnimationFrame(evoFrame);
+  }
+  function sizeEvoCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    evoCanvas.width = Math.round(window.innerWidth * dpr);
+    evoCanvas.height = Math.round(window.innerHeight * dpr);
+    evoCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function evoCenter() {
+    const r = evoImg.old.parentElement.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 2 };
+  }
+  // 반짝이: 처음엔 가운데로 모이고, 바뀌는 동안엔 주위를 돌고, 새 모습이 나오면 사방으로 터짐
+  function evoSpark(kind, c) {
+    const a = Math.random() * Math.PI * 2;
+    if (kind === 'in') {
+      const d = c.r * (1.1 + Math.random() * 0.8);
+      evo.sparks.push({ x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d, vx: -Math.cos(a) * d * 1.1, vy: -Math.sin(a) * d * 1.1, life: 0, max: 0.85, size: 2 + Math.random() * 3, gold: Math.random() < 0.3 });
+    } else if (kind === 'orbit') {
+      const d = c.r * (0.7 + Math.random() * 0.6), w = (Math.random() < 0.5 ? -1 : 1) * (1.4 + Math.random());
+      evo.sparks.push({ orbit: true, cx: c.x, cy: c.y, a, d, w, life: 0, max: 1.2 + Math.random() * 0.8, size: 2 + Math.random() * 3, gold: Math.random() < 0.4 });
+    } else {
+      const sp = c.r * (1.2 + Math.random() * 2.2);
+      evo.sparks.push({ x: c.x, y: c.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 0, max: 0.9 + Math.random() * 0.8, size: 3 + Math.random() * 4, gold: Math.random() < 0.55, star: true });
     }
   }
+  function drawEvoSparks(dt) {
+    const W = window.innerWidth, H = window.innerHeight;
+    evoCtx.clearRect(0, 0, W, H);
+    evoCtx.globalCompositeOperation = 'lighter';
+    for (let i = evo.sparks.length - 1; i >= 0; i--) {
+      const p = evo.sparks[i];
+      p.life += dt;
+      if (p.life >= p.max) { evo.sparks.splice(i, 1); continue; }
+      let x, y;
+      if (p.orbit) { p.a += p.w * dt; x = p.cx + Math.cos(p.a) * p.d; y = p.cy + Math.sin(p.a) * p.d * 0.8; }
+      else { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 1 - 1.5 * dt; p.vy *= 1 - 1.5 * dt; x = p.x; y = p.y; }
+      const u = p.life / p.max, alpha = Math.min(1, u / 0.15) * (1 - u);
+      const r = p.size * (p.star ? 1.6 - u * 0.6 : 1);
+      const g = evoCtx.createRadialGradient(x, y, 0, x, y, r * 3.2);
+      g.addColorStop(0, p.gold ? `rgba(255,236,160,${alpha})` : `rgba(255,255,255,${alpha})`);
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      evoCtx.fillStyle = g;
+      evoCtx.beginPath(); evoCtx.arc(x, y, r * 3.2, 0, Math.PI * 2); evoCtx.fill();
+      if (p.star) {                                        // 4갈래 반짝임
+        evoCtx.strokeStyle = `rgba(255,255,255,${alpha * 0.9})`;
+        evoCtx.lineWidth = 1.2;
+        evoCtx.beginPath(); evoCtx.moveTo(x - r * 3, y); evoCtx.lineTo(x + r * 3, y); evoCtx.moveTo(x, y - r * 3); evoCtx.lineTo(x, y + r * 3); evoCtx.stroke();
+      }
+    }
+    evoCtx.globalCompositeOperation = 'source-over';
+  }
+  function evoFrame(now) {
+    if (!evo.on) return;
+    const dt = Math.min(0.05, Math.max(0, (now - evo.last) / 1000));
+    evo.last = now;
+    evo.t += dt;
+    const t = evo.t, c = evoCenter();
+    let oldA = 0, oldSil = 0, newA = 0, newSil = 0, oldS = 1, newS = 1, flash = 0;
+    if (evo.stopped) {                                       // 멈춤: 원래 모습으로 돌아옴
+      evo.stopT = (evo.stopT || 0) + dt;
+      oldA = 1; oldSil = Math.max(0, 1 - evo.stopT / 0.6);
+    } else if (t < EVO_T.glow) {                             // ① 하얗게 빛나기 시작
+      oldA = 1; oldSil = smooth01((t / EVO_T.glow - 0.35) / 0.65);
+      oldS = 1 + 0.03 * Math.sin(t * 5);
+      if (Math.random() < dt * 40) evoSpark('in', c);
+    } else if (t < EVO_T.flash) {                            // ② 실루엣이 번갈아 바뀜 (초당 0.7번 → 3번)
+      if (!evoStage.classList.contains('rays')) evoStage.classList.add('rays');
+      const D = EVO_T.flash - EVO_T.glow, u = (t - EVO_T.glow) / D;
+      const fast = REDUCED_MOTION ? 1.4 : 3;
+      const phase = D * (0.7 * u + (fast - 0.7) * u * u / 2);
+      const k = Math.floor(phase), f = phase - k, showNew = k % 2 === 1;
+      const a = smooth01(f / 0.4);                           // 바뀔 때 0.4주기 동안 서서히 겹쳐 바뀜
+      newSil = showNew ? a : 1 - a;
+      oldSil = 1 - newSil;
+      oldS = 0.8 + 0.2 * oldSil; newS = 0.8 + 0.2 * newSil;
+      if (Math.random() < dt * 26) evoSpark('orbit', c);
+    } else if (t < EVO_T.reveal) {                           // ③ 빛이 부풀어 화면을 덮음
+      const u = (t - EVO_T.flash) / (EVO_T.reveal - EVO_T.flash);
+      flash = smooth01(u * 1.4) * (REDUCED_MOTION ? 0.6 : 1);
+      newSil = 1; newS = 1 + 0.08 * u;
+      if (!evo.committed && t >= EVO_T.commit) commitEvolution();
+    } else {                                                 // ④ 새 모습
+      if (!evo.committed) commitEvolution();
+      const u = (t - EVO_T.reveal) / 1.2;
+      flash = Math.max(0, 1 - u * 1.8) * (REDUCED_MOTION ? 0.6 : 1);
+      newA = 1; newSil = 1 - smooth01(u);
+      newS = 1 + 0.08 * Math.max(0, 1 - u) + 0.015 * Math.sin(t * 2.4);
+      if (!evo.revealed) revealEvolution(c);
+    }
+    evoImg.old.style.opacity = oldA.toFixed(3);
+    evoImg.oldSil.style.opacity = oldSil.toFixed(3);
+    evoImg.neu.style.opacity = newA.toFixed(3);
+    evoImg.newSil.style.opacity = newSil.toFixed(3);
+    evoImg.old.style.transform = evoImg.oldSil.style.transform = `scale(${oldS.toFixed(3)})`;
+    evoImg.neu.style.transform = evoImg.newSil.style.transform = `scale(${newS.toFixed(3)})`;
+    evoFlash.style.opacity = flash.toFixed(3);
+    drawEvoSparks(dt);
+    evo.raf = requestAnimationFrame(evoFrame);
+  }
+  function commitEvolution() {                               // 되돌릴 수 없는 순간: 여기서 실제로 진화
+    evo.committed = true;
+    evoStop.hidden = true;
+    if (!evolutionCheck(evo.mon, evo.toId).ok) { stopEvolution(true); return; }
+    spendEvolutionCandy(evo.mon);
+    evolveMon(evo.mon, evo.toId);
+    evo.notes = onEvolved(evo.toId, evo.mon);
+  }
+  function revealEvolution(c) {
+    evo.revealed = true;
+    evoStage.classList.remove('rays');
+    for (let i = 0; i < 46; i++) evoSpark('burst', c);
+    const a = DEX[evo.fromId].name, b = DEX[evo.toId].name;
+    evoMsg.textContent = `축하합니다! ${a}${josa(a, '은', '는')} ${b}${ro(b)} 진화했다!`;
+    const chips = document.createElement('div');
+    chips.className = 'tchips';
+    for (const ty of DEX[evo.toId].types) chips.appendChild(typeChip(ty));
+    const cp = document.createElement('div');
+    cp.textContent = `전투력 ${evo.cpBefore} → ${combatPower(evo.toId, evo.mon.level)} · 체력 가득!`;
+    evoInfo.textContent = '';
+    evoInfo.append(chips, cp);
+    for (const note of evo.notes || []) {                     // 🆕 도감 등록 · 도감 보상
+      const d = document.createElement('div');
+      d.className = 'evo-note';
+      d.textContent = note;
+      evoInfo.appendChild(d);
+    }
+    evoDone.textContent = '좋아요!';
+    evoDone.hidden = false;
+    evoDone.focus();
+  }
+  function stopEvolution(silent) {                           // '진화 멈추기' (게임의 B 버튼처럼)
+    if (evo.committed && !silent) return;
+    evo.stopped = true;
+    evo.stopT = 0;
+    evoStage.classList.remove('rays');
+    evoStop.hidden = true;
+    const n = DEX[evo.fromId].name;
+    evoMsg.textContent = silent ? '진화할 수 없어요.' : `어라…? ${n}의 변화가 멈췄다!`;
+    evoInfo.textContent = silent ? '' : '언제든 다시 진화시킬 수 있어요. (사탕은 그대로예요)';
+    evoDone.textContent = '확인';
+    evoDone.hidden = false;
+    evoDone.focus();
+  }
+  function closeEvolution() {
+    if (!evo.on) return;
+    evo.on = false;
+    cancelAnimationFrame(evo.raf);
+    evoStage.hidden = true;
+    sheets.evo = false;
+    if (evo.committed) {
+      const a = DEX[evo.fromId].name, b = DEX[evo.toId].name;
+      logStatus(`축하합니다! ${a}${josa(a, '은', '는')} ${b}${ro(b)} 진화했다!`);
+    }
+    if (evo.fromBag) openBag();
+    else { uiLayer.hidden = false; measureUiBounds(); }
+  }
+  evoStop.addEventListener('click', () => stopEvolution(false));
+  evoDone.addEventListener('click', closeEvolution);
+  window.addEventListener('resize', () => { if (evo.on) sizeEvoCanvas(); });
 
   // ---- 🎒 내 포켓몬 화면
   const bagEl = $('bag'), bagList = $('bag-list'), bagExp = $('bag-exp'), bagCount = $('bag-count');
@@ -3965,28 +5586,51 @@
   function closeBag() {
     sheets.bag = false;
     bagEl.hidden = true;
+    collection.gift = null;                                  // 업데이트 선물 안내는 한 번만
     uiLayer.hidden = false;
     measureUiBounds();
   }
+  // [수정] 카드 한 장: 이름·★희귀도·✨, 타입·전투력, 🍬 사탕과 진화 조건, 지금 상대와의 상성
   function monCard(m) {
     const sp = DEX[m.id], isPartner = m.uid === collection.partnerUid;
     const card = document.createElement('div');
-    card.className = 'mon-card' + (isPartner ? ' partner' : '');
+    card.className = 'mon-card' + (isPartner ? ' partner' : '') + (m.shiny ? ' shiny' : '');
     card.dataset.uid = m.uid;
     const img = document.createElement('img');
-    img.className = 'mon-img'; img.alt = ''; img.loading = 'lazy'; img.src = iconUrl(m.id);
+    img.className = 'mon-img'; img.alt = ''; img.loading = 'lazy'; img.src = iconUrl(m.id, m.shiny);
     img.addEventListener('error', () => { img.style.visibility = 'hidden'; });
     const info = document.createElement('div');
     info.className = 'mon-info';
     const title = document.createElement('div');
     title.className = 'mon-name';
-    title.textContent = `${sp.name} Lv.${m.level}`;
+    title.textContent = `${m.shiny ? '✨ ' : ''}${sp.name} Lv.${m.level}`;
+    const rar = document.createElement('span');
+    rar.className = 'rarity r' + rarityOf(m.id);
+    rar.textContent = stars(rarityOf(m.id));
+    title.appendChild(rar);
     if (isPartner) { const b = document.createElement('span'); b.className = 'mon-badge'; b.textContent = '함께 싸우는 중'; title.appendChild(b); }
     const meta = document.createElement('div');
     meta.className = 'mon-meta';
-    const nextLv = nextEvolutionLevel(m);
-    meta.textContent = `No.${m.id} · ${typeNames(m.id)} · 전투력 ${combatPower(m.id, m.level)}` +
-      (nextLv ? ` · ${m.level >= nextLv ? '진화 가능!' : `Lv.${nextLv}에 진화`}` : ' · 최종 진화');
+    meta.textContent = `No.${m.id} · ${typeNames(m.id)} · 전투력 ${combatPower(m.id, m.level)}`;
+    const grow = document.createElement('div');
+    grow.className = 'mon-grow';
+    const nextLv = nextEvolutionLevel(m), have = candyOf(m.id);
+    let growText = `🍬 ${DEX[familyRoot(m.id)].name} 사탕 ${have}개`;
+    if (!nextLv) growText += ' · 최종 진화';
+    else {
+      const need = evolutionCandyNeed(m.id), lvOk = m.level >= nextLv, cOk = have >= need;
+      growText += lvOk && cOk ? ' · ✨ 진화 가능!' : ` · 진화: Lv.${nextLv}${lvOk ? ' ✓' : ''} + 🍬${need}${cOk ? ' ✓' : ''}`;
+    }
+    grow.textContent = growText;
+    info.append(title, meta, grow);
+    const w = currentPokemon && DEX[currentPokemon.id] && pokemonMesh.visible ? currentPokemon.id : 0;
+    if (w) {                                                 // 지금 상대에게 유리한지 (파트너 고를 때 참고)
+      const mu = matchup(m.id, w);
+      const vs = document.createElement('div');
+      vs.className = 'mon-vs ' + mu.cls;
+      vs.textContent = `vs ${DEX[w].name} ${mu.label} · 내 기술 ×${fmtMult(mu.off)} · 상대 ×${fmtMult(mu.def)}`;
+      info.appendChild(vs);
+    }
     const actions = document.createElement('div');
     actions.className = 'mon-actions';
     const btn = (act, text, cls, disabled) => {
@@ -3997,15 +5641,45 @@
     };
     if (!isPartner) btn('partner', '함께 싸우기');
     if (m.level < 100) btn('up', `⬆ 강화 (경험치 ${levelUpCost(m.level).toLocaleString()})`, 'mbtn-up', !canUpgrade(m));
-    if (evolutionOptions(m).length) btn('evo', '✨ 진화', 'mbtn-evo');
+    const opts = evolutionOptions(m);
+    if (opts.length) {                                       // 레벨이 되면 버튼이 보이고, 사탕이 모자라면 흐리게 (눌러서 확인 가능)
+      const ok = canEvolveNow(m), need = evolutionCandyNeed(m.id);
+      btn('evo', ok ? '✨ 진화' : `✨ 진화 (🍬${have}/${need})`, 'mbtn-evo' + (ok ? '' : ' dim'));
+    }
     if (!isPartner) btn('del', '놓아주기', 'mbtn-del');
-    info.append(title, meta, actions);
+    info.appendChild(actions);
     card.append(img, info);
     return card;
+  }
+  // 정렬: 최근 · 전투력 · 지금 상대에게 유리한 순 · 도감 번호 (파트너는 늘 맨 위)
+  let bagSort = storageGet('arBattle.bagSort') || 'recent';
+  const bagSortEl = $('bag-sort');
+  function sortScore(m) {
+    if (bagSort === 'cp') return combatPower(m.id, m.level);
+    if (bagSort === 'dex') return -m.id * 1000 + m.level;
+    if (bagSort === 'match') {
+      const w = DEX[currentPokemon.id] ? currentPokemon.id : 0;
+      if (!w) return combatPower(m.id, m.level);
+      const mu = matchup(m.id, w);
+      return (mu.off === 0 ? 0 : mu.off / Math.max(0.25, mu.def)) * 1e5 + combatPower(m.id, m.level);
+    }
+    return m.caughtAt;
   }
   function renderBag() {
     bagExp.textContent = collection.exp.toLocaleString();
     bagCount.textContent = `(${collection.mons.length}마리)`;
+    const dexN = $('bag-dex'), gb = $('bag-great'), ub = $('bag-ultra');
+    if (dexN) dexN.textContent = String(dexCount(DEX_CAUGHT));
+    if (gb) gb.textContent = String(collection.balls.great);
+    if (ub) ub.textContent = String(collection.balls.ultra);
+    if (bagSortEl) for (const b of bagSortEl.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.sort === bagSort));
+    const tip = $('bag-tip');
+    if (tip) {
+      const r = nextDexReward();
+      tip.textContent = collection.gift
+        ? `🎁 업데이트 선물: 슈퍼볼 3 · 하이퍼볼 1 · 갖고 있던 ${collection.gift.fams}계열 사탕을 받았어요!`
+        : r ? `다음 도감 보상: ${r.n}종 → ${rewardText(r)} (앞으로 ${r.n - dexCount(DEX_CAUGHT)}종)` : '도감 보상을 모두 받았어요!';
+    }
     bagList.textContent = '';
     if (!collection.mons.length) {
       const p = document.createElement('p');
@@ -4015,8 +5689,105 @@
       return;
     }
     const list = collection.mons.slice().sort((a, b) =>
-      (b.uid === collection.partnerUid) - (a.uid === collection.partnerUid) || b.caughtAt - a.caughtAt);
+      (b.uid === collection.partnerUid) - (a.uid === collection.partnerUid) || sortScore(b) - sortScore(a) || b.caughtAt - a.caughtAt);
     for (const m of list) bagList.appendChild(monCard(m));
+  }
+  if (bagSortEl) bagSortEl.addEventListener('click', (ev) => {
+    const b = ev.target.closest('button[data-sort]');
+    if (!b) return;
+    bagSort = b.dataset.sort;
+    storageSet('arBattle.bagSort', bagSort);
+    renderBag();
+    bagList.scrollTop = 0;
+  });
+
+  // ---- [추가] 📖 도감: 세대별로 본 포켓몬(실루엣)·잡은 포켓몬(그림)·✨ 표시, 완성률과 다음 보상
+  const dexEl = $('dex'), dexGrid = $('dex-grid'), dexGens = $('dex-gens'), dexSummary = $('dex-summary'), dexNext = $('dex-next');
+  const GENS = (() => { const g = []; for (let i = 1; i <= DEX_MAX; i++) { const n = DEX[i].gen; if (!g[n - 1]) g[n - 1] = [i, i]; g[n - 1][1] = i; } return g.filter(Boolean); })();
+  let dexGen = 0;
+  function openDex() {
+    if (!dexEl) return;
+    sheets.dex = true;
+    dexEl.hidden = false;
+    renderDex();
+  }
+  function closeDex() {
+    sheets.dex = false;
+    if (dexEl) dexEl.hidden = true;
+    if (sheets.bag) renderBag();
+  }
+  function renderDex() {
+    const caught = dexCount(DEX_CAUGHT), seen = dexCount(DEX_SEEN), shinies = dexCount(DEX_SHINY);
+    dexSummary.textContent = '';
+    const big = document.createElement('div');
+    big.className = 'dex-big';
+    big.textContent = `${caught}`;
+    const small = document.createElement('span');
+    small.textContent = ` / ${DEX_MAX} 잡음 · 완성 ${(caught / DEX_MAX * 100).toFixed(1)}%`;
+    big.appendChild(small);
+    const bar = document.createElement('div');
+    bar.className = 'dex-bar';
+    const fill = document.createElement('div');
+    fill.style.width = `${Math.max(caught ? 1 : 0, caught / DEX_MAX * 100)}%`;
+    bar.appendChild(fill);
+    const sub = document.createElement('div');
+    sub.className = 'dex-sub';
+    sub.textContent = `본 포켓몬 ${seen} · ✨ 색이 다른 포켓몬 ${shinies}`;
+    dexSummary.append(big, bar, sub);
+    const r = nextDexReward();
+    dexNext.textContent = r ? `🎁 다음 보상: ${r.n}종 → ${rewardText(r)} (앞으로 ${r.n - caught}종)` : '🏆 도감 보상을 모두 받았어요!';
+    dexGens.textContent = '';
+    GENS.forEach(([a, b], i) => {
+      const t = document.createElement('button');
+      t.type = 'button';
+      t.className = 'dex-gen' + (i === dexGen ? ' on' : '');
+      t.dataset.gen = String(i);
+      t.setAttribute('aria-pressed', String(i === dexGen));
+      const c = dexCount(DEX_CAUGHT, a, b);
+      t.textContent = `${i + 1}세대 ${c}/${b - a + 1}`;
+      if (c === b - a + 1) t.classList.add('done');
+      dexGens.appendChild(t);
+    });
+    dexGrid.textContent = '';
+    const [a, b] = GENS[dexGen];
+    const frag = document.createDocumentFragment();
+    for (let id = a; id <= b; id++) {
+      const st = dexState(id);
+      const cell = document.createElement('div');
+      cell.className = 'dex-cell s' + st;
+      const no = document.createElement('small');
+      no.textContent = `No.${id}`;
+      cell.appendChild(no);
+      if (st > 0) {
+        const im = document.createElement('img');
+        im.alt = ''; im.loading = 'lazy'; im.src = iconUrl(id, st === DEX_SHINY);
+        im.addEventListener('error', () => { im.style.visibility = 'hidden'; });
+        cell.appendChild(im);
+      } else {
+        const q = document.createElement('div');
+        q.className = 'dex-q';
+        q.textContent = '?';
+        cell.appendChild(q);
+      }
+      const nm = document.createElement('span');
+      nm.textContent = st > 0 ? DEX[id].name : '???';
+      cell.appendChild(nm);
+      if (st === DEX_SHINY) { const sh = document.createElement('i'); sh.textContent = '✨'; cell.appendChild(sh); }
+      cell.title = st >= DEX_CAUGHT ? `${DEX[id].name} · ${typeNames(id)} · ${stars(rarityOf(id))}` : st ? `${DEX[id].name} (본 적 있음)` : '아직 못 본 포켓몬';
+      frag.appendChild(cell);
+    }
+    dexGrid.appendChild(frag);
+    dexGrid.scrollTop = 0;
+  }
+  if (dexGens) dexGens.addEventListener('click', (ev) => {
+    const t = ev.target.closest('button[data-gen]');
+    if (!t) return;
+    dexGen = +t.dataset.gen;
+    renderDex();
+  });
+  if (dexEl) {
+    $('btn-dex').addEventListener('click', openDex);
+    $('btn-dex-close').addEventListener('click', closeDex);
   }
   function setPartnerFromBag(m) {
     collection.partnerUid = m.uid;
@@ -4049,11 +5820,6 @@
     }
     card.querySelector('.mon-info').appendChild(box);
   }
-  function doEvolve(m, toId) {
-    const isPartner = partner.mon === m;
-    evolveMon(m, toId);
-    if (isPartner) closeBag(); else renderBag();          // 파트너는 화면에서 진화하는 모습을 보여 줌
-  }
   bagList.addEventListener('click', (ev) => {
     const b = ev.target.closest('button[data-act]');
     if (!b) return;
@@ -4063,17 +5829,18 @@
     const act = b.dataset.act;
     if (act === 'partner') setPartnerFromBag(m);
     else if (act === 'up') powerUp(m);
-    else if (act === 'evo') { const opts = evolutionOptions(m); if (opts.length === 1) doEvolve(m, opts[0].to); else showEvolutionChoices(card, m); }
-    else if (act === 'evo-to') doEvolve(m, +b.dataset.to);
+    else if (act === 'evo') { const opts = evolutionOptions(m); if (opts.length === 1) askEvolve(m, opts[0].to); else showEvolutionChoices(card, m); }
+    else if (act === 'evo-to') askEvolve(m, +b.dataset.to);
     else if (act === 'del') {
       if (!b.classList.contains('armed')) {               // 한 번 더 눌러야 놓아줌 (실수 방지)
         b.classList.add('armed');
-        b.textContent = `정말요? (경험치 +${releaseExp(m.level)})`;
+        b.textContent = `정말요? (경험치 +${releaseExp(m.level)} · 🍬+1)`;
         setTimeout(() => { if (b.isConnected) { b.classList.remove('armed'); b.textContent = '놓아주기'; } }, 3000);
         return;
       }
       collection.mons = collection.mons.filter((x) => x !== m);
       collection.exp += releaseExp(m.level);
+      addCandy(m.id, 1);                                    // [추가] 놓아주면 그 계열 사탕 1개
       saveCollection();
       renderBag();
     }
@@ -4226,6 +5993,27 @@
     spawnPokemon(randomWild(), { fromWalk: true, fled });
     try { if (navigator.vibrate) navigator.vibrate([60, 40, 120]); } catch (_) {}
     updateWalkPill();
+    walkRewards();
+  }
+  // [추가] 걸으면 얻는 것: 파트너와 120m마다 파트너 사탕 1개, 가끔 길에서 좋은 볼을 주움
+  const WALK_CANDY_M = 120;
+  function walkRewards() {
+    const notes = [], p = partnerMon();
+    if (p) {
+      collection.walkCandy += ENCOUNTER_DIST;
+      if (collection.walkCandy >= WALK_CANDY_M) {
+        collection.walkCandy -= WALK_CANDY_M;
+        addCandy(p.id, 1);
+        const n = DEX[p.id].name;
+        notes.push(`🍬 ${n}${josa(n, '과', '와')} 걸어서 사탕 +1`);
+      }
+    }
+    const r = Math.random();
+    if (r < 0.05) { collection.balls.ultra++; notes.push('🟡 하이퍼볼을 주웠어요!'); }
+    else if (r < 0.3) { collection.balls.great++; notes.push('🔵 슈퍼볼을 주웠어요!'); }
+    saveCollection();
+    if (notes.length) { updateBallPick(); notes.forEach((t, i) => setTimeout(() => showToast(t), 1500 + i * 1100)); }
+    return notes;
   }
   function updateWalk(now) {
     if (now < walk.checkAt) return;
@@ -4889,6 +6677,7 @@
       frameNo++;
       const now = performance.now();
       fitCameraFov();
+      updateSceneLight(now, dt);
       updateCameraOrientation();
       if (!uiPaused()) { // 카드 스캔·가방 화면이 열려 있는 동안엔 전투·사물 인식을 잠시 멈춤
         if (isArMode() && DETECTOR.state === 'off') ensureDetector();
@@ -4903,9 +6692,12 @@
       updateHandBall(dt);
       updateRing(dt);
       updateEffects(dt);
+      if (!uiPaused()) updateShinyTwinkle(now);
+      updateFx(dt);
+      updateMatchupUI();
       updateIndicator();
       updatePartnerTag();
-      if (!scanner.open) {
+      if (!scanner.open && !sheets.evo) {                     // 진화 화면(전체 화면)이 덮고 있으면 3D는 쉼
         renderer.clear();
         renderer.render(scene, camera);
         if (handBall.visible) { renderer.clearDepth(); renderer.render(overlayScene, camera); } // 손에 든 공은 맨 앞에
@@ -4936,6 +6728,7 @@
   // 시작
   loadCards();
   loadCollection();
+  updateBallPick();
   populateRegSelect();
   measureUiBounds();
   updateGyroButton();
